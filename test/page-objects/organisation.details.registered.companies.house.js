@@ -1,12 +1,12 @@
 import { Page } from 'page-objects/page'
 
 class OrganisationDetailsRegisteredCompaniesHousePage extends Page {
-  yes() {
-    $('#hNTczg').click()
+  async yes() {
+    await $('#hNTczg').click()
   }
 
-  no() {
-    $('#hNTczg-2').click()
+  async no() {
+    await $('#hNTczg-2').click()
   }
 }
 

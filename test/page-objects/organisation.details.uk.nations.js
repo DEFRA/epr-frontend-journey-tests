@@ -1,20 +1,20 @@
 import { Page } from 'page-objects/page'
 
 class OrganisationDetailsUKNationsPage extends Page {
-  england() {
-    $('#VcdRNr').click()
+  async england() {
+    await $('#VcdRNr').click()
   }
 
-  scotland() {
-    $('#VcdRNr-2').click()
+  async scotland() {
+    await $('#VcdRNr-2').click()
   }
 
-  wales() {
-    $('#VcdRNr-3').click()
+  async wales() {
+    await $('#VcdRNr-3').click()
   }
 
-  northernIreland() {
-    $('#VcdRNr-4').click()
+  async northernIreland() {
+    await $('#VcdRNr-4').click()
   }
 }
 

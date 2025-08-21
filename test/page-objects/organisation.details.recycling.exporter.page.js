@@ -1,20 +1,20 @@
 import { Page } from 'page-objects/page'
 
 class OrganisationDetailsRecyclingExporterPage extends Page {
-  reprocessor() {
-    $('#WVADkQ').click()
+  async reprocessor() {
+    await $('#WVADkQ').click()
   }
 
-  exporter() {
-    $('#WVADkQ-2').click()
+  async exporter() {
+    await $('#WVADkQ-2').click()
   }
 
-  reprocessorAndExporter() {
-    $('#WVADkQ-3').click()
+  async reprocessorAndExporter() {
+    await $('#WVADkQ-3').click()
   }
 
-  noneOfAbove() {
-    $('#WVADkQ-4').click()
+  async noneOfAbove() {
+    await $('#WVADkQ-4').click()
   }
 }
 
