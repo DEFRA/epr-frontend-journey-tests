@@ -1,16 +1,16 @@
 import { Page } from 'page-objects/page'
 
 class OrganisationDetailsPartnershipPage extends Page {
-  yesLimited() {
-    $('#hnwFjT').click()
+  async yesLimited() {
+    await $('#hnwFjT').click()
   }
 
-  yesLimitedLiability() {
-    $('#hnwFjT-2').click()
+  async yesLimitedLiability() {
+    await $('#hnwFjT-2').click()
   }
 
-  no() {
-    $('#hnwFjT-3').click()
+  async no() {
+    await $('#hnwFjT-3').click()
   }
 }
 

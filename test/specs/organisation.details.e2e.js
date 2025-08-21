@@ -77,8 +77,6 @@ describe('Organisation details form', () => {
       'Exporter'
     )
 
-    // eslint-disable-next-line wdio/no-pause
-    await browser.pause(50)
     await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await expect(browser).toHaveTitle(
@@ -104,8 +102,6 @@ describe('Organisation details form', () => {
         postcode: 'SW5 9PN'
       }
     )
-    // eslint-disable-next-line wdio/no-pause
-    await browser.pause(50)
     await OrganisationDetailsCompaniesHouseDetailsPage.continue()
 
     await expect(browser).toHaveTitle(
@@ -145,8 +141,6 @@ describe('Organisation details form', () => {
       'Reprocessor'
     )
 
-    // eslint-disable-next-line wdio/no-pause
-    await browser.pause(50)
     await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await expect(browser).toHaveTitle(
@@ -180,8 +174,6 @@ describe('Organisation details form', () => {
         postcode: 'SW5 9PN'
       }
     )
-    // eslint-disable-next-line wdio/no-pause
-    await browser.pause(50)
     await OrganisationDetailsCompaniesHouseDetailsPage.continue()
 
     await expect(browser).toHaveTitle(

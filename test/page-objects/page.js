@@ -10,7 +10,9 @@ class Page {
   }
 
   continue() {
-    $('#main-content div.govuk-button-group > button').click()
+    const continueButton = $('#main-content div.govuk-button-group > button')
+    continueButton.waitForClickable({ timeout: 3000 })
+    continueButton.click()
   }
 }
 
