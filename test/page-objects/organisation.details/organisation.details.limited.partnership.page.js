@@ -2,15 +2,15 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsLimitedPartnershipPage extends Page {
   async enterPartnerName(partnerName) {
-    await $('#RXPSft').setValue(partnerName)
+    await super.textInputElement(1).setValue(partnerName)
   }
 
   async companyPartner() {
-    await $('#PEWtSm').click()
+    await super.radioInputElement(1).click()
   }
 
   async individualPartner() {
-    await $('#PEWtSm-2').click()
+    await super.radioInputElement(2).click()
   }
 }
 

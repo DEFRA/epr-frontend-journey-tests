@@ -2,11 +2,11 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsRegisteredCompaniesHousePage extends Page {
   async yes() {
-    await $('#hNTczg').click()
+    await super.radioInputElement(1).click()
   }
 
   async no() {
-    await $('#hNTczg-2').click()
+    await super.radioInputElement(2).click()
   }
 }
 

@@ -2,15 +2,15 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsPartnershipPage extends Page {
   async yesLimited() {
-    await $('#hnwFjT').click()
+    await super.radioInputElement(1).click()
   }
 
   async yesLimitedLiability() {
-    await $('#hnwFjT-2').click()
+    await super.radioInputElement(2).click()
   }
 
   async no() {
-    await $('#hnwFjT-3').click()
+    await super.radioInputElement(3).click()
   }
 }
 

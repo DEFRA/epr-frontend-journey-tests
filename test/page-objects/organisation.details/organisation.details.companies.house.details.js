@@ -2,14 +2,25 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsCompaniesHouseDetailsPage extends Page {
   async enterDetails(companyDetails) {
-    await $('#RUKDyH').setValue(companyDetails.companyName)
-    await $('#XcvvZV').setValue(companyDetails.businessTradingName)
-    await $('#VZLTnn').setValue(companyDetails.regNo)
-    await $('#GNVlAd__addressLine1').setValue(companyDetails.address.line1)
-    await $('#GNVlAd__addressLine2').setValue(companyDetails.address.line2)
-    await $('#GNVlAd__town').setValue(companyDetails.address.town)
-    await $('#GNVlAd__county').setValue(companyDetails.address.county)
-    await $('#GNVlAd__postcode').setValue(companyDetails.address.postcode)
+    await super.textInputElement(1).setValue(companyDetails.companyName)
+    await super.textInputElement(2).setValue(companyDetails.businessTradingName)
+    await super.textInputElement(3).setValue(companyDetails.regNo)
+    await super
+      .fieldsetTextInputElement(1)
+      .setValue(companyDetails.address.line1)
+    await super
+      .fieldsetTextInputElement(2)
+      .setValue(companyDetails.address.line2)
+    // await $('#GNVlAd__addressLine2').setValue(companyDetails.address.line2)
+    await super
+      .fieldsetTextInputElement(3)
+      .setValue(companyDetails.address.town)
+    await super
+      .fieldsetTextInputElement(4)
+      .setValue(companyDetails.address.county)
+    await super
+      .fieldsetTextInputElement(5)
+      .setValue(companyDetails.address.postcode)
   }
 }
 
