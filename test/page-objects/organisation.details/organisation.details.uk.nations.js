@@ -1,4 +1,4 @@
-import { Page } from 'page-objects/page'
+import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsUKNationsPage extends Page {
   async england() {

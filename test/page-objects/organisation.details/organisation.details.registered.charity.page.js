@@ -1,4 +1,4 @@
-import { Page } from 'page-objects/page'
+import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsRegisteredCharityPage extends Page {
   async yes() {
