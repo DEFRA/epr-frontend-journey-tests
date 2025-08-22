@@ -8,10 +8,8 @@ import OrganisationDetailsUKNationsPage from 'page-objects/organisation.details/
 import OrganisationDetailsRegisteredCompaniesHousePage from 'page-objects/organisation.details/organisation.details.registered.companies.house.js'
 import OrganisationDetailsCompaniesHouseDetailsPage from 'page-objects/organisation.details/organisation.details.companies.house.details.js'
 import OrganisationDetailsPartnershipPage from 'page-objects/organisation.details/organisation.details.partnership.page.js'
-import OrganisationDetailsLimitedPartnershipPage
-  from 'page-objects/organisation.details/organisation.details.limited.partnership.page.js'
-import OrganisationDetailsAddMorePartnersPage
-  from 'page-objects/organisation.details/organisation.details.add.more.partners.page.js'
+import OrganisationDetailsLimitedPartnershipPage from 'page-objects/organisation.details/organisation.details.limited.partnership.page.js'
+import OrganisationDetailsAddMorePartnersPage from 'page-objects/organisation.details/organisation.details.add.more.partners.page.js'
 
 const whoIsCompleting = {
   fullName: 'Joe Bloggs',
