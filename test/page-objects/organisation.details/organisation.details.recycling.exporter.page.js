@@ -2,19 +2,19 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsRecyclingExporterPage extends Page {
   async reprocessor() {
-    await $('#WVADkQ').click()
+    await super.radioInputElement(1).click()
   }
 
   async exporter() {
-    await $('#WVADkQ-2').click()
+    await super.radioInputElement(2).click()
   }
 
   async reprocessorAndExporter() {
-    await $('#WVADkQ-3').click()
+    await super.radioInputElement(3).click()
   }
 
   async noneOfAbove() {
-    await $('#WVADkQ-4').click()
+    await super.radioInputElement(4).click()
   }
 }
 

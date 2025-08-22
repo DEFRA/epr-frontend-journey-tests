@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class OrganisationDetailsRegisteredCharityPage extends Page {
+class RegistrationReprocessorOrganisationIdPage extends Page {
   async yes() {
     await super.radioInputElement(1).click()
   }
@@ -10,4 +10,4 @@ class OrganisationDetailsRegisteredCharityPage extends Page {
   }
 }
 
-export default new OrganisationDetailsRegisteredCharityPage()
+export default new RegistrationReprocessorOrganisationIdPage()

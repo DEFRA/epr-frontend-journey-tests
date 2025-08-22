@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class OrganisationDetailsWhoIsCompletingPage extends Page {
+class RegistrationReprocessorApplicationContactDetailsPage extends Page {
   async enterDetails(formDetail) {
     await super.textInputElement(1).setValue(formDetail.fullName)
     await super.textInputElement(2).setValue(formDetail.email)
@@ -9,4 +9,4 @@ class OrganisationDetailsWhoIsCompletingPage extends Page {
   }
 }
 
-export default new OrganisationDetailsWhoIsCompletingPage()
+export default new RegistrationReprocessorApplicationContactDetailsPage()

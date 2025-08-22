@@ -14,6 +14,26 @@ class Page {
     continueButton.waitForClickable({ timeout: 3000 })
     continueButton.click()
   }
+
+  fieldsetTextInputElement(index) {
+    return $(
+      `#main-content fieldset.govuk-fieldset div.govuk-form-group:nth-of-type(${index}) input`
+    )
+  }
+
+  textInputElement(index) {
+    return $(`#main-content div.govuk-form-group:nth-of-type(${index}) input`)
+  }
+
+  radioInputElement(index) {
+    return $(`#main-content div.govuk-radios__item:nth-of-type(${index}) input`)
+  }
+
+  checkboxInputElement(index) {
+    return $(
+      `#main-content div.govuk-checkboxes__item:nth-of-type(${index}) input`
+    )
+  }
 }
 
 export { Page }
