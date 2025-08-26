@@ -11,7 +11,6 @@ class OrganisationDetailsCompaniesHouseDetailsPage extends Page {
     await super
       .fieldsetTextInputElement(2)
       .setValue(companyDetails.address.line2)
-    // await $('#GNVlAd__addressLine2').setValue(companyDetails.address.line2)
     await super
       .fieldsetTextInputElement(3)
       .setValue(companyDetails.address.town)
