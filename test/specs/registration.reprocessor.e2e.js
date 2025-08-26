@@ -153,7 +153,5 @@ describe('Registration as Reprocessor form', () => {
       applicationContactDetails
     )
     await RegistrationReprocessorYourContactDetailsPage.continue()
-
-    await browser.pause(3000000)
   })
 })
