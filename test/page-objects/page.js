@@ -29,6 +29,12 @@ class Page {
     return $(`#main-content div.govuk-radios__item:nth-of-type(${index}) input`)
   }
 
+  textAreaElement(index) {
+    return $(
+      `#main-content div.govuk-form-group:nth-of-type(${index}) textarea`
+    )
+  }
+
   checkboxInputElement(index) {
     return $(
       `#main-content div.govuk-checkboxes__item:nth-of-type(${index}) input`
