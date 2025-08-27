@@ -1,10 +1,10 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorOrganisationDetailsPage extends Page {
+class AccreditationReprocessorOrganisationDetailsPage extends Page {
   async enterDetails(orgId, referenceNumber) {
     await super.textInputElement(1).setValue(orgId)
     await super.textInputElement(2).setValue(referenceNumber)
   }
 }
 
-export default new RegistrationReprocessorOrganisationDetailsPage()
+export default new AccreditationReprocessorOrganisationDetailsPage()
