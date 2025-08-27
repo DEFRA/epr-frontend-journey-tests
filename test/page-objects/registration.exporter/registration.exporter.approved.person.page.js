@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorApprovedPersonPage extends Page {
+class RegistrationExporterApprovedPersonPage extends Page {
   async details(approvedPerson) {
     await $(
       '#main-content > div > div > form > div:nth-child(3) > input'
@@ -30,4 +30,4 @@ class RegistrationReprocessorApprovedPersonPage extends Page {
   }
 }
 
-export default new RegistrationReprocessorApprovedPersonPage()
+export default new RegistrationExporterApprovedPersonPage()

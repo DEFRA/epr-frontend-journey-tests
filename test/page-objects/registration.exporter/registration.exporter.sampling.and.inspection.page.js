@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorSamplingAndInspectionPage extends Page {
+class RegistrationExporterSamplingAndInspectionPage extends Page {
   async uploadFile(filePath) {
     const remoteFilePath = await browser.uploadFile(filePath)
     await $(
@@ -21,10 +21,11 @@ class RegistrationReprocessorSamplingAndInspectionPage extends Page {
   }
 
   async waitForContinueButton() {
+    // #uploadedFilesContainer > dl > div > dd.govuk-summary-list__value > strong
     await $('#main-content div.govuk-button-group > button').waitForEnabled({
       timeout: 10000
     })
   }
 }
 
-export default new RegistrationReprocessorSamplingAndInspectionPage()
+export default new RegistrationExporterSamplingAndInspectionPage()

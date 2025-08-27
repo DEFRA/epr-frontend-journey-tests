@@ -1,7 +1,7 @@
 import { Page } from 'page-objects/page.js'
 import { $ } from '@wdio/globals'
 
-class RegistrationReprocessorProductsRecycling2024SummaryPage extends Page {
+class RegistrationExporterUKPortsSummaryPage extends Page {
   async continue() {
     const continueButton = $(
       '#main-content > div > div > div.govuk-button-group > form > button:nth-child(2)'
@@ -11,4 +11,4 @@ class RegistrationReprocessorProductsRecycling2024SummaryPage extends Page {
   }
 }
 
-export default new RegistrationReprocessorProductsRecycling2024SummaryPage()
+export default new RegistrationExporterUKPortsSummaryPage()
