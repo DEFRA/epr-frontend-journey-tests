@@ -2,8 +2,12 @@ import { Page } from 'page-objects/page.js'
 
 class RegistrationReprocessorRawInputs2024Page extends Page {
   async enterDetails(rawMaterial, tonnage) {
-    await super.textInputElement(1).setValue(rawMaterial)
-    await super.textInputElement(2).setValue(tonnage)
+    await $(
+      '#main-content > div > div > form > div:nth-child(3) > input'
+    ).setValue(rawMaterial)
+    await $(
+      '#main-content > div > div > form > div:nth-child(4) > div.govuk-input__wrapper > input'
+    ).setValue(tonnage)
   }
 }
 

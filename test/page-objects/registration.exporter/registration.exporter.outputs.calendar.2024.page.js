@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorOutputsCalendar2024Page extends Page {
+class RegistrationExporterOutputsCalendar2024Page extends Page {
   async actualFigures() {
     await super.radioInputElement(1).click()
   }
@@ -22,4 +22,4 @@ class RegistrationReprocessorOutputsCalendar2024Page extends Page {
   }
 }
 
-export default new RegistrationReprocessorOutputsCalendar2024Page()
+export default new RegistrationExporterOutputsCalendar2024Page()

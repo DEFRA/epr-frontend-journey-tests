@@ -27,7 +27,7 @@ const applicationContactDetails = {
   fullName: 'Joe Bloggs',
   email: 'joebloggs@test.com',
   telephone: '07777 123456',
-  jobTitle: 'Exporter'
+  jobTitle: 'Reprocessor'
 }
 
 const address = {
@@ -142,7 +142,10 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorKeyPlantAndEquipmentPage.details('Equipment')
     await RegistrationReprocessorKeyPlantAndEquipmentPage.continue()
 
-    await RegistrationReprocessorSamplingAndInspectionPage.uploadFile() // TODO: Fix this
+    await RegistrationReprocessorSamplingAndInspectionPage.uploadFile(
+      'Reprocessor_Registration_SIP.doc'
+    )
+    await RegistrationReprocessorSamplingAndInspectionPage.waitForContinueButton()
     await RegistrationReprocessorSamplingAndInspectionPage.continue()
 
     await RegistrationReprocessorApprovedPersonPage.details(approvedPerson)

@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorYourContactDetailsPage extends Page {
+class RegistrationExporterYourContactDetailsPage extends Page {
   async enterDetails(formDetail) {
     await $(
       '#main-content > div > div > form > div:nth-child(2) > input'
@@ -17,4 +17,4 @@ class RegistrationReprocessorYourContactDetailsPage extends Page {
   }
 }
 
-export default new RegistrationReprocessorYourContactDetailsPage()
+export default new RegistrationExporterYourContactDetailsPage()

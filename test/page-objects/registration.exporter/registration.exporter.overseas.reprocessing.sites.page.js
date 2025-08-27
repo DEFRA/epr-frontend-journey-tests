@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorSamplingAndInspectionPage extends Page {
+class RegistrationExporterOverseasReprocessingSitesPage extends Page {
   async uploadFile(filePath) {
     const remoteFilePath = await browser.uploadFile(filePath)
     await $(
@@ -27,4 +27,4 @@ class RegistrationReprocessorSamplingAndInspectionPage extends Page {
   }
 }
 
-export default new RegistrationReprocessorSamplingAndInspectionPage()
+export default new RegistrationExporterOverseasReprocessingSitesPage()
