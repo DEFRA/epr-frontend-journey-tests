@@ -1,4 +1,17 @@
-import { expect } from '@wdio/globals'
+import { browser, expect } from '@wdio/globals'
+import {
+  orgId,
+  referenceNumber,
+  address,
+  regNumber,
+  applicationContactDetails,
+  approvedPerson,
+  SIPFile,
+  ORSLogFile,
+  wasteFromText,
+  permitNumber,
+  UKPort
+} from '../support/form.values.js'
 
 import RegistrationExporterHomePage from 'page-objects/registration.exporter/registration.exporter.home.page.js'
 import RegistrationExporterOrganisationIdPage from 'page-objects/registration.exporter/registration.exporter.organisation.id.page.js'
@@ -16,27 +29,6 @@ import RegistrationExporterWhatAddressRegulatorServesToPage from 'page-objects/r
 import RegistrationExporterOverseasReprocessingSitesPage from 'page-objects/registration.exporter/registration.exporter.overseas.reprocessing.sites.page.js'
 import RegistrationExporterUKPortsPage from 'page-objects/registration.exporter/registration.exporter.uk.ports.page.js'
 import RegistrationExporterUKPortsSummaryPage from 'page-objects/registration.exporter/registration.exporter.uk.ports.summary.page.js'
-
-const applicationContactDetails = {
-  fullName: 'Joe Bloggs',
-  email: 'joebloggs@test.com',
-  telephone: '07777 123456',
-  jobTitle: 'Exporter'
-}
-
-const address = {
-  line1: 'Rubbish Removals Limited',
-  line2: '',
-  town: 'Earls Court',
-  county: 'London',
-  postcode: 'SW5 9PN'
-}
-
-const approvedPerson = {
-  name: 'Joe Bloggs',
-  email: 'exporter@approval.com',
-  telephone: '07777 689789'
-}
 
 describe('Registration as Exporter form', () => {
   it('Should not be able to register if there is no Organisation ID', async () => {
@@ -59,8 +51,8 @@ describe('Registration as Exporter form', () => {
     await RegistrationExporterOrganisationIdPage.continue()
 
     await RegistrationExporterOrganisationDetailsPage.enterDetails(
-      '123456',
-      '123ab456789cd01e23fabc45'
+      orgId,
+      referenceNumber
     )
     await RegistrationExporterOrganisationDetailsPage.continue()
 
@@ -74,34 +66,32 @@ describe('Registration as Exporter form', () => {
     )
     await RegistrationExporterWhatAddressRegulatorServesToPage.continue()
 
-    await RegistrationExporterWasteCarrierNumberPage.regNumber('CBDU123456')
+    await RegistrationExporterWasteCarrierNumberPage.regNumber(regNumber)
     await RegistrationExporterWasteCarrierNumberPage.continue()
 
     await RegistrationExporterWhatPermitPage.environmental()
     await RegistrationExporterWhatPermitPage.continue()
 
-    await RegistrationExporterLicenceDetailsPage.permit('123456')
+    await RegistrationExporterLicenceDetailsPage.permit(permitNumber)
     await RegistrationExporterLicenceDetailsPage.continue()
 
     await RegistrationExporterWasteCategoryPage.aluminium()
     await RegistrationExporterWasteCategoryPage.continue()
 
-    await RegistrationExporterWasteFromPage.details('Local council collections')
+    await RegistrationExporterWasteFromPage.details(wasteFromText)
     await RegistrationExporterWasteFromPage.continue()
 
-    await RegistrationExporterUKPortsPage.enter('Portsmouth')
+    await RegistrationExporterUKPortsPage.enter(UKPort)
     await RegistrationExporterUKPortsPage.continue()
 
     await RegistrationExporterUKPortsSummaryPage.continue()
 
-    await RegistrationExporterSamplingAndInspectionPage.uploadFile(
-      'Reprocessor_Registration_SIP.doc'
-    )
+    await RegistrationExporterSamplingAndInspectionPage.uploadFile(SIPFile)
     await RegistrationExporterSamplingAndInspectionPage.waitForContinueButton()
     await RegistrationExporterSamplingAndInspectionPage.continue()
 
     await RegistrationExporterOverseasReprocessingSitesPage.uploadFile(
-      'ors_log.xlsx'
+      ORSLogFile
     )
     await RegistrationExporterOverseasReprocessingSitesPage.waitForContinueButton()
     await RegistrationExporterOverseasReprocessingSitesPage.continue()
@@ -114,5 +104,7 @@ describe('Registration as Exporter form', () => {
       applicationContactDetails
     )
     await RegistrationExporterYourContactDetailsPage.continue()
+
+    await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
   })
 })

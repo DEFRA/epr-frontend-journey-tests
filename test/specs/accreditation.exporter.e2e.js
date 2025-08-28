@@ -1,4 +1,13 @@
 import { browser, expect } from '@wdio/globals'
+import {
+  orgId,
+  referenceNumber,
+  applicationContactDetails,
+  signatory,
+  SIPFile,
+  ORSLogFile,
+  percentages
+} from '../support/form.values.js'
 
 import AccreditationExporterHomePage from 'page-objects/accreditation.exporter/accreditation.exporter.home.page.js'
 import AccreditationExporterOrganisationIdPage from 'page-objects/accreditation.exporter/accreditation.exporter.organisation.id.page.js'
@@ -12,30 +21,6 @@ import AccreditationExporterSamplingAndInspectionPage from 'page-objects/accredi
 import AccreditationExporterYourContactDetailsPage from 'page-objects/accreditation.exporter/accreditation.exporter.your.contact.details.js'
 import AccreditationExporterOverseasReprocessingSitesPage from 'page-objects/accreditation.exporter/accreditation.exporter.overseas.reprocessing.sites.page.js'
 import AccreditationExporterBESPage from 'page-objects/accreditation.exporter/accreditation.exporter.bes.page.js'
-
-const signatory = {
-  fullName: 'Joe Bloggs',
-  email: 'joebloggs@test.com',
-  telephone: '07777 123456',
-  jobTitle: 'Reprocessor'
-}
-
-const percentages = {
-  infrastructure: '4',
-  priceSupport: '10',
-  businessCollections: '15',
-  comms: '5',
-  newMarkets: '20',
-  newUse: '10',
-  other: '5'
-}
-
-const applicationContactDetails = {
-  name: 'Joe Bloggs',
-  email: 'approval@approval.com',
-  telephone: '07777 689789',
-  jobTitle: 'Reprocessor'
-}
 
 describe('Accreditation as Reprocessor form', () => {
   it('Should not be able to apply if there is no Organisation ID', async () => {
@@ -58,8 +43,8 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationExporterOrganisationIdPage.continue()
 
     await AccreditationExporterOrganisationDetailsPage.enterDetails(
-      '123456',
-      '123ab456789cd01e23fabc45'
+      orgId,
+      referenceNumber
     )
     await AccreditationExporterOrganisationDetailsPage.continue()
 
@@ -77,14 +62,12 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationExporterBusinessPlanPage.enterDetails(percentages)
     await AccreditationExporterBusinessPlanPage.continue()
 
-    await AccreditationExporterSamplingAndInspectionPage.uploadFile(
-      'Reprocessor_Registration_SIP.doc'
-    )
+    await AccreditationExporterSamplingAndInspectionPage.uploadFile(SIPFile)
     await AccreditationExporterSamplingAndInspectionPage.waitForContinueButton()
     await AccreditationExporterSamplingAndInspectionPage.continue()
 
     await AccreditationExporterOverseasReprocessingSitesPage.uploadFile(
-      'ors_log.xlsx'
+      ORSLogFile
     )
     await AccreditationExporterOverseasReprocessingSitesPage.waitForContinueButton()
     await AccreditationExporterOverseasReprocessingSitesPage.continue()
@@ -95,5 +78,7 @@ describe('Accreditation as Reprocessor form', () => {
       applicationContactDetails
     )
     await AccreditationExporterYourContactDetailsPage.continue()
+
+    await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
   })
 })
