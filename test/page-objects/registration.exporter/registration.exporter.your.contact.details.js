@@ -4,7 +4,7 @@ class RegistrationExporterYourContactDetailsPage extends Page {
   async enterDetails(formDetail) {
     await $(
       '#main-content > div > div > form > div:nth-child(2) > input'
-    ).setValue(formDetail.fullName)
+    ).setValue(formDetail.name)
     await $(
       '#main-content > div > div > form > div:nth-child(3) > input'
     ).setValue(formDetail.email)

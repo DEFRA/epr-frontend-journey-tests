@@ -1,4 +1,20 @@
 import { browser, expect } from '@wdio/globals'
+import {
+  orgId,
+  referenceNumber,
+  address,
+  regNumber,
+  applicationContactDetails,
+  approvedPerson,
+  tonnage,
+  SIPFile,
+  wasteFromText,
+  permitNumber,
+  gridRef,
+  rawMaterial,
+  products,
+  equipment
+} from '../support/form.values.js'
 
 import RegistrationReprocessorHomePage from 'page-objects/registration.reprocessor/registration.reprocessor.home.page.js'
 import RegistrationReprocessorOrganisationIdPage from 'page-objects/registration.reprocessor/registration.reprocessor.organisation.id.page.js'
@@ -23,27 +39,6 @@ import RegistrationReprocessorSamplingAndInspectionPage from 'page-objects/regis
 import RegistrationReprocessorApprovedPersonPage from 'page-objects/registration.reprocessor/registration.reprocessor.approved.person.page.js'
 import RegistrationReprocessorYourContactDetailsPage from 'page-objects/registration.reprocessor/registration.reprocessor.your.contact.details.js'
 
-const applicationContactDetails = {
-  fullName: 'Joe Bloggs',
-  email: 'joebloggs@test.com',
-  telephone: '07777 123456',
-  jobTitle: 'Reprocessor'
-}
-
-const address = {
-  line1: 'Rubbish Removals Limited',
-  line2: '',
-  town: 'Earls Court',
-  county: 'London',
-  postcode: 'SW5 9PN'
-}
-
-const approvedPerson = {
-  name: 'Joe Bloggs',
-  email: 'approval@approval.com',
-  telephone: '07777 689789'
-}
-
 describe('Registration as Reprocessor form', () => {
   it('Should not be able to register if there is no Organisation ID', async () => {
     await RegistrationReprocessorHomePage.open()
@@ -65,8 +60,8 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorOrganisationIdPage.continue()
 
     await RegistrationReprocessorOrganisationDetailsPage.enterDetails(
-      '123456',
-      '123ab456789cd01e23fabc45'
+      orgId,
+      referenceNumber
     )
     await RegistrationReprocessorOrganisationDetailsPage.continue()
 
@@ -79,7 +74,7 @@ describe('Registration as Reprocessor form', () => {
       address
     )
     await RegistrationReprocessorReprocessingSiteDetailsPage.enterGridReference(
-      'AA123456'
+      gridRef
     )
     await RegistrationReprocessorReprocessingSiteDetailsPage.yes()
     await RegistrationReprocessorReprocessingSiteDetailsPage.continue()
@@ -90,61 +85,60 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorWhatPermitPage.environmental()
     await RegistrationReprocessorWhatPermitPage.continue()
 
-    await RegistrationReprocessorLicenceDetailsPage.permit('123456')
-    await RegistrationReprocessorLicenceDetailsPage.tonnage('10')
+    await RegistrationReprocessorLicenceDetailsPage.permit(permitNumber)
+    await RegistrationReprocessorLicenceDetailsPage.tonnage(tonnage)
     await RegistrationReprocessorLicenceDetailsPage.monthly()
     await RegistrationReprocessorLicenceDetailsPage.continue()
 
-    await RegistrationReprocessorSiteCapacityPage.tonnage('15')
+    await RegistrationReprocessorSiteCapacityPage.tonnage(tonnage)
     await RegistrationReprocessorSiteCapacityPage.monthly()
     await RegistrationReprocessorSiteCapacityPage.continue()
 
-    await RegistrationReprocessorWasteCarrierNumberPage.regNumber('CBDU123456')
+    await RegistrationReprocessorWasteCarrierNumberPage.regNumber(regNumber)
     await RegistrationReprocessorWasteCarrierNumberPage.continue()
 
     await RegistrationReprocessorWasteCategoryPage.aluminium()
     await RegistrationReprocessorWasteCategoryPage.continue()
 
-    await RegistrationReprocessorWasteFromPage.details(
-      'Local council collections'
-    )
+    await RegistrationReprocessorWasteFromPage.details(wasteFromText)
     await RegistrationReprocessorWasteFromPage.continue()
 
     await RegistrationReprocessorInputsCalendar2024Page.estimatedFigures()
     await RegistrationReprocessorInputsCalendar2024Page.enterTonnages(
-      '10',
-      '10',
-      '10'
+      tonnage,
+      tonnage,
+      tonnage
     )
     await RegistrationReprocessorInputsCalendar2024Page.continue()
 
-    await RegistrationReprocessorRawInputs2024Page.enterDetails('Water', '10')
+    await RegistrationReprocessorRawInputs2024Page.enterDetails(
+      rawMaterial,
+      tonnage
+    )
     await RegistrationReprocessorRawInputs2024Page.continue()
 
     await RegistrationReprocessorRawInputsSummary2024Page.continue()
 
     await RegistrationReprocessorOutputsCalendar2024Page.estimatedFigures()
     await RegistrationReprocessorOutputsCalendar2024Page.enterTonnages(
-      '10',
-      '10',
-      '10'
+      tonnage,
+      tonnage,
+      tonnage
     )
     await RegistrationReprocessorOutputsCalendar2024Page.continue()
 
     await RegistrationReprocessorProductsMadeFromRecycling2024Page.enterTonnages(
-      'Milk bottles',
-      '10'
+      products,
+      tonnage
     )
     await RegistrationReprocessorProductsMadeFromRecycling2024Page.continue()
 
     await RegistrationReprocessorProductsRecycling2024SummaryPage.continue()
 
-    await RegistrationReprocessorKeyPlantAndEquipmentPage.details('Equipment')
+    await RegistrationReprocessorKeyPlantAndEquipmentPage.details(equipment)
     await RegistrationReprocessorKeyPlantAndEquipmentPage.continue()
 
-    await RegistrationReprocessorSamplingAndInspectionPage.uploadFile(
-      'Reprocessor_Registration_SIP.doc'
-    )
+    await RegistrationReprocessorSamplingAndInspectionPage.uploadFile(SIPFile)
     await RegistrationReprocessorSamplingAndInspectionPage.waitForContinueButton()
     await RegistrationReprocessorSamplingAndInspectionPage.continue()
 
@@ -156,5 +150,7 @@ describe('Registration as Reprocessor form', () => {
       applicationContactDetails
     )
     await RegistrationReprocessorYourContactDetailsPage.continue()
+
+    await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
   })
 })

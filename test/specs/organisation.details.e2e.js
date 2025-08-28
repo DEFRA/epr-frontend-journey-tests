@@ -1,4 +1,9 @@
 import { browser, expect } from '@wdio/globals'
+import {
+  companiesHouseDetails,
+  applicationContactDetails,
+  partnerName
+} from '../support/form.values.js'
 
 import OrganisationDetailsHomePage from 'page-objects/organisation.details/organisation.details.home.page.js'
 import OrganisationDetailsRegisteredCharityPage from 'page-objects/organisation.details/organisation.details.registered.charity.page.js'
@@ -10,26 +15,6 @@ import OrganisationDetailsCompaniesHouseDetailsPage from 'page-objects/organisat
 import OrganisationDetailsPartnershipPage from 'page-objects/organisation.details/organisation.details.partnership.page.js'
 import OrganisationDetailsLimitedPartnershipPage from 'page-objects/organisation.details/organisation.details.limited.partnership.page.js'
 import OrganisationDetailsAddMorePartnersPage from 'page-objects/organisation.details/organisation.details.add.more.partners.page.js'
-
-const whoIsCompleting = {
-  fullName: 'Joe Bloggs',
-  email: 'joebloggs@test.com',
-  telephone: '07777 123456',
-  jobTitle: 'Exporter'
-}
-
-const companiesHouseDetails = {
-  companyName: 'Rubbish Removals Limited',
-  businessTradingName: '',
-  regNo: 'AA123456',
-  address: {
-    line1: 'Rubbish Removals Limited',
-    line2: '',
-    town: 'Earls Court',
-    county: 'London',
-    postcode: 'SW5 9PN'
-  }
-}
 
 describe('Organisation details form', () => {
   it('Should not need to complete the form if it is a charity', async () => {
@@ -69,7 +54,9 @@ describe('Organisation details form', () => {
     await OrganisationDetailsRecyclingExporterPage.exporter()
     await OrganisationDetailsRecyclingExporterPage.continue()
 
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(whoIsCompleting)
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
     await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await OrganisationDetailsRegisteredCompaniesHousePage.yes()
@@ -96,7 +83,9 @@ describe('Organisation details form', () => {
     await OrganisationDetailsRecyclingExporterPage.reprocessor()
     await OrganisationDetailsRecyclingExporterPage.continue()
 
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(whoIsCompleting)
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
     await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await OrganisationDetailsUKNationsPage.england()
@@ -126,7 +115,9 @@ describe('Organisation details form', () => {
     await OrganisationDetailsRecyclingExporterPage.reprocessorAndExporter()
     await OrganisationDetailsRecyclingExporterPage.continue()
 
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(whoIsCompleting)
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
     await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await OrganisationDetailsUKNationsPage.wales()
@@ -144,7 +135,7 @@ describe('Organisation details form', () => {
     await OrganisationDetailsPartnershipPage.continue()
 
     await OrganisationDetailsLimitedPartnershipPage.enterPartnerName(
-      'Partner Limited'
+      partnerName
     )
     await OrganisationDetailsLimitedPartnershipPage.companyPartner()
     await OrganisationDetailsLimitedPartnershipPage.continue()

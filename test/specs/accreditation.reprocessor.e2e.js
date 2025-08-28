@@ -1,4 +1,13 @@
 import { browser, expect } from '@wdio/globals'
+import {
+  orgId,
+  referenceNumber,
+  applicationContactDetails,
+  signatory,
+  SIPFile,
+  address,
+  percentages
+} from '../support/form.values.js'
 
 import AccreditationReprocessorHomePage from 'page-objects/accreditation.reprocessor/accreditation.reprocessor.home.page.js'
 import AccreditationReprocessorOrganisationIdPage from 'page-objects/accreditation.reprocessor/accreditation.reprocessor.organisation.id.page.js'
@@ -11,30 +20,6 @@ import AccreditationReprocessorSignatorySummaryPage from 'page-objects/accredita
 import AccreditationReprocessorBusinessPlanPage from 'page-objects/accreditation.reprocessor/accreditation.reprocessor.business.plan.page.js'
 import AccreditationReprocessorSamplingAndInspectionPage from 'page-objects/accreditation.reprocessor/accreditation.reprocessor.sampling.and.inspection.page.js'
 import AccreditationReprocessorYourContactDetailsPage from 'page-objects/accreditation.reprocessor/accreditation.reprocessor.your.contact.details.js'
-
-const signatory = {
-  fullName: 'Joe Bloggs',
-  email: 'joebloggs@test.com',
-  telephone: '07777 123456',
-  jobTitle: 'Reprocessor'
-}
-
-const percentages = {
-  infrastructure: '4',
-  priceSupport: '10',
-  businessCollections: '15',
-  comms: '5',
-  newMarkets: '20',
-  newUse: '10',
-  other: '5'
-}
-
-const applicationContactDetails = {
-  name: 'Joe Bloggs',
-  email: 'approval@approval.com',
-  telephone: '07777 689789',
-  jobTitle: 'Reprocessor'
-}
 
 describe('Accreditation as Reprocessor form', () => {
   it('Should not be able to apply if there is no Organisation ID', async () => {
@@ -57,14 +42,14 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationReprocessorOrganisationIdPage.continue()
 
     await AccreditationReprocessorOrganisationDetailsPage.enterDetails(
-      '123456',
-      '123ab456789cd01e23fabc45'
+      orgId,
+      referenceNumber
     )
     await AccreditationReprocessorOrganisationDetailsPage.continue()
 
     await AccreditationReprocessorSiteDetailsPage.enterDetails(
-      'first line',
-      'AA1 1AA'
+      address.line1,
+      address.postcode
     )
     await AccreditationReprocessorSiteDetailsPage.continue()
 
@@ -82,9 +67,7 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationReprocessorBusinessPlanPage.enterDetails(percentages)
     await AccreditationReprocessorBusinessPlanPage.continue()
 
-    await AccreditationReprocessorSamplingAndInspectionPage.uploadFile(
-      'Reprocessor_Registration_SIP.doc'
-    )
+    await AccreditationReprocessorSamplingAndInspectionPage.uploadFile(SIPFile)
     await AccreditationReprocessorSamplingAndInspectionPage.waitForContinueButton()
     await AccreditationReprocessorSamplingAndInspectionPage.continue()
 
@@ -92,5 +75,7 @@ describe('Accreditation as Reprocessor form', () => {
       applicationContactDetails
     )
     await AccreditationReprocessorYourContactDetailsPage.continue()
+
+    await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
   })
 })
