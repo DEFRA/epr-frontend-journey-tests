@@ -6,7 +6,8 @@ import {
   signatory,
   SIPFile,
   ORSLogFile,
-  percentages
+  percentages,
+  orgName
 } from '../support/form.values.js'
 
 import AccreditationExporterHomePage from 'page-objects/accreditation.exporter/accreditation.exporter.home.page.js'
@@ -43,6 +44,7 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationExporterOrganisationIdPage.continue()
 
     await AccreditationExporterOrganisationDetailsPage.enterDetails(
+      orgName,
       orgId,
       referenceNumber
     )
@@ -80,5 +82,7 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationExporterYourContactDetailsPage.continue()
 
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 })

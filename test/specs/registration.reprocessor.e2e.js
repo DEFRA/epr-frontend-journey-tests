@@ -13,7 +13,8 @@ import {
   gridRef,
   rawMaterial,
   products,
-  equipment
+  equipment,
+  orgName
 } from '../support/form.values.js'
 
 import RegistrationReprocessorHomePage from 'page-objects/registration.reprocessor/registration.reprocessor.home.page.js'
@@ -38,6 +39,7 @@ import RegistrationReprocessorKeyPlantAndEquipmentPage from 'page-objects/regist
 import RegistrationReprocessorSamplingAndInspectionPage from 'page-objects/registration.reprocessor/registration.reprocessor.sampling.and.inspection.page.js'
 import RegistrationReprocessorApprovedPersonPage from 'page-objects/registration.reprocessor/registration.reprocessor.approved.person.page.js'
 import RegistrationReprocessorYourContactDetailsPage from 'page-objects/registration.reprocessor/registration.reprocessor.your.contact.details.js'
+import RegistrationReprocessorWasteDetailsPage from 'page-objects/registration.reprocessor/registration.reprocessor.waste.details.page.js'
 
 describe('Registration as Reprocessor form', () => {
   it('Should not be able to register if there is no Organisation ID', async () => {
@@ -60,6 +62,7 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorOrganisationIdPage.continue()
 
     await RegistrationReprocessorOrganisationDetailsPage.enterDetails(
+      orgName,
       orgId,
       referenceNumber
     )
@@ -86,9 +89,12 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorWhatPermitPage.continue()
 
     await RegistrationReprocessorLicenceDetailsPage.permit(permitNumber)
-    await RegistrationReprocessorLicenceDetailsPage.tonnage(tonnage)
-    await RegistrationReprocessorLicenceDetailsPage.monthly()
+    await RegistrationReprocessorLicenceDetailsPage.aluminium()
     await RegistrationReprocessorLicenceDetailsPage.continue()
+
+    await RegistrationReprocessorWasteDetailsPage.tonnage(tonnage)
+    await RegistrationReprocessorWasteDetailsPage.monthly()
+    await RegistrationReprocessorWasteDetailsPage.continue()
 
     await RegistrationReprocessorSiteCapacityPage.tonnage(tonnage)
     await RegistrationReprocessorSiteCapacityPage.monthly()
@@ -152,5 +158,7 @@ describe('Registration as Reprocessor form', () => {
     await RegistrationReprocessorYourContactDetailsPage.continue()
 
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 })

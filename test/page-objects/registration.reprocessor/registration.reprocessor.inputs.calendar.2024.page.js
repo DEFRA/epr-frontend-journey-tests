@@ -11,13 +11,13 @@ class RegistrationReprocessorInputsCalendar2024Page extends Page {
 
   async enterTonnages(uk, nonUK, nonPackaging) {
     await $(
-      '#main-content > div > div > form > div:nth-child(3) > div > input'
+      '#main-content > div > div > form > div:nth-child(4) > div > input'
     ).setValue(uk)
     await $(
-      '#main-content > div > div > form > div:nth-child(4) > div > input'
+      '#main-content > div > div > form > div:nth-child(5) > div > input'
     ).setValue(nonUK)
     await $(
-      '#main-content > div > div > form > div:nth-child(5) > div > input'
+      '#main-content > div > div > form > div:nth-child(6) > div > input'
     ).setValue(nonPackaging)
   }
 }
