@@ -4,7 +4,7 @@ import { urlSuffix } from '../../url.js'
 class OrganisationDetailsHomePage extends Page {
   open() {
     return super.open(
-      `/form/preview/draft/extended-producer-responsibilities-submit-your-organisation-details-${urlSuffix}/form-guidance`
+      `/extended-producer-responsibilities-submit-your-organisation-details-${urlSuffix}/form-guidance`
     )
   }
 }

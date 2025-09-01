@@ -118,7 +118,7 @@ export const config = {
   // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
   // gets prepended directly.
   // baseUrl: 'http://localhost:3000',
-  baseUrl: 'https://submit-form-to-defra.service.gov.uk',
+  baseUrl: 'https://forms-runner.test.cdp-int.defra.cloud/',
   //
   // Default timeout for all waitFor* commands.
   waitforTimeout: 10000,

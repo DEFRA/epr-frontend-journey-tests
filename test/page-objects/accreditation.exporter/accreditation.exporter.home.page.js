@@ -4,7 +4,7 @@ import { urlSuffix } from '../../url.js'
 class AccreditationExporterHomePage extends Page {
   open() {
     return super.open(
-      `/form/preview/draft/extended-producer-responsibilities-apply-for-accreditation-as-a-packaging-waste-exporter-${urlSuffix}/form-guidance`
+      `/extended-producer-responsibilities-apply-for-accreditation-as-a-packaging-waste-exporter-${urlSuffix}/form-guidance`
     )
   }
 }
