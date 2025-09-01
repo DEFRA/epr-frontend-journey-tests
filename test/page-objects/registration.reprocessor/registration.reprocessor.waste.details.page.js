@@ -1,6 +1,6 @@
 import { Page } from 'page-objects/page.js'
 
-class RegistrationReprocessorSiteCapacityPage extends Page {
+class RegistrationReprocessorWasteDetailsPage extends Page {
   async tonnage(number) {
     await $(
       '#main-content > div > div > form > div:nth-child(2) > div > input'
@@ -26,4 +26,4 @@ class RegistrationReprocessorSiteCapacityPage extends Page {
   }
 }
 
-export default new RegistrationReprocessorSiteCapacityPage()
+export default new RegistrationReprocessorWasteDetailsPage()

@@ -11,13 +11,13 @@ class RegistrationReprocessorOutputsCalendar2024Page extends Page {
 
   async enterTonnages(packaging, contaminants, processLoss) {
     await $(
-      '#main-content > div > div > form > div:nth-child(3) > div > input'
+      '#main-content > div > div > form > div:nth-child(4) > div > input'
     ).setValue(packaging)
     await $(
-      '#main-content > div > div > form > div:nth-child(4) > div > input'
+      '#main-content > div > div > form > div:nth-child(5) > div > input'
     ).setValue(contaminants)
     await $(
-      '#main-content > div > div > form > div:nth-child(5) > div > input'
+      '#main-content > div > div > form > div:nth-child(6) > div > input'
     ).setValue(processLoss)
   }
 }

@@ -1,5 +1,6 @@
 import { browser, expect } from '@wdio/globals'
 import {
+  orgName,
   orgId,
   referenceNumber,
   address,
@@ -9,7 +10,6 @@ import {
   SIPFile,
   ORSLogFile,
   wasteFromText,
-  permitNumber,
   UKPort
 } from '../support/form.values.js'
 
@@ -18,7 +18,6 @@ import RegistrationExporterOrganisationIdPage from 'page-objects/registration.ex
 import RegistrationExporterOrganisationDetailsPage from 'page-objects/registration.exporter/registration.exporter.organisation.details.page.js'
 import RegistrationExporterApplicationContactDetailsPage from 'page-objects/registration.exporter/registration.exporter.application.contact.details.page.js'
 import RegistrationExporterWhatPermitPage from 'page-objects/registration.exporter/registration.exporter.what.permit.page.js'
-import RegistrationExporterLicenceDetailsPage from 'page-objects/registration.exporter/registration.exporter.licence.details.page.js'
 import RegistrationExporterWasteCarrierNumberPage from 'page-objects/registration.exporter/registration.exporter.waste.carrier.number.page.js'
 import RegistrationExporterWasteCategoryPage from 'page-objects/registration.exporter/registration.exporter.packaging.waste.category.page.js'
 import RegistrationExporterWasteFromPage from 'page-objects/registration.exporter/registration.exporter.waste.from.page.js'
@@ -51,6 +50,7 @@ describe('Registration as Exporter form', () => {
     await RegistrationExporterOrganisationIdPage.continue()
 
     await RegistrationExporterOrganisationDetailsPage.enterDetails(
+      orgName,
       orgId,
       referenceNumber
     )
@@ -71,9 +71,6 @@ describe('Registration as Exporter form', () => {
 
     await RegistrationExporterWhatPermitPage.environmental()
     await RegistrationExporterWhatPermitPage.continue()
-
-    await RegistrationExporterLicenceDetailsPage.permit(permitNumber)
-    await RegistrationExporterLicenceDetailsPage.continue()
 
     await RegistrationExporterWasteCategoryPage.aluminium()
     await RegistrationExporterWasteCategoryPage.continue()
@@ -106,5 +103,7 @@ describe('Registration as Exporter form', () => {
     await RegistrationExporterYourContactDetailsPage.continue()
 
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 })

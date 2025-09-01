@@ -2,7 +2,10 @@ import { Page } from 'page-objects/page.js'
 
 class OrganisationDetailsLimitedPartnershipPage extends Page {
   async enterPartnerName(partnerName) {
-    await super.textInputElement(1).setValue(partnerName)
+    await $(
+      '#main-content > div > div > form > div:nth-child(3) > input'
+    ).setValue(partnerName)
+    // await super.textInputElement(1).setValue(partnerName)
   }
 
   async companyPartner() {

@@ -1,3 +1,4 @@
+export const orgName = 'Testing Limited'
 export const orgId = '999999'
 export const referenceNumber = '123ab456789cd01e23fabc45'
 export const address = {
@@ -17,20 +18,20 @@ export const companiesHouseDetails = {
 
 export const applicationContactDetails = {
   name: 'Test User',
-  email: 'testcontact@defratesting.com',
+  email: 'REEXServiceTeam@defra.gov.uk',
   telephone: '07777 999999',
   jobTitle: 'Testing'
 }
 
 export const approvedPerson = {
   name: 'Test User',
-  email: 'testapproval@defratesting.com',
+  email: 'REEXServiceTeam@defra.gov.uk',
   telephone: '07777 123456'
 }
 
 export const signatory = {
   fullName: 'Test User',
-  email: 'testsignatory@defratesting.com',
+  email: 'REEXServiceTeam@defra.gov.uk',
   telephone: '07777 222333',
   jobTitle: 'Testing'
 }

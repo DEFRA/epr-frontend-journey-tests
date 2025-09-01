@@ -25,7 +25,7 @@ describe('Organisation details form', () => {
     await OrganisationDetailsRegisteredCharityPage.continue()
 
     await expect(browser).toHaveTitle(
-      expect.stringContaining("You don't need to register")
+      expect.stringContaining('Charities do not need to register')
     )
   })
 
@@ -54,11 +54,6 @@ describe('Organisation details form', () => {
     await OrganisationDetailsRecyclingExporterPage.exporter()
     await OrganisationDetailsRecyclingExporterPage.continue()
 
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
-      applicationContactDetails
-    )
-    await OrganisationDetailsWhoIsCompletingPage.continue()
-
     await OrganisationDetailsRegisteredCompaniesHousePage.yes()
     await OrganisationDetailsRegisteredCompaniesHousePage.continue()
 
@@ -70,7 +65,14 @@ describe('Organisation details form', () => {
     await OrganisationDetailsPartnershipPage.no()
     await OrganisationDetailsPartnershipPage.continue()
 
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
+    await OrganisationDetailsWhoIsCompletingPage.continue()
+
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 
   it('Should complete the form if it is a Reprocessor', async () => {
@@ -82,11 +84,6 @@ describe('Organisation details form', () => {
 
     await OrganisationDetailsRecyclingExporterPage.reprocessor()
     await OrganisationDetailsRecyclingExporterPage.continue()
-
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
-      applicationContactDetails
-    )
-    await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await OrganisationDetailsUKNationsPage.england()
     await OrganisationDetailsUKNationsPage.continue()
@@ -102,7 +99,14 @@ describe('Organisation details form', () => {
     await OrganisationDetailsPartnershipPage.no()
     await OrganisationDetailsPartnershipPage.continue()
 
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
+    await OrganisationDetailsWhoIsCompletingPage.continue()
+
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 
   it('Should complete the form if it is a Exporter / Reprocessor with a Limited Partnership', async () => {
@@ -114,11 +118,6 @@ describe('Organisation details form', () => {
 
     await OrganisationDetailsRecyclingExporterPage.reprocessorAndExporter()
     await OrganisationDetailsRecyclingExporterPage.continue()
-
-    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
-      applicationContactDetails
-    )
-    await OrganisationDetailsWhoIsCompletingPage.continue()
 
     await OrganisationDetailsUKNationsPage.wales()
     await OrganisationDetailsUKNationsPage.continue()
@@ -142,6 +141,13 @@ describe('Organisation details form', () => {
 
     await OrganisationDetailsAddMorePartnersPage.continue()
 
+    await OrganisationDetailsWhoIsCompletingPage.enterDetails(
+      applicationContactDetails
+    )
+    await OrganisationDetailsWhoIsCompletingPage.continue()
+
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 })

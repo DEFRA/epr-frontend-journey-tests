@@ -4,11 +4,11 @@ class RegistrationReprocessorSamplingAndInspectionPage extends Page {
   async uploadFile(filePath) {
     const remoteFilePath = await browser.uploadFile(filePath)
     await $(
-      '#main-content > div > div > form:nth-child(5) > div > input'
+      '#main-content > div > div > form:nth-child(4) > div > input'
     ).setValue(remoteFilePath)
-    await $('#main-content > div > div > form:nth-child(5) > button').click()
+    await $('#main-content > div > div > form:nth-child(4) > button').click()
 
-    const elem = $('#uploadedFilesContainer > p:nth-child(2)')
+    const elem = $('#uploadedFilesContainer > p')
     await browser.waitUntil(
       async function () {
         return (await elem.getText()) === '1 file uploaded'

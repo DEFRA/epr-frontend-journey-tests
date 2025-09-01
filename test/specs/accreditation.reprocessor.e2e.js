@@ -1,5 +1,6 @@
 import { browser, expect } from '@wdio/globals'
 import {
+  orgName,
   orgId,
   referenceNumber,
   applicationContactDetails,
@@ -42,6 +43,7 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationReprocessorOrganisationIdPage.continue()
 
     await AccreditationReprocessorOrganisationDetailsPage.enterDetails(
+      orgName,
       orgId,
       referenceNumber
     )
@@ -77,5 +79,7 @@ describe('Accreditation as Reprocessor form', () => {
     await AccreditationReprocessorYourContactDetailsPage.continue()
 
     await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
   })
 })
