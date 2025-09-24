@@ -4,7 +4,6 @@ ENV TZ="Europe/London"
 
 USER root
 
-
 RUN apk update\
     && apk add \
     curl \
