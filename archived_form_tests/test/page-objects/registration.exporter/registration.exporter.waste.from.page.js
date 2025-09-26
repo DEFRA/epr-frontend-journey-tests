@@ -1,0 +1,9 @@
+import { Page } from '../page.js'
+
+class RegistrationExporterWasteFromPage extends Page {
+  async details(text) {
+    await super.textAreaElement(1).setValue(text)
+  }
+}
+
+export default new RegistrationExporterWasteFromPage()

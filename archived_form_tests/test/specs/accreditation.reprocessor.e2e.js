@@ -1,0 +1,85 @@
+import { browser, expect } from '@wdio/globals'
+import {
+  orgName,
+  orgId,
+  referenceNumber,
+  applicationContactDetails,
+  signatory,
+  SIPFile,
+  address,
+  percentages
+} from '../support/form.values.js'
+
+import AccreditationReprocessorHomePage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.home.page.js'
+import AccreditationReprocessorOrganisationIdPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.organisation.id.page.js'
+import AccreditationReprocessorOrganisationDetailsPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.organisation.details.page.js'
+import AccreditationReprocessorSiteDetailsPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.site.details.page.js'
+import AccreditationReprocessorPackagingWasteCategoryPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.packaging.waste.category.page.js'
+import AccreditationReprocessorWasteNotesPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.packaging.waste.notes.page.js'
+import AccreditationReprocessorSignatoryDetailsPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.signatory.details.page.js'
+import AccreditationReprocessorSignatorySummaryPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.signatory.summary.page.js'
+import AccreditationReprocessorBusinessPlanPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.business.plan.page.js'
+import AccreditationReprocessorSamplingAndInspectionPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.sampling.and.inspection.page.js'
+import AccreditationReprocessorYourContactDetailsPage from '~/archived_form_tests/test/page-objects/accreditation.reprocessor/accreditation.reprocessor.your.contact.details.js'
+
+describe('Accreditation as Reprocessor form', () => {
+  it('Should not be able to apply if there is no Organisation ID', async () => {
+    await AccreditationReprocessorHomePage.open()
+    await AccreditationReprocessorHomePage.continue()
+
+    await AccreditationReprocessorOrganisationIdPage.no()
+    await AccreditationReprocessorOrganisationIdPage.continue()
+
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Apply for an Organisation ID')
+    )
+  })
+
+  it('Should be able to apply for accreditation', async () => {
+    await AccreditationReprocessorHomePage.open()
+    await AccreditationReprocessorHomePage.continue()
+
+    await AccreditationReprocessorOrganisationIdPage.yes()
+    await AccreditationReprocessorOrganisationIdPage.continue()
+
+    await AccreditationReprocessorOrganisationDetailsPage.enterDetails(
+      orgName,
+      orgId,
+      referenceNumber
+    )
+    await AccreditationReprocessorOrganisationDetailsPage.continue()
+
+    await AccreditationReprocessorSiteDetailsPage.enterDetails(
+      address.line1,
+      address.postcode
+    )
+    await AccreditationReprocessorSiteDetailsPage.continue()
+
+    await AccreditationReprocessorPackagingWasteCategoryPage.aluminium()
+    await AccreditationReprocessorPackagingWasteCategoryPage.continue()
+
+    await AccreditationReprocessorWasteNotesPage.fiveHundredTonnes()
+    await AccreditationReprocessorWasteNotesPage.continue()
+
+    await AccreditationReprocessorSignatoryDetailsPage.enterDetails(signatory)
+    await AccreditationReprocessorSignatoryDetailsPage.continue()
+
+    await AccreditationReprocessorSignatorySummaryPage.continue()
+
+    await AccreditationReprocessorBusinessPlanPage.enterDetails(percentages)
+    await AccreditationReprocessorBusinessPlanPage.continue()
+
+    await AccreditationReprocessorSamplingAndInspectionPage.uploadFile(SIPFile)
+    await AccreditationReprocessorSamplingAndInspectionPage.waitForContinueButton()
+    await AccreditationReprocessorSamplingAndInspectionPage.continue()
+
+    await AccreditationReprocessorYourContactDetailsPage.enterDetails(
+      applicationContactDetails
+    )
+    await AccreditationReprocessorYourContactDetailsPage.continue()
+
+    await expect(browser).toHaveTitle(expect.stringContaining('Summary'))
+    await $('#main-content > div > div > form > button').click()
+    await expect(browser).toHaveTitle(expect.stringContaining('Form submitted'))
+  })
+})

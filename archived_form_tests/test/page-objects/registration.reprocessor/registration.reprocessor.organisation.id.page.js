@@ -1,0 +1,13 @@
+import { Page } from '../page.js'
+
+class RegistrationReprocessorOrganisationIdPage extends Page {
+  async yes() {
+    await super.radioInputElement(1).click()
+  }
+
+  async no() {
+    await super.radioInputElement(2).click()
+  }
+}
+
+export default new RegistrationReprocessorOrganisationIdPage()

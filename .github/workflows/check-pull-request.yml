@@ -69,9 +69,8 @@ jobs:
           npm run format:check
           npm run lint
 
-# Uncomment this to run the tests in your test suite
-#  tests:
-#    name: Run Journey Tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: DEFRA/cdp-node-journey-test-suite-template/run-journey-tests@main
+  tests:
+    name: Run Journey Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DEFRA/epr-frontend-journey-tests/run-journey-tests@main
