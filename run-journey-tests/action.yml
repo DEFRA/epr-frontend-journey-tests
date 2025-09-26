@@ -1,36 +1,41 @@
 name: Run Journey Tests on GitHub
 
 inputs:
-  example-node-backend:
+  epr-frontend:
     required: false
     type: string
-  example-node-frontend:
+  branch:
     required: false
     type: string
+    default: main
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
       with:
-        repository: DEFRA/cdp-node-journey-test-suite-template
-
-    - name: Docker Login
-      uses: DEFRA/cdp-build-action/docker-login@main
+        repository: DEFRA/epr-frontend-journey-tests
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         cache: npm
     - name: Setup the tests
       run: npm i
       shell: bash
+
     - name: Start docker compose
       shell: bash
       run: |
-          CDP_EXAMPLE_NODE_FRONTEND=${{inputs.example-node-frontend}} \
-          CDP_EXAMPLE_NODE_BACKEND=${{inputs.example-node-backend}} \
+          EPR_FRONTEND=${{inputs.epr-frontend}} \
           docker compose up --wait-timeout 300 -d --quiet-pull
+
+    - name: Wait for services to be ready
+      shell: bash
+      run: |
+        echo "Waiting for frontend to be ready..."
+        timeout 180 bash -c 'until curl -f http://localhost:3000/health; do sleep 5; done'
+
     - name: Run the tests
       shell: bash
       run: |
@@ -54,3 +59,10 @@ runs:
       with:
         name: docker-compose-logs
         path: ./logs.txt
+    - name: Fail this step if FAILED file exists
+      if: always()
+      run: |
+        if [ -f "FAILED" ]; then
+          exit 1
+        fi
+      shell: bash
