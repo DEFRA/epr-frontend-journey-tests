@@ -52,7 +52,7 @@
     "eslint": "9.36.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
-    "eslint-plugin-wdio": "8.24.12",
+    "eslint-plugin-wdio": "9.16.2",
     "husky": "9.1.7",
     "neostandard": "0.12.2",
     "prettier": "3.6.2"
