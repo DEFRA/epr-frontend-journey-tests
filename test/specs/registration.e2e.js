@@ -12,6 +12,7 @@ describe('Registration', () => {
     )
     await UploadSummaryLogPage.uploadFile('sample.xlsx')
     await UploadSummaryLogPage.continue()
+    console.log(await browser.getUrl())
     await browser.waitUntil(
       async () => {
         const pageText = await browser.$('body').getText()
