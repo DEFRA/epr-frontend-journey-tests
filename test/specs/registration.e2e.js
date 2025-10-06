@@ -10,9 +10,8 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await UploadSummaryLogPage.uploadFile('sample.xlsx')
+    await UploadSummaryLogPage.uploadFile('resources/sample.xlsx')
     await UploadSummaryLogPage.continue()
-    console.log(await browser.getUrl())
     await browser.waitUntil(
       async () => {
         const pageText = await browser.$('body').getText()
@@ -22,6 +21,26 @@ describe('Registration', () => {
         timeout: 5000,
         timeoutMsg:
           'Expected text "Your file is being uploaded" to be present on the page within 5 seconds'
+      }
+    )
+  })
+
+  it('Should get an error message with an empty Summary Log spreadsheet', async () => {
+    await UploadSummaryLogPage.open(123, 456)
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+    await UploadSummaryLogPage.uploadFile('resources/empty.xlsx')
+    await UploadSummaryLogPage.continue()
+    await browser.waitUntil(
+      async () => {
+        const errorText = await browser.$('#summary-log-upload-error').getText()
+        return errorText.includes('The selected file is empty')
+      },
+      {
+        timeout: 5000,
+        timeoutMsg:
+          'Expected error message "The selected file is empty" to be present on the page within 5 seconds'
       }
     )
   })
