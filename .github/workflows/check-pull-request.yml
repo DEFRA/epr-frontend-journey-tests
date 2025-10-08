@@ -73,4 +73,4 @@ jobs:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: DEFRA/epr-frontend-journey-tests/run-journey-tests@main
+      - uses: DEFRA/epr-frontend-journey-tests/run-journey-tests@PAE-313-docker-network
