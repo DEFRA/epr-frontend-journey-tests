@@ -47,7 +47,7 @@ services:
 
 ################################################################################
   redis:
-    image: redis:7
+    image: redis:8.2.2-alpine3.22
     restart: always
     healthcheck:
       test: [ "CMD", "redis-cli", "PING" ]
