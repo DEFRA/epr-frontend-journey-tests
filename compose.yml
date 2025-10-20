@@ -88,6 +88,42 @@ services:
 # Add the services you want to test below.
 #
 ################################################################################
+  mongodb:
+    image: mongo:6.0.13
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 5s
+      retries: 3
+
+  epr-backend:
+    image: defradigital/epr-backend:${EPR_BACKEND:-latest}
+    links:
+      - 'localstack:localstack'
+      - 'mongodb:mongodb'
+    depends_on:
+      localstack:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - ./docker/config/defaults.env
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      MONGO_URI: mongodb://mongodb:27017/
+      GOVUK_NOTIFY_API_KEY: fake-key-for-testing
+      AUDIT_ENABLED: false
+      FEATURE_FLAG_SUMMARY_LOGS: true
+      FEATURE_FLAG_ORGANISATIONS: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 5s
+      start_period: 10s
+      retries: 5
+
   epr-frontend:
     image: defradigital/epr-frontend:${EPR_FRONTEND:-latest}
     env_file:
@@ -99,8 +135,11 @@ services:
       LOCALSTACK_ENDPOINT: http://localstack:4566
       USE_SINGLE_INSTANCE_CACHE: true
       CDP_UPLOADER_URL: http://cdp-uploader:7337
+      EPR_BACKEND_URL: http://epr-backend:3001
     depends_on:
       redis:
+        condition: service_healthy
+      epr-backend:
         condition: service_healthy
     ports:
       - 3000:3000
