@@ -23,6 +23,17 @@ describe('Registration', () => {
           'Expected text "Your file is being uploaded" to be present on the page within 5 seconds'
       }
     )
+    await browser.waitUntil(
+      async () => {
+        const pageText = await browser.$('body').getText()
+        return pageText.includes('Your file is ready to submit')
+      },
+      {
+        timeout: 10000,
+        timeoutMsg:
+          'Expected text "Your file is ready to submit" to be present on the page within 10 seconds'
+      }
+    )
   })
 
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
