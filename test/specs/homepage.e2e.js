@@ -7,4 +7,10 @@ describe('EPR Frontend', () => {
     await EprFrontendHomePage.open()
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))
   })
+
+  it('Should be able to navigate to Home Page via Welsh', async () => {
+    await EprFrontendHomePage.open('/cy')
+    const lang = await browser.$('html').getAttribute('lang')
+    expect(lang).toBe('cy')
+  })
 })
