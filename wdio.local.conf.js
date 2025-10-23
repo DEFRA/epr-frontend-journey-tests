@@ -63,11 +63,12 @@ export const config = {
   //
 
   capabilities: debug
-    ? [{ browserName: 'chrome' }]
+    ? [{ browserName: 'chrome', browserVersion: 'stable' }]
     : [
         {
           maxInstances: 1,
           browserName: 'chrome',
+          browserVersion: 'stable',
           'goog:chromeOptions': {
             args: [
               '--no-sandbox',
