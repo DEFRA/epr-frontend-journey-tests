@@ -11,7 +11,7 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await UploadSummaryLogPage.uploadFile('resources/sample.xlsx')
+    await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
     await UploadSummaryLogPage.continue()
     await checkBodyText('Your file is being uploaded', 5)
     await checkBodyText('Your file is ready to submit', 10)
