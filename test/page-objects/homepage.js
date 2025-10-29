@@ -5,8 +5,12 @@ class EprFrontendHomePage {
     return browser.url(lang + '/')
   }
 
-  registrationLink() {
-    $('#main-content a').click()
+  async signInLink() {
+    await $('#login-link').click()
+  }
+
+  async registrationLink() {
+    await $('#main-content a').click()
   }
 }
 
