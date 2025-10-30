@@ -21,7 +21,10 @@ describe('Registration', () => {
 
     await DefraIdStubPage.login()
 
-    await WasteRecordsPage.open('123', '456')
+    await WasteRecordsPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943912'
+    )
     await expect(browser).toHaveTitle(expect.stringContaining('Registration'))
     await WasteRecordsPage.submitSummaryLogLink()
     await expect(browser).toHaveTitle(
@@ -31,7 +34,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being uploaded', 5)
-    // await checkBodyText('Your file is ready to submit', 10)
+    await checkBodyText('Validation complete', 10)
   })
 
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
