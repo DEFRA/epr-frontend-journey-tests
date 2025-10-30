@@ -29,6 +29,8 @@ services:
     ports:
       - 4444:4444
     network_mode: host
+    extra_hosts:
+      defra-id-stub: host-gateway
 
 ################################################################################
   localstack:

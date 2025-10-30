@@ -2,16 +2,15 @@ import { browser, $ } from '@wdio/globals'
 
 class DefraIdStubPage {
   constructor() {
-    this.baseUrl = 'http://defra-id-stub:3200'
-    // this.baseUrl = 'http://localhost:3200'
+    this.baseUrl = 'http://localhost:3200'
   }
 
-  open() {
+  async open() {
     return browser.url(this.baseUrl)
   }
 
-  register() {
-    return browser.url(`${this.baseUrl}/cdp-defra-id-stub/register`)
+  async register() {
+    browser.url(`${this.baseUrl}/cdp-defra-id-stub/register`)
   }
 
   async registerUser() {
