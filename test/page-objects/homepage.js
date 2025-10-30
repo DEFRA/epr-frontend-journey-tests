@@ -6,7 +6,7 @@ class EprFrontendHomePage {
   }
 
   async signInLink() {
-    await $('=Start now').click()
+    await $('button[type=submit]').click()
   }
 
   async registrationLink() {

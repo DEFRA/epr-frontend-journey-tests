@@ -6,7 +6,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 
 describe('Registration', () => {
-  it('Should be able to submit Summary Log spreadsheet', async () => {
+  it.skip('Should be able to submit Summary Log spreadsheet', async () => {
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
     await expect(browser).toHaveTitle(

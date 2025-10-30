@@ -74,8 +74,7 @@ export const config = {
               '--no-sandbox',
               '--disable-infobars',
               '--disable-gpu',
-              '--window-size=1920,1080',
-              '--host-resolver-rules=MAP defra-id-stub localhost'
+              '--window-size=1920,1080'
             ]
           }
         }
