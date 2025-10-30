@@ -1,12 +1,12 @@
 import { browser, expect } from '@wdio/globals'
-import WasteRecordsPage from '../page-objects/waste.records.page.js'
-import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
-import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import Homepage from 'page-objects/homepage.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
+import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 
 describe('Registration', () => {
-  it.skip('Should be able to submit Summary Log spreadsheet', async () => {
+  it('Should be able to submit Summary Log spreadsheet', async () => {
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
     await expect(browser).toHaveTitle(

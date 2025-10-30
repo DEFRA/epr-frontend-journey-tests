@@ -35,6 +35,8 @@ services:
 ################################################################################
   localstack:
     image: localstack/localstack:3.2.0
+    ports:
+      - '4566:4566'
     environment:
       - LOCALSTACK_HOST=127.0.0.1
       - SERVICES=s3,sqs,sns,dynamodb
@@ -52,9 +54,11 @@ services:
 ################################################################################
   redis:
     image: redis:7.2.11-alpine3.21
+    ports:
+      - '6379:6379'
     restart: always
     healthcheck:
-      test: [ "CMD", "redis-cli", "PING" ]
+      test: ["CMD", "redis-cli", "PING"]
       interval: 5s
       start_period: 2s
       retries: 5
@@ -101,6 +105,8 @@ services:
 
   epr-backend:
     image: defradigital/epr-backend:${EPR_BACKEND:-latest}
+    ports:
+      - '3001:3001'
     links:
       - 'localstack:localstack'
       - 'mongodb:mongodb'
@@ -151,6 +157,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      epr-backend:
+        condition: service_healthy
+      cdp-uploader:
+        condition: service_started
 
   defra-id-stub:
     image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
@@ -160,7 +170,7 @@ services:
       redis:
         condition: service_started
     environment:
-      APP_BASE_URL: http://defra-id-stub:3200
+      APP_BASE_URL: http://localhost:3200
       NODE_ENV: development
       OIDC_BASE_PATH: /cdp-defra-id-stub
       OIDC_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
@@ -170,4 +180,3 @@ services:
       REDIS_HOST: redis
       SESSION_CACHE_ENGINE: redis
       USE_SINGLE_INSTANCE_CACHE: true
-
