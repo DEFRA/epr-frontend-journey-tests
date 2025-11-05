@@ -1,6 +1,6 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 
-class EprFrontendHomePage {
+class HomePage {
   open(lang = '') {
     return browser.url(lang + '/')
   }
@@ -9,9 +9,21 @@ class EprFrontendHomePage {
     await $('button[type=submit]').click()
   }
 
+  async welcomeText() {
+    return await $('#main-content div.govuk-panel__body').getText()
+  }
+
+  async navLinkElements() {
+    return await $$('div.govuk-service-navigation__container a').getElements()
+  }
+
   async registrationLink() {
     await $('#main-content a').click()
   }
+
+  async signOut() {
+    await $('#navigation > li:nth-child(2) > a').click()
+  }
 }
 
-export default new EprFrontendHomePage()
+export default new HomePage()

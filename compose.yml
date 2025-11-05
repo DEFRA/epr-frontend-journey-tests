@@ -144,7 +144,7 @@ services:
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
       LOCALSTACK_ENDPOINT: http://localstack:4566
-      NODE_ENV: test
+      NODE_ENV: development
       PORT: 3000
       REDIS_HOST: redis
       USE_SINGLE_INSTANCE_CACHE: true
@@ -168,7 +168,7 @@ services:
       redis:
         condition: service_started
     environment:
-      APP_BASE_URL: http://localhost:3200
+      APP_BASE_URL: http://defra-id-stub:3200
       NODE_ENV: development
       OIDC_BASE_PATH: /cdp-defra-id-stub
       OIDC_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
