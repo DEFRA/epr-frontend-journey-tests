@@ -1,4 +1,4 @@
-import EprFrontendHomePage from 'page-objects/homepage.js'
+import HomePage from 'page-objects/homepage.js'
 import { browser } from '@wdio/globals'
 
 import AxeBuilder from '@axe-core/webdriverio'
@@ -18,7 +18,7 @@ function failOnViolationLevel(results) {
 
 describe('WCAG Accessibility', () => {
   it('Should have no critical accessibility violations for Home Page', async () => {
-    await EprFrontendHomePage.open()
+    await HomePage.open()
 
     const builder = new AxeBuilder({ client: browser })
     const results = await builder.analyze()

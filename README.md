@@ -36,6 +36,14 @@ Install application dependencies:
 npm install
 ```
 
+### Additional configuration in Linux
+
+For Linux based machines, you will need to add this entry into your `etc/hosts` file for the tests to run locally:
+
+```
+127.0.0.1 defra-id-stub
+```
+
 ### Running local tests
 
 Start application you are testing on the url specified in `baseUrl` [wdio.local.conf.js](wdio.local.conf.js)
