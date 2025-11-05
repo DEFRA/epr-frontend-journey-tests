@@ -43,7 +43,8 @@ export const config = {
           '--disable-background-networking',
           '--disable-remote-fonts',
           '--ignore-certificate-errors',
-          '--disable-dev-shm-usage'
+          '--disable-dev-shm-usage',
+          '--host-resolver-rules=MAP defra-id-stub:3200 localhost:3200'
         ]
       }
     }

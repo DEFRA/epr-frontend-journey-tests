@@ -2,7 +2,7 @@ import { browser, $ } from '@wdio/globals'
 
 class DefraIdStubPage {
   constructor() {
-    this.baseUrl = 'http://defra-id-stub:3200'
+    this.baseUrl = 'http://localhost:3200'
   }
 
   async open() {
