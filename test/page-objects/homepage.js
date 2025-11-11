@@ -6,7 +6,7 @@ class HomePage {
   }
 
   async signInLink() {
-    await $('button[type=submit]').click()
+    await $('a[role=button]').click()
   }
 
   async welcomeText() {
