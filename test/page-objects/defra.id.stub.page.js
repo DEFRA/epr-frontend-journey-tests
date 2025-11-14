@@ -22,10 +22,10 @@ class DefraIdStubPage {
     await $('button[type=submit]').click()
   }
 
-  async newUserRelationship() {
-    await $('#relationshipId').setValue('abc')
-    await $('#organisationId').setValue('123')
-    await $('#organisationName').setValue('Test Org')
+  async newUserRelationship(relationship) {
+    await $('#relationshipId').setValue(relationship.id)
+    await $('#organisationId').setValue(relationship.orgId)
+    await $('#organisationName').setValue(relationship.orgName)
     await $('button[type=submit]').click()
   }
 
@@ -39,6 +39,12 @@ class DefraIdStubPage {
     await $(
       '#main-content > div:nth-child(2) > div > div > table > tbody > tr > td:nth-child(2) > a'
     ).click()
+  }
+
+  async selectOrganisation(index) {
+    const suffix = index === 1 ? '' : `-${index}`
+    await $(`#relationshipId${suffix}`).click()
+    await $('button[type=submit]').click()
   }
 }
 
