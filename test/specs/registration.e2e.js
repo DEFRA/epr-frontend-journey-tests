@@ -13,7 +13,17 @@ describe('Registration', () => {
       expect.stringContaining('DEFRA ID Registration')
     )
     await DefraIdStubPage.registerUser()
-    await DefraIdStubPage.newUserRelationship()
+    await DefraIdStubPage.newUserRelationship({
+      id: 'abc',
+      orgId: '123',
+      orgName: 'Test Org'
+    })
+    await DefraIdStubPage.newUserRelationship({
+      id: 'def',
+      orgId: '456',
+      orgName: 'Another Org'
+    })
+
     await DefraIdStubPage.finish()
 
     await Homepage.open()
@@ -24,12 +34,16 @@ describe('Registration', () => {
     await Homepage.signInLink()
 
     await DefraIdStubPage.login()
-
+    await DefraIdStubPage.selectOrganisation(1)
     const welcomeText = await Homepage.welcomeText()
     await expect(welcomeText).toEqual('Welcome, Waste Reprocessor')
 
     navigationLinks = await Homepage.navLinkElements()
     expect(navigationLinks.length).toBeGreaterThan(1)
+    const switchOrg = await navigationLinks.find(
+      async (link) => (await link.getText()) === 'Switch organisation'
+    )
+    expect(switchOrg).toBeDefined()
 
     await WasteRecordsPage.open(
       '6507f1f77bcf86cd79943911',
@@ -44,7 +58,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being uploaded', 5)
-    await checkBodyText('Validation complete', 10)
+    await checkBodyText('Validation failed', 10)
 
     await Homepage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))

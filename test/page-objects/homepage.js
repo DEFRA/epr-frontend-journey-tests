@@ -22,7 +22,11 @@ class HomePage {
   }
 
   async signOut() {
-    await $('#navigation > li:nth-child(2) > a').click()
+    const links = await $$('#navigation a')
+    const navLink = await links.find(
+      async (link) => (await link.getText()) === 'Sign out'
+    )
+    navLink.click()
   }
 }
 
