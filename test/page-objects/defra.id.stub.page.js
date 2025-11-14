@@ -23,9 +23,9 @@ class DefraIdStubPage {
   }
 
   async newUserRelationship(relationship) {
-    await $('#relationshipId').setValue(relationship.id) // 'abc'
-    await $('#organisationId').setValue(relationship.orgId) // '123'
-    await $('#organisationName').setValue(relationship.orgName) // 'Test Org'
+    await $('#relationshipId').setValue(relationship.id)
+    await $('#organisationId').setValue(relationship.orgId)
+    await $('#organisationName').setValue(relationship.orgName)
     await $('button[type=submit]').click()
   }
 
