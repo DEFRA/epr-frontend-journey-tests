@@ -67,6 +67,21 @@ describe('Registration', () => {
     expect(navigationLinks.length).toBe(1)
   })
 
+  it.skip('Should show check page after successful validation', async () => {
+    await UploadSummaryLogPage.open(123, 456)
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+    await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
+    await UploadSummaryLogPage.continue()
+    await checkBodyText('Your file is being uploaded', 5)
+    await checkBodyText('Check before you submit', 10)
+    await checkBodyText(
+      'Your summary log has been validated and is ready to submit',
+      1
+    )
+  })
+
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(123, 456)
 
