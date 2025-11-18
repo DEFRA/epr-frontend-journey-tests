@@ -28,6 +28,10 @@ class UploadSummaryLogPage {
     )
     return await $('#main-content h1').getText()
   }
+
+  async confirmAndSubmit() {
+    await $('#main-content > div > div > button').click()
+  }
 }
 
 export default new UploadSummaryLogPage()

@@ -58,7 +58,8 @@ describe('Registration', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being uploaded', 5)
-    await checkBodyText('Validation failed', 10)
+    await checkBodyText('Check before you submit', 10)
+    await UploadSummaryLogPage.confirmAndSubmit()
 
     await Homepage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))
