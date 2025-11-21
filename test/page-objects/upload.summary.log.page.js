@@ -30,7 +30,7 @@ class UploadSummaryLogPage {
   }
 
   async confirmAndSubmit() {
-    await $('#main-content > div > div > button').click()
+    await $('#main-content button[type=submit]').click()
   }
 }
 
