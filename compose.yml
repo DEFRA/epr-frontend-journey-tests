@@ -110,11 +110,14 @@ services:
     links:
       - 'localstack:localstack'
       - 'mongodb:mongodb'
+      - 'cdp-uploader:cdp-uploader'
     depends_on:
       localstack:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+      cdp-uploader:
+        condition: service_started
     env_file:
       - ./docker/config/defaults.env
     environment:
@@ -126,6 +129,7 @@ services:
       AUDIT_ENABLED: false
       FEATURE_FLAG_SUMMARY_LOGS: true
       FEATURE_FLAG_ORGANISATIONS: true
+      CDP_UPLOADER_URL: http://cdp-uploader:7337
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 5s
