@@ -18,20 +18,20 @@ export const companiesHouseDetails = {
 
 export const applicationContactDetails = {
   name: 'Test User',
-  email: 'REEXServiceTeam@defra.gov.uk',
+  email: 'testing@defra.gov.uk',
   telephone: '07777 999999',
   jobTitle: 'Testing'
 }
 
 export const approvedPerson = {
   name: 'Test User',
-  email: 'REEXServiceTeam@defra.gov.uk',
+  email: 'testing@defra.gov.uk',
   telephone: '07777 123456'
 }
 
 export const signatory = {
   fullName: 'Test User',
-  email: 'REEXServiceTeam@defra.gov.uk',
+  email: 'testing@defra.gov.uk',
   telephone: '07777 222333',
   jobTitle: 'Testing'
 }
