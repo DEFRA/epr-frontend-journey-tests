@@ -73,7 +73,7 @@ describe('Registration', () => {
     expect(navigationLinks.length).toBe(1)
   })
 
-  it.skip('Should get an error message with an empty Summary Log spreadsheet', async () => {
+  it('Should get an error message with an empty Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(123, 456)
 
     const navigationLinks = await Homepage.navLinkElements()
@@ -85,7 +85,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.uploadFile('resources/empty.xlsx')
     await UploadSummaryLogPage.continue()
     await checkUploadErrorText(
-      '#summary-log-upload-error',
+      '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
       'The selected file is empty',
       5
     )
