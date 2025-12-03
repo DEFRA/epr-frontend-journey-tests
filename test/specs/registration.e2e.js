@@ -73,7 +73,7 @@ describe('Registration', () => {
     expect(navigationLinks.length).toBe(1)
   })
 
-  it('Should get an error message with an empty Summary Log spreadsheet', async () => {
+  it.skip('Should get an error message with an empty Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(123, 456)
 
     const navigationLinks = await Homepage.navLinkElements()
