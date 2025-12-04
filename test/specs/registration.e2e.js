@@ -89,5 +89,8 @@ describe('Registration', () => {
       'The selected file is empty',
       5
     )
+
+    await UploadSummaryLogPage.returnToSubmissionPage()
+    await expect(browser).toHaveTitle(expect.stringContaining('Registration'))
   })
 })
