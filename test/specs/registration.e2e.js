@@ -82,12 +82,27 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
+
+    // Should not continue without uploading a file
+    await UploadSummaryLogPage.continue()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+
     await UploadSummaryLogPage.uploadFile('resources/empty.xlsx')
     await UploadSummaryLogPage.continue()
     await checkUploadErrorText(
       '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
       'The selected file is empty',
       5
+    )
+
+    // Should not continue without uploading a file
+    await UploadSummaryLogPage.continue()
+    await checkUploadErrorText(
+      '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
+      'The selected file is empty',
+      2
     )
 
     await UploadSummaryLogPage.returnToSubmissionPage()
