@@ -128,7 +128,7 @@ services:
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       AUDIT_ENABLED: false
       FEATURE_FLAG_SUMMARY_LOGS: true
-      FEATURE_FLAG_ORGANISATIONS: true
+      FEATURE_FLAG_DEV_ENDPOINTS: true
       CDP_UPLOADER_URL: http://cdp-uploader:7337
       APP_BASE_URL: http://epr-backend:3001
     healthcheck:
@@ -136,6 +136,14 @@ services:
       interval: 5s
       start_period: 10s
       retries: 5
+  epr-backend-data-setup:
+    image: curlimages/curl:latest
+    depends_on:
+      epr-backend:
+        condition: service_healthy
+    volumes:
+      - ./docker/scripts/epr-backend-data-setup.sh:/setup.sh
+    command: sh /setup.sh
 
   epr-frontend:
     image: defradigital/epr-frontend:${EPR_FRONTEND:-latest}
