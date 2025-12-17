@@ -9,12 +9,19 @@ class HomePage {
     await $('a[role=button]').click()
   }
 
+  async linkRegistration() {
+    if (await $('#organisation-id').isExisting()) {
+      await $('#organisation-id').click()
+      await $('button[type=submit]').click()
+    }
+  }
+
   async welcomeText() {
     return await $('#main-content div.govuk-panel__body').getText()
   }
 
   async navLinkElements() {
-    return await $$('div.govuk-service-navigation__container a').getElements()
+    return await $$('ul#navigation li a').getElements()
   }
 
   async registrationLink() {

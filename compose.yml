@@ -129,6 +129,9 @@ services:
       AUDIT_ENABLED: false
       FEATURE_FLAG_SUMMARY_LOGS: true
       FEATURE_FLAG_DEV_ENDPOINTS: true
+      FEATURE_FLAG_DEFRA_ID_AUTH: true
+      DEFRA_ID_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
+      DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       CDP_UPLOADER_URL: http://cdp-uploader:7337
       APP_BASE_URL: http://epr-backend:3001
     healthcheck:

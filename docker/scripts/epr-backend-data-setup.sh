@@ -14,10 +14,11 @@ curl -X PATCH http://epr-backend:3001/v1/dev/organisations/6507f1f77bcf86cd79943
             },
             {
               "id": "6507f1f77bcf86cd79943913",
+              "accreditationId": "68f6a147c117aec8a1ab7498",
               "status": "approved",
               "validFrom": "2025-01-01T00:00:00.000Z",
               "validTo": "2028-01-01T00:00:00.000Z",
-              "registrationNumber": "R25SR500030913PA"
+              "registrationNumber": "E25SR500030913PA"
             }
           ],
           "accreditations": [
@@ -27,8 +28,17 @@ curl -X PATCH http://epr-backend:3001/v1/dev/organisations/6507f1f77bcf86cd79943
               "validFrom": "2025-01-01T00:00:00.000Z",
               "validTo": "2028-01-01T00:00:00.000Z",
               "status": "approved"
+            },
+            {
+              "id": "68f6a147c117aec8a1ab7498",
+              "accreditationNumber": "ACC234567",
+              "validFrom": "2025-01-01T00:00:00.000Z",
+              "validTo": "2028-01-01T00:00:00.000Z",
+              "status": "approved"
             }
-          ]
+          ],
+          "status": "approved"
         }
       }
+
 '

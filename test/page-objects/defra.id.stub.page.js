@@ -14,9 +14,9 @@ class DefraIdStubPage {
   }
 
   async registerUser() {
-    await $('#email').setValue('reprocessor@test.gov.uk')
-    await $('#firstName').setValue('Waste')
-    await $('#lastName').setValue('Reprocessor')
+    await $('#email').setValue('alice.smith@ecorecycle.com')
+    await $('#firstName').setValue('Alice')
+    await $('#lastName').setValue('Smith')
     await $('#enrolmentCount').setValue('1')
     await $('#enrolmentRequestCount').setValue('1')
     await $('button[type=submit]').click()
