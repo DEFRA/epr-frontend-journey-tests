@@ -6,7 +6,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 
 describe('Registration', () => {
-  it.skip('Should be able to submit Summary Log spreadsheet', async () => {
+  it('Should be able to submit Summary Log spreadsheet', async () => {
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
     await expect(browser).toHaveTitle(
@@ -14,9 +14,9 @@ describe('Registration', () => {
     )
     await DefraIdStubPage.registerUser()
     await DefraIdStubPage.newUserRelationship({
-      id: 'abc',
-      orgId: '123',
-      orgName: 'Test Org'
+      id: 'relationshipId',
+      orgId: '2dee1e31-5ac6-4bc4-8fe0-0820f710c2b1',
+      orgName: 'ACME ltd'
     })
     await DefraIdStubPage.newUserRelationship({
       id: 'def',
@@ -29,14 +29,14 @@ describe('Registration', () => {
     await Homepage.open()
 
     let navigationLinks = await Homepage.navLinkElements()
-    expect(navigationLinks.length).toBe(1)
+    expect(navigationLinks.length).toBe(0)
 
     await Homepage.signInLink()
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
-    const welcomeText = await Homepage.welcomeText()
-    await expect(welcomeText).toEqual('Welcome, Waste Reprocessor')
+
+    await Homepage.linkRegistration()
 
     navigationLinks = await Homepage.navLinkElements()
     expect(navigationLinks.length).toBeGreaterThan(1)
@@ -58,7 +58,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being uploaded', 5)
-    await checkBodyText('Check before you submit', 10)
+    await checkBodyText('Check before confirming upload', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText(
@@ -70,18 +70,20 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))
 
     navigationLinks = await Homepage.navLinkElements()
-    expect(navigationLinks.length).toBe(1)
+    expect(navigationLinks.length).toBe(0)
   })
 
-  it.skip('Should get an error message with an empty Summary Log spreadsheet', async () => {
+  it('Should get an error message with an empty Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(123, 456)
 
-    const navigationLinks = await Homepage.navLinkElements()
-    expect(navigationLinks.length).toBe(1)
+    await DefraIdStubPage.login()
+    await DefraIdStubPage.selectOrganisation(1)
 
-    await expect(browser).toHaveTitle(
-      expect.stringContaining('Summary log: upload')
+    await WasteRecordsPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943912'
     )
+    await WasteRecordsPage.submitSummaryLogLink()
 
     // Should not continue without uploading a file
     await UploadSummaryLogPage.continue()
