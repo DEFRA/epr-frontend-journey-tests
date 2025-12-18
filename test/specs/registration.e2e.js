@@ -61,6 +61,8 @@ describe('Registration', () => {
     await checkBodyText('Check before confirming upload', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
+    await checkBodyText('Your waste records are being updated', 5)
+
     await checkBodyText(
       'Summary log for accreditation number ACC123456 submitted',
       10
