@@ -61,10 +61,7 @@ describe('Registration', () => {
     await checkBodyText('Check before confirming upload', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
-    await checkBodyText(
-      'Summary log for accreditation number ACC123456 submitted',
-      10
-    )
+    await checkBodyText('Summary log uploaded', 10)
 
     await Homepage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))
