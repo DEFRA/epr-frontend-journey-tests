@@ -64,10 +64,7 @@ describe('Registration', () => {
 
     await checkBodyText('Your waste records are being updated', 5)
 
-    await checkBodyText(
-      'Summary log for accreditation number ACC123456 submitted',
-      10
-    )
+    await checkBodyText('Summary log uploaded', 10)
 
     await Homepage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Home'))
