@@ -39,6 +39,7 @@ describe('Registration', () => {
     await Homepage.linkRegistration()
 
     await browser.pause(500) // Not the best but allow some time for linking to happen in the background
+    await checkBodyText('Sites', 5)
 
     navigationLinks = await Homepage.navLinkElements()
     expect(navigationLinks.length).toBeGreaterThan(1)
