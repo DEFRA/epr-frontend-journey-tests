@@ -57,9 +57,12 @@ describe('Registration', () => {
     await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being uploaded', 5)
+    await checkBodyText('Your file is being uploaded', 10)
+
     await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 5)
 
     await checkBodyText('Summary log uploaded', 10)
 
@@ -71,7 +74,10 @@ describe('Registration', () => {
   })
 
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
-    await UploadSummaryLogPage.open(123, 456)
+    await UploadSummaryLogPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943912'
+    )
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)

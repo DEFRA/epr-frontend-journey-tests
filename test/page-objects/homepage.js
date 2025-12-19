@@ -10,10 +10,8 @@ class HomePage {
   }
 
   async linkRegistration() {
-    if (await $('#organisation-id').isExisting()) {
-      await $('#organisation-id').click()
-      await $('button[type=submit]').click()
-    }
+    await $('#organisation-id').click()
+    await $('button[type=submit]').click()
   }
 
   async welcomeText() {
