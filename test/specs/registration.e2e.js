@@ -58,7 +58,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being uploaded', 5)
-    await checkBodyText('Check before confirming upload', 10)
+    await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Summary log uploaded', 10)
