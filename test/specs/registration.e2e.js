@@ -6,7 +6,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 
 describe('Registration', () => {
-  it('Should be able to submit Summary Log spreadsheet', async () => {
+  it('Should be able to submit a Reprocessor Input Summary Log spreadsheet', async () => {
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
     await expect(browser).toHaveTitle(
@@ -71,6 +71,37 @@ describe('Registration', () => {
 
     navigationLinks = await Homepage.navLinkElements()
     expect(navigationLinks.length).toBe(0)
+  })
+
+  it('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
+    await UploadSummaryLogPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943913'
+    )
+
+    await DefraIdStubPage.login()
+    await DefraIdStubPage.selectOrganisation(1)
+
+    await WasteRecordsPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943913'
+    )
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being uploaded', 10)
+
+    await checkBodyText('Check before confirming upload', 20)
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 5)
+
+    await checkBodyText('Summary log uploaded', 10)
+
+    await Homepage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Home'))
   })
 
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
