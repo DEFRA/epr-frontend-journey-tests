@@ -93,7 +93,7 @@ services:
 #
 ################################################################################
   mongodb:
-    image: mongo:6.0.13
+    image: mongo:6.0.27
     restart: always
     ports:
       - '27017:27017'
@@ -129,7 +129,7 @@ services:
       AUDIT_ENABLED: false
       FEATURE_FLAG_SUMMARY_LOGS: true
       FEATURE_FLAG_DEV_ENDPOINTS: true
-      FEATURE_FLAG_DEFRA_ID_AUTH: true
+      FEATURE_FLAG_CALCULATE_WASTE_BALANCE_ON_IMPORT: true
       DEFRA_ID_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
       DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       CDP_UPLOADER_URL: http://cdp-uploader:7337
@@ -139,10 +139,13 @@ services:
       interval: 5s
       start_period: 10s
       retries: 5
+
   epr-backend-data-setup:
     image: curlimages/curl:latest
     depends_on:
       epr-backend:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     volumes:
       - ./docker/scripts/epr-backend-data-setup.sh:/setup.sh
