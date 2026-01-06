@@ -5,6 +5,18 @@ class HomePage {
     return browser.url(lang + '/')
   }
 
+  openStart(lang = '') {
+    return browser.url(lang + '/start')
+  }
+
+  async getStartNowHref() {
+    return await $('a.govuk-button').getAttribute('href')
+  }
+
+  async clickStartNow() {
+    await $('a.govuk-button').click()
+  }
+
   async signInLink() {
     await $('a[role=button]').click()
   }
