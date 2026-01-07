@@ -22,8 +22,7 @@ class HomePage {
   }
 
   async linkRegistration() {
-    // GOV.UK radios use idPrefix, so first radio is #organisation-id-1
-    await $('#organisation-id-1').click()
+    await $('#organisation-id').click()
     await $('button[type=submit]').click()
   }
 

@@ -5,8 +5,10 @@ class WasteRecordsPage {
     return browser.url(`/organisations/${orgId}/registrations/${regId}`)
   }
 
-  submitSummaryLogLink() {
-    $('#main-content a').click()
+  async submitSummaryLogLink() {
+    await $(
+      '#main-content > div > div > div > div:nth-child(6) > div:nth-child(1) > div > div.govuk-summary-card__content > p > a'
+    ).click()
   }
 }
 

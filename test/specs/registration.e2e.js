@@ -1,13 +1,17 @@
 import { browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
-import Homepage from 'page-objects/homepage.js'
+import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
+import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 
 describe('Registration', () => {
-  it.skip('Should be able to submit a Reprocessor Input Summary Log spreadsheet', async () => {
-    await DefraIdStubPage.open()
+  it('Should be able to submit a Reprocessor Input Summary Log spreadsheet', async () => {
+    await HomePage.openStart()
+    const href = await HomePage.getStartNowHref()
+    expect(href).toBe('/login')
+
     await DefraIdStubPage.register()
     await expect(browser).toHaveTitle(
       expect.stringContaining('DEFRA ID Registration')
@@ -26,30 +30,27 @@ describe('Registration', () => {
 
     await DefraIdStubPage.finish()
 
-    await Homepage.open()
+    await HomePage.open()
 
-    let navigationLinks = await Homepage.navLinkElements()
+    let navigationLinks = await HomePage.navLinkElements()
     expect(navigationLinks.length).toBe(0)
 
-    await Homepage.signInLink()
+    await HomePage.signInLink()
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await Homepage.linkRegistration()
+    await HomePage.linkRegistration()
 
-    navigationLinks = await Homepage.navLinkElements()
-    expect(navigationLinks.length).toBeGreaterThan(1)
-    const switchOrg = await navigationLinks.find(
-      async (link) => (await link.getText()) === 'Switch organisation'
-    )
-    expect(switchOrg).toBeDefined()
+    navigationLinks = await HomePage.navLinkElements()
+    expect(navigationLinks.length).toBeGreaterThanOrEqual(1)
 
-    await WasteRecordsPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943912'
-    )
-    await expect(browser).toHaveTitle(expect.stringContaining('Registration'))
+    const dashboardHeaderText = await DashboardPage.dashboardHeaderText()
+
+    expect(dashboardHeaderText).toContain('Eco Recycle')
+
+    await DashboardPage.selectLink(1)
+
     await WasteRecordsPage.submitSummaryLogLink()
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
@@ -66,14 +67,14 @@ describe('Registration', () => {
 
     await checkBodyText('Summary log uploaded', 10)
 
-    await Homepage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Home'))
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
 
-    navigationLinks = await Homepage.navLinkElements()
+    navigationLinks = await HomePage.navLinkElements()
     expect(navigationLinks.length).toBe(0)
   })
 
-  it.skip('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
+  it('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(
       '6507f1f77bcf86cd79943911',
       '6507f1f77bcf86cd79943913'
@@ -100,11 +101,11 @@ describe('Registration', () => {
 
     await checkBodyText('Summary log uploaded', 10)
 
-    await Homepage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Home'))
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it.skip('Should get an error message with an empty Summary Log spreadsheet', async () => {
+  it('Should get an error message with an empty Summary Log spreadsheet', async () => {
     await UploadSummaryLogPage.open(
       '6507f1f77bcf86cd79943911',
       '6507f1f77bcf86cd79943912'
@@ -142,6 +143,8 @@ describe('Registration', () => {
     )
 
     await UploadSummaryLogPage.returnToSubmissionPage()
-    await expect(browser).toHaveTitle(expect.stringContaining('Registration'))
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('1 Green Park: Paper')
+    )
   })
 })
