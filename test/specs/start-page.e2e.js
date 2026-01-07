@@ -3,110 +3,104 @@ import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 
 describe('Start Page (PAE-777)', () => {
-  describe('Unauthenticated users', () => {
-    it('should redirect from / to /start', async () => {
-      await HomePage.open()
-      await browser.waitUntil(
-        async () => (await browser.getUrl()).includes('/start'),
-        {
-          timeout: 5000,
-          timeoutMsg: 'Expected URL to redirect to /start'
-        }
-      )
-      const url = await browser.getUrl()
-      expect(url).toContain('/start')
-    })
-
-    it('should display the start page at /start', async () => {
-      await HomePage.openStart()
-      await expect(browser).toHaveTitle(expect.stringContaining('Home'))
-    })
-
-    it('should have Start Now button linking to /login', async () => {
-      await HomePage.openStart()
-      const href = await HomePage.getStartNowHref()
-      expect(href).toBe('/login')
-    })
+  it('Should redirect from / to /start', async () => {
+    await HomePage.open()
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes('/start'),
+      {
+        timeout: 5000,
+        timeoutMsg: 'Expected URL to redirect to /start'
+      }
+    )
+    const url = await browser.getUrl()
+    expect(url).toContain('/start')
   })
 
-  describe('Authenticated users with linked organisation', () => {
-    // Skip: Tests full linking flow which requires complex backend state setup
-    // The auth redirect behaviour is tested in auth-callback.e2e.js
-    it.skip('should redirect to organisation home after login and linking', async () => {
-      // Setup: Register user with Defra ID stub
-      await DefraIdStubPage.open()
-      await DefraIdStubPage.register()
-      await DefraIdStubPage.registerUser()
-      await DefraIdStubPage.newUserRelationship({
-        id: 'relationshipId',
-        orgId: '2dee1e31-5ac6-4bc4-8fe0-0820f710c2b1',
-        orgName: 'ACME ltd'
-      })
-      // Add second relationship so the selection page appears
-      await DefraIdStubPage.newUserRelationship({
-        id: 'dummy-relationship',
-        orgId: 'dummy-org-id',
-        orgName: 'Dummy Organisation'
-      })
-      await DefraIdStubPage.finish()
-
-      // Navigate to start page and click Start Now
-      await HomePage.openStart()
-      await HomePage.clickStartNow()
-      await DefraIdStubPage.login()
-      await DefraIdStubPage.selectOrganisation(1)
-
-      // Should be redirected to account linking
-      await browser.waitUntil(
-        async () => (await browser.getUrl()).includes('/account/linking'),
-        {
-          timeout: 10000,
-          timeoutMsg: 'Expected redirect to account linking'
-        }
-      )
-
-      // Link the organisation
-      await HomePage.linkRegistration()
-
-      // Should redirect to organisation home
-      await browser.waitUntil(
-        async () => (await browser.getUrl()).includes('/organisations/'),
-        {
-          timeout: 10000,
-          timeoutMsg: 'Expected redirect to organisation home after linking'
-        }
-      )
-      const url = await browser.getUrl()
-      expect(url).toContain('/organisations/')
-
-      // Start Now button should now link to organisation home
-      await HomePage.openStart()
-      const href = await HomePage.getStartNowHref()
-      expect(href).toContain('/organisations/')
-
-      // Cleanup
-      await HomePage.signOut()
-    })
+  it('Should display the start page at /start', async () => {
+    await HomePage.openStart()
+    await expect(browser).toHaveTitle(expect.stringContaining('Home'))
   })
 
-  describe('Welsh language support', () => {
-    it('should redirect from /cy to /cy/start', async () => {
-      await HomePage.open('/cy')
-      await browser.waitUntil(
-        async () => (await browser.getUrl()).includes('/cy/start'),
-        {
-          timeout: 5000,
-          timeoutMsg: 'Expected URL to redirect to /cy/start'
-        }
-      )
-      const url = await browser.getUrl()
-      expect(url).toContain('/cy/start')
-    })
+  it('Should have Start Now button linking to /login', async () => {
+    await HomePage.openStart()
+    const href = await HomePage.getStartNowHref()
+    expect(href).toBe('/login')
+  })
 
-    it('should display the Welsh start page', async () => {
-      await HomePage.openStart('/cy')
-      const lang = await browser.$('html').getAttribute('lang')
-      expect(lang).toBe('cy')
+  // Skip: Tests full linking flow which requires complex backend state setup
+  // The auth redirect behaviour is tested in auth-callback.e2e.js
+  it.skip('Should redirect to organisation home after login and linking', async () => {
+    // Setup: Register user with Defra ID stub
+    await DefraIdStubPage.open()
+    await DefraIdStubPage.register()
+    await DefraIdStubPage.registerUser()
+    await DefraIdStubPage.newUserRelationship({
+      id: 'relationshipId',
+      orgId: '2dee1e31-5ac6-4bc4-8fe0-0820f710c2b1',
+      orgName: 'ACME ltd'
     })
+    // Add second relationship so the selection page appears
+    await DefraIdStubPage.newUserRelationship({
+      id: 'dummy-relationship',
+      orgId: 'dummy-org-id',
+      orgName: 'Dummy Organisation'
+    })
+    await DefraIdStubPage.finish()
+
+    // Navigate to start page and click Start Now
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+    await DefraIdStubPage.login()
+    await DefraIdStubPage.selectOrganisation(1)
+
+    // Should be redirected to account linking
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes('/account/linking'),
+      {
+        timeout: 10000,
+        timeoutMsg: 'Expected redirect to account linking'
+      }
+    )
+
+    // Link the organisation
+    await HomePage.linkRegistration()
+
+    // Should redirect to organisation home
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes('/organisations/'),
+      {
+        timeout: 10000,
+        timeoutMsg: 'Expected redirect to organisation home after linking'
+      }
+    )
+    const url = await browser.getUrl()
+    expect(url).toContain('/organisations/')
+
+    // Start Now button should now link to organisation home
+    await HomePage.openStart()
+    const href = await HomePage.getStartNowHref()
+    expect(href).toContain('/organisations/')
+
+    // Cleanup
+    await HomePage.signOut()
+  })
+
+  it('Should redirect from /cy to /cy/start', async () => {
+    await HomePage.open('/cy')
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes('/cy/start'),
+      {
+        timeout: 5000,
+        timeoutMsg: 'Expected URL to redirect to /cy/start'
+      }
+    )
+    const url = await browser.getUrl()
+    expect(url).toContain('/cy/start')
+  })
+
+  it('Should display the Welsh start page', async () => {
+    await HomePage.openStart('/cy')
+    const lang = await browser.$('html').getAttribute('lang')
+    expect(lang).toBe('cy')
   })
 })

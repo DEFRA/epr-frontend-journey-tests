@@ -3,7 +3,7 @@ import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 
 describe('Auth Callback Redirects (PAE-757)', () => {
-  it('should redirect to account linking page when organisation not linked', async () => {
+  it('Should redirect to account linking page when organisation not linked', async () => {
     // Setup: Register user with Defra ID stub
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
@@ -42,7 +42,7 @@ describe('Auth Callback Redirects (PAE-757)', () => {
 
   // Skip: Tests post-linking behaviour which requires complex backend state setup
   // The auth callback redirect (to /account/linking) is verified in the test above
-  it.skip('should redirect to organisation home after linking', async () => {
+  it.skip('Should redirect to organisation home after linking', async () => {
     // Continuing from previous test state - link the organisation
     await HomePage.linkRegistration()
 
@@ -63,7 +63,7 @@ describe('Auth Callback Redirects (PAE-757)', () => {
 
   // Skip: Tests linked user flow which requires pre-linked organisation state
   // Would need backend setup to create a user with an already-linked organisation
-  it.skip('should redirect directly to organisation home when already linked', async () => {
+  it.skip('Should redirect directly to organisation home when already linked', async () => {
     // Setup: Register new user and complete full linking flow
     await DefraIdStubPage.open()
     await DefraIdStubPage.register()
