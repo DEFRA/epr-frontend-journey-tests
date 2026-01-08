@@ -1,4 +1,4 @@
-import { browser, expect } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
@@ -12,7 +12,8 @@ describe('Registration', () => {
     const href = await HomePage.getStartNowHref()
     expect(href).toBe('/login')
 
-    await DefraIdStubPage.register()
+    await HomePage.clickStartNow()
+
     await expect(browser).toHaveTitle(
       expect.stringContaining('DEFRA ID Registration')
     )
@@ -51,6 +52,12 @@ describe('Registration', () => {
 
     await DashboardPage.selectLink(1)
 
+    const regNo = await $('//a[normalize-space()="R25SR500030912PA"]')
+    expect(regNo).toExist()
+
+    const accNo = await $('//a[normalize-space()="ACC123456"]')
+    expect(accNo).toExist()
+
     await WasteRecordsPage.submitSummaryLogLink()
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
@@ -58,12 +65,12 @@ describe('Registration', () => {
     await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being uploaded', 10)
+    await checkBodyText('Your file is being uploaded', 20)
 
     await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
 
-    await checkBodyText('Your waste records are being updated', 5)
+    await checkBodyText('Your waste records are being updated', 20)
 
     await checkBodyText('Summary log uploaded', 10)
 
@@ -83,21 +90,28 @@ describe('Registration', () => {
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await WasteRecordsPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943913'
-    )
+    await HomePage.clickStartNow()
+
+    await DashboardPage.selectExportingTab()
+    await DashboardPage.selectLink(1)
+
+    const regNo = await $('//a[normalize-space()="E25SR500030913PA"]')
+    expect(regNo).toExist()
+
+    const accNo = await $('//a[normalize-space()="ACC234567"]')
+    expect(accNo).toExist()
+
     await WasteRecordsPage.submitSummaryLogLink()
 
     await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being uploaded', 10)
+    await checkBodyText('Your file is being uploaded', 20)
 
     await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
 
-    await checkBodyText('Your waste records are being updated', 5)
+    await checkBodyText('Your waste records are being updated', 20)
 
     await checkBodyText('Summary log uploaded', 10)
 
@@ -114,10 +128,9 @@ describe('Registration', () => {
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await WasteRecordsPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943912'
-    )
+    await HomePage.clickStartNow()
+    await DashboardPage.selectLink(1)
+
     await WasteRecordsPage.submitSummaryLogLink()
 
     // Should not continue without uploading a file

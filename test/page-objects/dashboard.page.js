@@ -14,6 +14,10 @@ class DashboardPage {
       '#main-content table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
     ).click()
   }
+
+  async selectExportingTab() {
+    await $('//a[normalize-space()="Exporting"]').click()
+  }
 }
 
 export default new DashboardPage()

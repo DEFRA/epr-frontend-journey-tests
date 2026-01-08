@@ -6,9 +6,7 @@ class WasteRecordsPage {
   }
 
   async submitSummaryLogLink() {
-    await $(
-      '#main-content > div > div > div > div:nth-child(6) > div:nth-child(1) > div > div.govuk-summary-card__content > p > a'
-    ).click()
+    await $('a*=Upload your summary log').click()
   }
 }
 

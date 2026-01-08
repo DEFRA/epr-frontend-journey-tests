@@ -30,15 +30,11 @@ class DefraIdStubPage {
   }
 
   async finish() {
-    await $(
-      '#main-content > div:nth-child(2) > div > div > form > div:nth-child(6) > a:nth-child(2)'
-    ).click()
+    await $('a*=Finish').click()
   }
 
   async login() {
-    await $(
-      '#main-content > div:nth-child(2) > div > div > table > tbody > tr > td:nth-child(2) > a'
-    ).click()
+    await $('a*=Log in').click()
   }
 
   async selectOrganisation(index) {
