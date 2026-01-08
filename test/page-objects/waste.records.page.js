@@ -5,8 +5,8 @@ class WasteRecordsPage {
     return browser.url(`/organisations/${orgId}/registrations/${regId}`)
   }
 
-  submitSummaryLogLink() {
-    $('#main-content a').click()
+  async submitSummaryLogLink() {
+    await $('a*=Upload your summary log').click()
   }
 }
 
