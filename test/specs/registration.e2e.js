@@ -90,8 +90,6 @@ describe('Registration', () => {
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await HomePage.clickStartNow()
-
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)
 
@@ -128,7 +126,6 @@ describe('Registration', () => {
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await HomePage.clickStartNow()
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
