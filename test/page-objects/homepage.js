@@ -22,12 +22,12 @@ class HomePage {
   }
 
   async linkRegistration() {
-    await $('#organisation-id').click()
+    await $('input[type=radio]').click()
     await $('button[type=submit]').click()
   }
 
   async navLinkElements() {
-    return await $$('ul#navigation li a').getElements()
+    return await $$('.govuk-service-navigation__item a').getElements()
   }
 
   async signOut() {
