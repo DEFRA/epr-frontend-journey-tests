@@ -82,10 +82,8 @@ describe('Registration', () => {
   })
 
   it('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
-    await UploadSummaryLogPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943913'
-    )
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
@@ -126,11 +124,6 @@ describe('Registration', () => {
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
-    await DashboardPage.selectLink(1)
-
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    // Should not continue without uploading a file
     await UploadSummaryLogPage.continue()
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
