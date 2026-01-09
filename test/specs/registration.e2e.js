@@ -9,8 +9,25 @@ import { checkBodyText, checkUploadErrorText } from '../support/checks.js'
 describe('Registration', () => {
   it('Should be able to submit a Reprocessor Input Summary Log spreadsheet', async () => {
     await HomePage.openStart()
+
+    // PAE-743: Site Furniture checks
     const href = await HomePage.getStartNowHref()
     expect(href).toBe('/login')
+
+    const phaseTag = await HomePage.getPhaseTagText()
+    expect(phaseTag).toBe('Beta')
+
+    const feedbackHref = await HomePage.getFeedbackLinkHref()
+    expect(feedbackHref).toBe('mailto:eprcustomerservice@defra.gov.uk')
+
+    const feedbackText = await HomePage.getFeedbackLinkText()
+    expect(feedbackText).toBe('give your feedback by email')
+
+    // Not signed in, navigation links do not display
+    let navigationLinks = await HomePage.navLinkElements()
+    expect(navigationLinks.length).toBe(0)
+
+    // PAE-743: End of Site Furniture checks
 
     await HomePage.clickStartNow()
 
@@ -33,9 +50,6 @@ describe('Registration', () => {
 
     await HomePage.open()
 
-    let navigationLinks = await HomePage.navLinkElements()
-    expect(navigationLinks.length).toBe(0)
-
     await HomePage.signInLink()
 
     await DefraIdStubPage.login()
@@ -43,8 +57,18 @@ describe('Registration', () => {
 
     await HomePage.linkRegistration()
 
+    // Signed in, there should be navigation links now
     navigationLinks = await HomePage.navLinkElements()
     expect(navigationLinks.length).toBeGreaterThanOrEqual(1)
+
+    const navLinkTexts = await HomePage.getNavLinkTexts()
+
+    expect(navLinkTexts).toContain('Home')
+    expect(navLinkTexts).toContain('Manage account')
+    expect(navLinkTexts).toContain('Sign out')
+
+    const homeHref = await HomePage.getNavigationLinkHref('Home')
+    expect(homeHref).toContain('/organisations/')
 
     const dashboardHeaderText = await DashboardPage.dashboardHeaderText()
 
@@ -74,6 +98,7 @@ describe('Registration', () => {
 
     await checkBodyText('Summary log uploaded', 10)
 
+    // PAE-743: Sign out link is visible, hence able to sign out
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
 
@@ -82,10 +107,8 @@ describe('Registration', () => {
   })
 
   it('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
-    await UploadSummaryLogPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943913'
-    )
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
@@ -118,19 +141,15 @@ describe('Registration', () => {
   })
 
   it('Should get an error message with an empty Summary Log spreadsheet', async () => {
-    await UploadSummaryLogPage.open(
-      '6507f1f77bcf86cd79943911',
-      '6507f1f77bcf86cd79943912'
-    )
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
 
     await DashboardPage.selectLink(1)
-
     await WasteRecordsPage.submitSummaryLogLink()
 
-    // Should not continue without uploading a file
     await UploadSummaryLogPage.continue()
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
