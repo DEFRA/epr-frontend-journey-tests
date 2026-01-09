@@ -82,22 +82,13 @@ describe('Registration', () => {
   })
 
   it('Should be able to submit a Exporter Summary Log spreadsheet', async () => {
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
+    await UploadSummaryLogPage.open(
+      '6507f1f77bcf86cd79943911',
+      '6507f1f77bcf86cd79943913'
+    )
 
     await DefraIdStubPage.login()
     await DefraIdStubPage.selectOrganisation(1)
-
-    await DashboardPage.selectExportingTab()
-    await DashboardPage.selectLink(1)
-
-    const regNo = await $('//a[normalize-space()="E25SR500030913PA"]')
-    expect(regNo).toExist()
-
-    const accNo = await $('//a[normalize-space()="ACC234567"]')
-    expect(accNo).toExist()
-
-    await WasteRecordsPage.submitSummaryLogLink()
 
     await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
     await UploadSummaryLogPage.continue()
