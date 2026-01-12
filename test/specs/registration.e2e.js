@@ -89,7 +89,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being uploaded', 20)
+    await checkBodyText('Your file is being checked', 20)
 
     await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
@@ -127,7 +127,7 @@ describe('Registration', () => {
     await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being uploaded', 20)
+    await checkBodyText('Your file is being checked', 20)
 
     await checkBodyText('Check before confirming upload', 20)
     await UploadSummaryLogPage.confirmAndSubmit()
