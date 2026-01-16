@@ -34,7 +34,13 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('DEFRA ID Registration')
     )
-    await DefraIdStubPage.registerUser()
+
+    const user = {
+      email: 'alice.smith@ecorecycle.com',
+      firstName: 'Alice',
+      lastName: 'Smith'
+    }
+    await DefraIdStubPage.registerUser(user)
     await DefraIdStubPage.newUserRelationship({
       id: 'relationshipId',
       orgId: '2dee1e31-5ac6-4bc4-8fe0-0820f710c2b1',
@@ -204,5 +210,69 @@ describe('Registration', () => {
       "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
       20
     )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('Should be able to submit a Reprocessor Output Summary Log spreadsheet (6 rows total, but only 1 added for waste balance)', async () => {
+    await DefraIdStubPage.register()
+
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('DEFRA ID Registration')
+    )
+
+    const user = {
+      email: 'eve.black@charity.org',
+      firstName: 'Eve',
+      lastName: 'Black'
+    }
+    await DefraIdStubPage.registerUser(user)
+    await DefraIdStubPage.newUserRelationship({
+      id: 'relationshipId',
+      orgId: '88887777-5ac6-4bc4-8fe0-0820f710c231',
+      orgName: 'Green Future Trust'
+    })
+
+    await DefraIdStubPage.finish()
+
+    await HomePage.open()
+
+    await HomePage.signInLink()
+
+    await DefraIdStubPage.login(1)
+    await HomePage.linkRegistration()
+
+    const dashboardHeaderText = await DashboardPage.dashboardHeaderText()
+
+    expect(dashboardHeaderText).toContain('Green Future')
+
+    await DashboardPage.selectLink(1)
+
+    const regNo = await $('//a[normalize-space()="R25SR500050912PA"]')
+    expect(regNo).toExist()
+
+    const accNo = await $('//a[normalize-space()="ACC500591"]')
+    expect(accNo).toExist()
+
+    await WasteRecordsPage.submitSummaryLogLink()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+    await UploadSummaryLogPage.uploadFile('resources/reprocessor-output.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 20)
+
+    await checkBodyText('Check before confirming upload', 20)
+    await checkBodyText('1 new load will be added to your waste balance', 20)
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 20)
+
+    await checkBodyText('Summary log uploaded', 10)
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 })
