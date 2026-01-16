@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 
 class DefraIdStubPage {
   constructor() {
@@ -13,10 +13,10 @@ class DefraIdStubPage {
     browser.url(`${this.baseUrl}/cdp-defra-id-stub/register`)
   }
 
-  async registerUser() {
-    await $('#email').setValue('alice.smith@ecorecycle.com')
-    await $('#firstName').setValue('Alice')
-    await $('#lastName').setValue('Smith')
+  async registerUser(user) {
+    await $('#email').setValue(user.email)
+    await $('#firstName').setValue(user.firstName)
+    await $('#lastName').setValue(user.lastName)
     await $('#enrolmentCount').setValue('1')
     await $('#enrolmentRequestCount').setValue('1')
     await $('button[type=submit]').click()
@@ -33,8 +33,8 @@ class DefraIdStubPage {
     await $('a*=Finish').click()
   }
 
-  async login() {
-    await $('a*=Log in').click()
+  async login(index = 0) {
+    await $$('a*=Log in')[index].click()
   }
 
   async selectOrganisation(index) {
