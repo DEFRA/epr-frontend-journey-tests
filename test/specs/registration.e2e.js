@@ -175,5 +175,34 @@ describe('Registration', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('1 Green Park: Paper')
     )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('Should get an error message with a Summary Log spreadsheet that does not conform to template requirements', async () => {
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.login()
+    await DefraIdStubPage.selectOrganisation(1)
+
+    await DashboardPage.selectLink(1)
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await UploadSummaryLogPage.continue()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+
+    await UploadSummaryLogPage.uploadFile('resources/bad-marker.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 20)
+
+    await checkBodyText(
+      "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
+      20
+    )
   })
 })
