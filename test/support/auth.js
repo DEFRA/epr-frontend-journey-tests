@@ -1,5 +1,5 @@
 import config from '../config/config.js'
-import { request } from 'undici'
+import { request, setGlobalDispatcher } from 'undici'
 
 export class AuthClient {
   constructor(baseUrl = config.authUri) {
@@ -9,13 +9,11 @@ export class AuthClient {
 
   async generateToken(payload, suffix) {
     const instanceHeaders = { ...this.defaultHeaders }
-
-    console.log(config.undiciAgent)
+    setGlobalDispatcher(config.undiciAgent)
     const response = await request(`${this.baseUrl}${suffix}`, {
       method: 'POST',
       headers: instanceHeaders,
-      body: payload,
-      dispatcher: config.undiciAgent
+      body: payload
     })
     const responseJson = await response.body.json()
     this.accessToken = responseJson.access_token
