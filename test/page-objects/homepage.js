@@ -75,6 +75,10 @@ class HomePage {
     return await this.phaseBannerFeedbackLink.getText()
   }
 
+  async homeLink() {
+    await $('a*=Home').click()
+  }
+
   async signOut() {
     await $('a*=Sign out').click()
   }
