@@ -17,10 +17,6 @@ class HomePage {
     await $('a.govuk-button').click()
   }
 
-  async signInLink() {
-    await $('a[role=button]').click()
-  }
-
   async linkRegistration() {
     await $('#organisation-id').click()
     await $('button[type=submit]').click()

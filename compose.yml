@@ -132,6 +132,9 @@ services:
       FEATURE_FLAG_CALCULATE_WASTE_BALANCE_ON_IMPORT: true
       DEFRA_ID_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
       DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
+      ENTRA_OIDC_WELL_KNOWN_CONFIGURATION_URL: http://epr-re-ex-entra-stub:3010/.well-known/openid-configuration
+      ADMIN_UI_ENTRA_CLIENT_ID: clientId
+      SERVICE_MAINTAINER_EMAILS: '["ea@test.gov.uk"]'
       CDP_UPLOADER_URL: http://cdp-uploader:7337
       APP_BASE_URL: http://epr-backend:3001
     healthcheck:
@@ -180,6 +183,18 @@ services:
         condition: service_healthy
       cdp-uploader:
         condition: service_started
+
+  epr-re-ex-entra-stub:
+    image: defradigital/epr-re-ex-entra-stub:latest
+    ports:
+      - 3010:3010
+    environment:
+      STUB_INTERNAL_URL: http://epr-re-ex-entra-stub:3010
+    healthcheck:
+      test: ['CMD', 'curl', 'http://localhost:3010/health']
+      interval: 3s
+      start_period: 2s
+      retries: 3
 
   defra-id-stub:
     image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
