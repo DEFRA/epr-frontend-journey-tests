@@ -11,6 +11,7 @@ import { AuthClient } from './auth.js'
 import { fakerEN_GB } from '@faker-js/faker'
 import { DefraIdStub } from './defra-id-stub.js'
 import Users from './users.js'
+import { FormData } from 'undici'
 
 // Examples
 // dataRows = [{ material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor'}, { material: 'Steel (R4)', wasteProcessingType: 'Exporter'}]
@@ -95,10 +96,7 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
     payload = JSON.stringify({ clientId, username })
     urlSuffix = '/sign'
   }
-  console.log('Attempting to generate auth token for epr-backend')
   await authClient.generateToken(payload, urlSuffix)
-
-  console.log('Generated auth token for epr-backend')
 
   let response = await baseAPI.get(
     `/v1/organisations/${orgId}`,
