@@ -15,6 +15,16 @@ class DashboardPage {
     ).click()
   }
 
+  async selectTableLink(tableIndex, index) {
+    await $(
+      '#main-content table.govuk-table:nth-of-type(' +
+        tableIndex +
+        ') tr:nth-child(' +
+        index +
+        ') a.govuk-link'
+    ).click()
+  }
+
   async availableWasteBalance(index) {
     const wasteBalanceElement = await $(
       '#main-content table.govuk-table tr:nth-child(' +
@@ -27,6 +37,18 @@ class DashboardPage {
 
   async selectExportingTab() {
     await $('//a[normalize-space()="Exporting"]').click()
+  }
+
+  async getMaterial(tableIndex, rowIndex) {
+    const materialElement = await $(
+      '#main-content table.govuk-table:nth-of-type(' +
+        tableIndex +
+        ') tr:nth-child(' +
+        rowIndex +
+        ') > td:nth-child(1)'
+    )
+    await materialElement.waitForExist({ timeout: 5000 })
+    return await materialElement.getText()
   }
 }
 

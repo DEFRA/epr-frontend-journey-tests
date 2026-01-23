@@ -38,14 +38,15 @@ export async function createLinkedOrganisation(dataRows) {
 
   for (const dataRow of dataRows) {
     let material = 'Paper or board (R3)'
+    const glassRecyclingProcess = dataRow.glassRecyclingProcess?.trim()
     if (dataRow.material !== '') {
       material = dataRow.material
     }
     const registration = new Registration(orgId, refNo)
     payload =
       dataRow.wasteProcessingType === 'Reprocessor'
-        ? registration.toAllMaterialsPayload(material)
-        : registration.toExporterPayload(material)
+        ? registration.toAllMaterialsPayload(material, glassRecyclingProcess)
+        : registration.toExporterPayload(material, glassRecyclingProcess)
     response = await baseAPI.post(
       '/v1/apply/registration',
       JSON.stringify(payload)
@@ -56,8 +57,8 @@ export async function createLinkedOrganisation(dataRows) {
     accreditation.postcode = registration.postcode
     payload =
       dataRow.wasteProcessingType === 'Reprocessor'
-        ? accreditation.toReprocessorPayload(material)
-        : accreditation.toExporterPayload(material)
+        ? accreditation.toReprocessorPayload(material, glassRecyclingProcess)
+        : accreditation.toExporterPayload(material, glassRecyclingProcess)
 
     response = await baseAPI.post(
       '/v1/apply/accreditation',
@@ -94,7 +95,10 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
     payload = JSON.stringify({ clientId, username })
     urlSuffix = '/sign'
   }
+  console.log('Attempting to generate auth token for epr-backend')
   await authClient.generateToken(payload, urlSuffix)
+
+  console.log('Generated auth token for epr-backend')
 
   let response = await baseAPI.get(
     `/v1/organisations/${orgId}`,

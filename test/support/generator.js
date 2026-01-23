@@ -7,7 +7,6 @@ import orgUkSoleTraderPayload from '../fixtures/ea/organisation/non-registered-u
 import nonRegOutsideUkAddressPayload from '../fixtures/ea/organisation/non-registered-outside-uk-address.json' with { type: 'json' }
 import regPayload from '../fixtures/registration.json' with { type: 'json' }
 import regAllMaterialsPayload from '../fixtures/ea/registration/reprocessor-all-materials.json' with { type: 'json' }
-import organisationsPayload from '../fixtures/sample-organisation-1.json' with { type: 'json' }
 
 const materials = [
   'Aluminium (R4)',
@@ -67,13 +66,16 @@ export class Accreditation {
     this.postcode = fakerEN_GB.location.zipCode()
   }
 
-  toReprocessorPayload(material = 'Paper or board (R3)') {
+  toReprocessorPayload(
+    material = 'Paper or board (R3)',
+    glassRecyclingType = 'Glass other'
+  ) {
     const payload = JSON.parse(JSON.stringify(accReprocessorPayload))
 
     this.material = material
 
     if (this.material === 'Glass (R5)') {
-      payload.data.main.gQZpRd = 'Glass re-melt'
+      payload.data.main.gQZpRd = glassRecyclingType
     }
 
     payload.data.main.PcYDad = this.fullName
@@ -111,13 +113,16 @@ export class Accreditation {
     return payload
   }
 
-  toExporterPayload(material = 'Paper or board (R3)') {
+  toExporterPayload(
+    material = 'Paper or board (R3)',
+    glassRecyclingType = 'Glass re-melt'
+  ) {
     const payload = JSON.parse(JSON.stringify(accPayload))
 
     this.material = material
 
     if (this.material === 'Glass (R5)') {
-      payload.data.main.WNTLmM = 'Glass re-melt'
+      payload.data.main.WNTLmM = glassRecyclingType
     } else {
       delete payload.data.main.WNTLmM
     }
@@ -303,7 +308,10 @@ export class Registration {
       postcode
   }
 
-  toAllMaterialsPayload(material = 'Paper or board (R3)') {
+  toAllMaterialsPayload(
+    material = 'Paper or board (R3)',
+    glassRecyclingType = 'Glass other'
+  ) {
     const payload = JSON.parse(JSON.stringify(regAllMaterialsPayload))
 
     payload.data.main.DDVUrr = this.companyName
@@ -325,7 +333,7 @@ export class Registration {
     payload.data.main.dFPgaw = material
 
     if (material === 'Glass (R5)') {
-      payload.data.main.YMRnmp = 'Glass other'
+      payload.data.main.YMRnmp = glassRecyclingType
     }
     payload.data.main.Laiblc = this.address
     payload.data.main.xinNGX =
@@ -347,13 +355,16 @@ export class Registration {
     return payload
   }
 
-  toExporterPayload(material = 'Paper or board (R3)') {
+  toExporterPayload(
+    material = 'Paper or board (R3)',
+    glassRecyclingType = 'Glass re-melt'
+  ) {
     const payload = JSON.parse(JSON.stringify(regPayload))
 
     this.material = material
 
     if (this.material === 'Glass (R5)') {
-      payload.data.main.RaiIHT = 'Glass re-melt'
+      payload.data.main.RaiIHT = glassRecyclingType
     } else {
       delete payload.data.main.RaiIHT
     }
@@ -391,79 +402,5 @@ export class Registration {
     payload.data.files.uUWjUW[0].userDownloadLink = `https://forms-designer.test.cdp-int.defra.cloud/file-download/${this.fileId2}`
 
     return payload
-  }
-}
-
-export class SummaryLog {
-  constructor(
-    orgId = `${fakerEN_GB.number.int({ min: 500000, max: 999999 })}`,
-    regId = fakerEN_GB.database.mongodbObjectId()
-  ) {
-    this.summaryLogId = fakerEN_GB.string.uuid()
-    this.orgId = orgId
-    this.regId = regId
-  }
-
-  setUploadData(uploadData) {
-    this.setFileData(
-      uploadData.s3Bucket,
-      uploadData.s3Key,
-      uploadData.fileId,
-      uploadData.filename,
-      uploadData.fileStatus
-    )
-  }
-
-  setFileData(s3Bucket, s3Key, fileId, filename, fileStatus) {
-    this.s3Bucket = s3Bucket
-    this.s3Key = s3Key
-    this.fileId = fileId
-    this.filename = filename
-    this.fileStatus = fileStatus
-  }
-
-  toPayload() {
-    return {
-      s3Bucket: this.s3Bucket,
-      s3Key: this.s3Key,
-      fileId: this.fileId,
-      filename: this.filename
-    }
-  }
-
-  toUploadCompletedPayload() {
-    return {
-      form: {
-        summaryLogUpload: {
-          fileId: this.fileId,
-          filename: this.filename,
-          fileStatus: this.fileStatus,
-          s3Bucket: this.s3Bucket,
-          s3Key: this.s3Key
-        }
-      }
-    }
-  }
-}
-
-export class Organisations {
-  toDefaultPayload(dataTableHash) {
-    return {
-      version: Number(dataTableHash.version),
-      updateFragment: organisationsPayload
-    }
-  }
-
-  toPayload(dataTableHash) {
-    let updateFragment
-    try {
-      updateFragment = JSON.parse(dataTableHash.updateFragment)
-    } catch (error) {
-      updateFragment = dataTableHash.updateFragment
-    }
-    return {
-      version: Number(dataTableHash.version),
-      updateFragment
-    }
   }
 }
