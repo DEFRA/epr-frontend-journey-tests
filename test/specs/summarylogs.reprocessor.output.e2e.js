@@ -68,6 +68,18 @@ describe('Summary Logs Reprocessor Output', () => {
     await checkBodyText('Your waste records are being updated', 30)
 
     await checkBodyText('Summary log uploaded', 30)
+    await checkBodyText('Your updated waste balance', 10)
+    await checkBodyText('3.00 tonnes', 10)
+
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('3.00')
+
+    await DashboardPage.selectLink(1)
+    const wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+
+    expect(wasteBalanceAmount).toBe('3.00 tonnes')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
