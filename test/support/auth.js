@@ -9,6 +9,8 @@ export class AuthClient {
 
   async generateToken(payload, suffix) {
     const instanceHeaders = { ...this.defaultHeaders }
+
+    console.log(config.undiciAgent)
     const response = await request(`${this.baseUrl}${suffix}`, {
       method: 'POST',
       headers: instanceHeaders,

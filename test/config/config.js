@@ -2,8 +2,6 @@ import { Agent, ProxyAgent } from 'undici'
 
 const environment = process.env.ENVIRONMENT
 const withProxy = process.env.WITH_PROXY
-const withExternalProxy = process.env.WITH_EXTERNAL_PROXY
-const withoutLogs = process.env.WITHOUT_LOGS
 const xApiKey = process.env.X_API_KEY
 
 if (environment === 'prod') {
@@ -21,7 +19,9 @@ const api = {
 
 const proxy = process.env.HTTP_PROXY
   ? new ProxyAgent({
-      uri: process.env.HTTP_PROXY
+      uri: process.env.HTTP_PROXY,
+      keepAliveTimeout: 10,
+      keepAliveMaxTimeout: 10
     })
   : new ProxyAgent({
       uri: 'http://localhost:7777',
@@ -60,14 +60,8 @@ const defraId = {
   env: `https://cdp-defra-id-stub.${environment}.cdp-int.defra.cloud`
 }
 
-const dockerLogParser = {
-  containerName: 'epr-backend-journey-tests-epr-backend-1'
-}
-
-const testLogs = !withoutLogs && !environment
-
 let globalUndiciAgent = agent
-if (withExternalProxy || withProxy || process.env.HTTP_PROXY) {
+if (environment) {
   globalUndiciAgent = proxy
 }
 
@@ -91,8 +85,6 @@ if (!environment) {
 
 export default {
   apiUri,
-  testLogs,
-  dockerLogParser,
   authUri,
   defraIdUri,
   auth,
