@@ -37,6 +37,10 @@ class DefraIdStubPage {
     await $$('a*=Log in')[index].click()
   }
 
+  async loginViaEmail(email) {
+    await $(`//tr[th[text()="${email}"]]//a`).click()
+  }
+
   async selectOrganisation(index) {
     const suffix = index === 1 ? '' : `-${index}`
     await $(`#relationshipId${suffix}`).click()
