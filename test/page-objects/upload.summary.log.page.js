@@ -33,6 +33,10 @@ class UploadSummaryLogPage {
     await $('#main-content button[type=submit]').click()
   }
 
+  async clickOnReturnToHomePage() {
+    await $('a*=Return to home').click()
+  }
+
   async returnToSubmissionPage() {
     await $('#main-content form > div.govuk-button-group > a').click()
   }

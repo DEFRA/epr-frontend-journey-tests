@@ -102,6 +102,18 @@ describe('Summary Logs Reprocessor Input', () => {
     await checkBodyText('Your waste records are being updated', 30)
 
     await checkBodyText('Summary log uploaded', 30)
+    await checkBodyText('Your updated waste balance', 10)
+    await checkBodyText('391.62 tonnes', 10)
+
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('391.62')
+
+    await DashboardPage.selectLink(1)
+    const wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+
+    expect(wasteBalanceAmount).toBe('391.62 tonnes')
 
     // PAE-743: Sign out link is visible, hence able to sign out
     await HomePage.signOut()
