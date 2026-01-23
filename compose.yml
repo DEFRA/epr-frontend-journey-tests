@@ -143,17 +143,6 @@ services:
       start_period: 10s
       retries: 5
 
-  epr-backend-data-setup:
-    image: curlimages/curl:latest
-    depends_on:
-      epr-backend:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-    volumes:
-      - ./docker/scripts/epr-backend-data-setup.sh:/setup.sh
-    command: sh /setup.sh
-
   epr-frontend:
     image: defradigital/epr-frontend:${EPR_FRONTEND:-latest}
     ports:
