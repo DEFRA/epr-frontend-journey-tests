@@ -2,6 +2,7 @@ import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
@@ -79,15 +80,18 @@ describe('Summary Logs (Glass Material)', () => {
     const accNo = await $('//a[normalize-space()="234567GO"]')
     expect(accNo).toExist()
 
-    let dashboardHeaderText = await DashboardPage.dashboardHeaderText()
-
+    let dashboardHeaderText = await WasteRecordsPage.dashboardHeaderText()
     expect(dashboardHeaderText).toContain('Glass other')
+    const createNewPERNLink = await WasteRecordsPage.createNewPERNLink()
+    expect(createNewPERNLink).toExist()
 
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
 
-    dashboardHeaderText = await DashboardPage.dashboardHeaderText()
+    dashboardHeaderText = await WasteRecordsPage.dashboardHeaderText()
     expect(dashboardHeaderText).toContain('Glass remelt')
+    const createNewPRNLink = await WasteRecordsPage.createNewPRNLink()
+    expect(createNewPRNLink).toExist()
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

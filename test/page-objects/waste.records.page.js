@@ -5,8 +5,20 @@ class WasteRecordsPage {
     return browser.url(`/organisations/${orgId}/registrations/${regId}`)
   }
 
+  async dashboardHeaderText() {
+    return $('#main-content > div > div > div > h1').getText()
+  }
+
   async submitSummaryLogLink() {
     await $('a*=Upload your summary log').click()
+  }
+
+  async createNewPRNLink() {
+    await $('a*=Create new PRN')
+  }
+
+  async createNewPERNLink() {
+    await $('a*=Create new PERN')
   }
 
   async wasteBalanceAmount() {
