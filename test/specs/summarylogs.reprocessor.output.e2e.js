@@ -25,7 +25,8 @@ describe('Summary Logs Reprocessor Output', () => {
           reprocessingType: 'output',
           regNumber: 'R25SR500050912PA',
           accNumber: 'ACC500591',
-          status: 'approved'
+          status: 'approved',
+          validFrom: '2026-01-01'
         }
       ]
     )
@@ -73,13 +74,48 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await UploadSummaryLogPage.clickOnReturnToHomePage()
 
-    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    let availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('3.00')
 
     await DashboardPage.selectLink(1)
-    const wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+    let wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
 
     expect(wasteBalanceAmount).toBe('3.00 tonnes')
+
+    await WasteRecordsPage.submitSummaryLogLink()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+    await UploadSummaryLogPage.uploadFile(
+      'resources/reprocessor-output-adjustments.xlsx'
+    )
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+
+    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText(
+      '1 adjusted load will be reflected in your waste balance',
+      30
+    )
+
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 30)
+
+    await checkBodyText('Summary log uploaded', 30)
+    await checkBodyText('Your updated waste balance', 10)
+    await checkBodyText('9.25 tonnes', 10)
+
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+    availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('9.25')
+
+    await DashboardPage.selectLink(1)
+    wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+
+    expect(wasteBalanceAmount).toBe('9.25 tonnes')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
