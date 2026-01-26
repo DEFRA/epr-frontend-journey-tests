@@ -19,6 +19,7 @@ describe('Summary Logs Exporter', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
     ])
 
+    // We adjust validFrom date to test filtering of rows from the Summary Log upload
     const userEmail = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
@@ -31,7 +32,8 @@ describe('Summary Logs Exporter', () => {
         {
           regNumber: 'E25SR500030913PA',
           accNumber: 'ACC234567',
-          status: 'approved'
+          status: 'approved',
+          validFrom: '2025-02-02'
         }
       ]
     )
@@ -59,27 +61,55 @@ describe('Summary Logs Exporter', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being checked', 30)
-
     await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('3 new loads will be added to your waste balance', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyText('Your updated waste balance', 10)
-    await checkBodyText('10.00 tonnes', 10)
+    await checkBodyText('30.00 tonnes', 10)
 
     await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
 
-    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('10.00')
+    let availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('30.00')
 
     await DashboardPage.selectLink(1)
     const wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
 
-    expect(wasteBalanceAmount).toBe('10.00 tonnes')
+    expect(wasteBalanceAmount).toBe('30.00 tonnes')
+
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await UploadSummaryLogPage.uploadFile('resources/exporter-adjustments.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('2 new loads will be added to your waste balance', 10)
+    await checkBodyText(
+      '1 adjusted load will be reflected in your waste balance',
+      10
+    )
+
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 30)
+
+    await checkBodyText('Summary log uploaded', 30)
+    await checkBodyText('Your updated waste balance', 10)
+    await checkBodyText('89.00 tonnes', 10)
+
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+    await DashboardPage.selectExportingTab()
+
+    availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('89.00')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
