@@ -161,6 +161,7 @@ services:
       PORT: 3000
       REDIS_HOST: redis
       USE_SINGLE_INSTANCE_CACHE: true
+      FEATURE_FLAG_WASTE_BALANCE: true
     depends_on:
       defra-id-stub:
         condition: service_started
