@@ -40,9 +40,7 @@ class DashboardPage {
   }
 
   async selectExportingTab() {
-    const linkElement = $('//a[normalize-space()="Exporting"]').click()
-    await linkElement.waitForExist({ timeout: 5000 })
-    await linkElement.click()
+    await $('//a[normalize-space()="Exporting"]').click()
   }
 
   async getMaterial(tableIndex, rowIndex) {
