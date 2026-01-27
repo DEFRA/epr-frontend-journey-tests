@@ -11,6 +11,7 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+import PRNPage from 'page-objects/prn.page.js'
 
 describe('Summary Logs Exporter', () => {
   it('Should be able to submit a Exporter Summary Log spreadsheet @exporter', async () => {
@@ -110,6 +111,14 @@ describe('Summary Logs Exporter', () => {
 
     availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('89.00')
+
+    await DashboardPage.selectLink(1)
+
+    const pernLink = await WasteRecordsPage.createNewPERNLink()
+    await pernLink.click()
+
+    const prnHeading = await PRNPage.headingText()
+    expect(prnHeading).toBe('Create a PERN')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

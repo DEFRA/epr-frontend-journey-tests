@@ -14,11 +14,11 @@ class WasteRecordsPage {
   }
 
   async createNewPRNLink() {
-    await $('a*=Create new PRN')
+    return await $('a*=Create new PRN')
   }
 
   async createNewPERNLink() {
-    await $('a*=Create new PERN')
+    return await $('a*=Create new PERN')
   }
 
   async wasteBalanceAmount() {
