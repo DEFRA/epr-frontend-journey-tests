@@ -16,7 +16,7 @@ import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.p
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 
 describe('Packing Recycling Notes', () => {
-  it.skip('Should be able to submit a Reprocessor Input waste balance and create PRNs @prn', async () => {
+  it.skip('Should be able to submit a Reprocessor Input waste balance and create and manage PRNs @prn', async () => {
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' },
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' },
