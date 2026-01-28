@@ -17,6 +17,14 @@ class WasteRecordsPage {
     return await $('a*=Create new PRN')
   }
 
+  async managePRNsLink() {
+    return await $('a*=Manage PRNs')
+  }
+
+  async managePERNsLink() {
+    return await $('a*=Manage PRNs')
+  }
+
   async createNewPERNLink() {
     return await $('a*=Create new PERN')
   }
