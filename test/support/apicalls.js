@@ -37,6 +37,8 @@ export async function createLinkedOrganisation(dataRows) {
   const orgId = orgResponseData?.orgId
   const refNo = orgResponseData?.referenceNumber
 
+  const regAddresses = []
+
   for (const dataRow of dataRows) {
     let material = 'Paper or board (R3)'
     const glassRecyclingProcess = dataRow.glassRecyclingProcess?.trim()
@@ -53,6 +55,7 @@ export async function createLinkedOrganisation(dataRows) {
       JSON.stringify(payload)
     )
     expect(response.statusCode).toBe(201)
+    regAddresses.push(registration.address)
 
     const accreditation = new Accreditation(orgId, refNo)
     accreditation.postcode = registration.postcode
@@ -71,7 +74,7 @@ export async function createLinkedOrganisation(dataRows) {
   response = await baseAPI.post(`/v1/dev/form-submissions/${refNo}/migrate`, '')
   expect(response.statusCode).toBe(200)
 
-  return { refNo, organisation }
+  return { refNo, organisation, regAddresses }
 }
 
 // Examples for updateDataRows:
