@@ -90,7 +90,8 @@ export const config = {
   // See the full list at http://mochajs.org/
   mochaOpts: {
     ui: 'bdd',
-    timeout: 2 * oneMinute
+    timeout: 2 * oneMinute,
+    grep: process.env.GREP || ''
   },
   //
   // =====
