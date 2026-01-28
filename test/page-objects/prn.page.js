@@ -13,8 +13,13 @@ class PRNPage {
     await headingElement.waitForExist({ timeout: 5000 })
     return await headingElement.getText()
   }
+
   async enterTonnage(tonnes) {
     await $('#tonnage').setValue(tonnes)
+  }
+
+  async select(producer) {
+    await $('#recipient').selectByVisibleText(producer)
   }
 
   async continue() {
