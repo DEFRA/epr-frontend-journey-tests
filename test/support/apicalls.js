@@ -57,18 +57,20 @@ export async function createLinkedOrganisation(dataRows) {
     expect(response.statusCode).toBe(201)
     regAddresses.push(registration.address)
 
-    const accreditation = new Accreditation(orgId, refNo)
-    accreditation.postcode = registration.postcode
-    payload =
-      dataRow.wasteProcessingType === 'Reprocessor'
-        ? accreditation.toReprocessorPayload(material, glassRecyclingProcess)
-        : accreditation.toExporterPayload(material, glassRecyclingProcess)
+    if (!dataRow.withoutAccreditation) {
+      const accreditation = new Accreditation(orgId, refNo)
+      accreditation.postcode = registration.postcode
+      payload =
+        dataRow.wasteProcessingType === 'Reprocessor'
+          ? accreditation.toReprocessorPayload(material, glassRecyclingProcess)
+          : accreditation.toExporterPayload(material, glassRecyclingProcess)
 
-    response = await baseAPI.post(
-      '/v1/apply/accreditation',
-      JSON.stringify(payload)
-    )
-    expect(response.statusCode).toBe(201)
+      response = await baseAPI.post(
+        '/v1/apply/accreditation',
+        JSON.stringify(payload)
+      )
+      expect(response.statusCode).toBe(201)
+    }
   }
 
   response = await baseAPI.post(`/v1/dev/form-submissions/${refNo}/migrate`, '')
@@ -110,6 +112,7 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
   const currentYear = new Date().getFullYear()
 
   let data = responseData
+  let accreditationIndex = 0
 
   for (let i = 0; i < updateDataRows.length; i++) {
     const orgUpdateData = updateDataRows[i]
@@ -117,27 +120,38 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
     data.registrations[i].validFrom = '2025-01-01'
     data.registrations[i].validTo = `${currentYear + 1}-01-01`
     data.registrations[i].registrationNumber = orgUpdateData.regNumber
-    data.registrations[i].accreditationId = data.accreditations[i].id
-    data.accreditations[i].status = orgUpdateData.status
-    data.accreditations[i].validFrom = '2025-01-01'
-    data.accreditations[i].validTo = `${currentYear + 1}-01-01`
     if (orgUpdateData.validFrom?.trim()) {
       data.registrations[i].validFrom = orgUpdateData.validFrom
-      data.accreditations[i].validFrom = orgUpdateData.validFrom
     }
     if (orgUpdateData.reprocessingType?.trim()) {
       data.registrations[i].reprocessingType = orgUpdateData.reprocessingType
-      data.accreditations[i].reprocessingType = orgUpdateData.reprocessingType
     }
     if (orgUpdateData.glassRecyclingProcess?.trim()) {
       data.registrations[i].glassRecyclingProcess = [
         orgUpdateData.glassRecyclingProcess
       ]
-      data.accreditations[i].glassRecyclingProcess = [
-        orgUpdateData.glassRecyclingProcess
-      ]
     }
-    data.accreditations[i].accreditationNumber = orgUpdateData.accNumber
+
+    if (!orgUpdateData.withoutAccreditation) {
+      const j = accreditationIndex
+      data.registrations[i].accreditationId = data.accreditations[j].id
+      data.accreditations[j].status = orgUpdateData.status
+      data.accreditations[j].validFrom = '2025-01-01'
+      data.accreditations[j].validTo = `${currentYear + 1}-01-01`
+      if (orgUpdateData.validFrom?.trim()) {
+        data.accreditations[j].validFrom = orgUpdateData.validFrom
+      }
+      if (orgUpdateData.reprocessingType?.trim()) {
+        data.accreditations[j].reprocessingType = orgUpdateData.reprocessingType
+      }
+      if (orgUpdateData.glassRecyclingProcess?.trim()) {
+        data.accreditations[j].glassRecyclingProcess = [
+          orgUpdateData.glassRecyclingProcess
+        ]
+      }
+      data.accreditations[j].accreditationNumber = orgUpdateData.accNumber
+      accreditationIndex++
+    }
   }
 
   let email = ''
