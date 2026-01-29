@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 
 class DashboardPage {
   open(orgId) {
@@ -53,6 +53,13 @@ class DashboardPage {
     )
     await materialElement.waitForExist({ timeout: 5000 })
     return await materialElement.getText()
+  }
+
+  async getNumberOfRows(tableIndex) {
+    const rows = await $$(
+      '#main-content table.govuk-table:nth-of-type(' + tableIndex + ') tbody tr'
+    )
+    return rows.length
   }
 }
 
