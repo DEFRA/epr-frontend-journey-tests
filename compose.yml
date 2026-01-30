@@ -145,7 +145,7 @@ services:
       retries: 5
 
   epr-frontend:
-    image: epr-frontend:local
+    image: defradigital/epr-frontend:${EPR_FRONTEND:-latest}
     ports:
       - '3000:3000'
     env_file:
