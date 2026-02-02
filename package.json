@@ -45,7 +45,7 @@
     "@faker-js/faker": "10.2.0",
     "esm-module-alias": "2.2.1",
     "global-agent": "3.0.0",
-    "undici": "7.19.1",
+    "undici": "7.19.2",
     "@axe-core/webdriverio": "4.11.0"
   },
   "devDependencies": {
