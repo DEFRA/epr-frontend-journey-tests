@@ -12,6 +12,60 @@ import { fakerEN_GB } from '@faker-js/faker'
 import { DefraIdStub } from './defra-id-stub.js'
 import Users from './users.js'
 import { FormData } from 'undici'
+import { MATERIALS } from '~/test/support/materials.js'
+
+export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
+  const wasteProcessingTypes = [
+    {
+      wasteProcessingType: 'Reprocessor',
+      street: 'reprocessor input street',
+      type: 'input'
+    },
+    {
+      wasteProcessingType: 'Reprocessor',
+      street: 'reprocessor output street',
+      type: 'output'
+    },
+    { wasteProcessingType: 'Exporter', street: 'exporter street', type: '' }
+  ]
+  const dataRows = []
+
+  for (const wasteProcessingType of wasteProcessingTypes) {
+    for (const material of MATERIALS) {
+      const updateDataRow = {}
+      updateDataRow.material = material.material
+      updateDataRow.glassRecyclingProcess = material.glassRecyclingProcess
+      updateDataRow.wasteProcessingType =
+        wasteProcessingType.wasteProcessingType
+      updateDataRow.street = wasteProcessingType.street
+      dataRows.push(updateDataRow)
+    }
+  }
+
+  const organisationDetails = await createLinkedOrganisation(dataRows)
+
+  const updateDataRows = []
+  for (let i = 0; i < wasteProcessingTypes.length; i++) {
+    for (const material of MATERIALS) {
+      const updateDataRow = {}
+      if (wasteProcessingTypes[i].type !== '') {
+        updateDataRow.reprocessingType = wasteProcessingTypes[i].type
+      }
+      updateDataRow.regNumber = `R25SR5000${i}0912${material.suffix}`
+      updateDataRow.accNumber = `ACC12${i}45${material.suffix}`
+      updateDataRow.status = 'approved'
+      updateDataRows.push(updateDataRow)
+    }
+  }
+
+  updateDataRows[0].email = `sanity_${fakerEN_GB.internet.email()}`
+
+  const userEmail = await updateMigratedOrganisation(
+    organisationDetails.refNo,
+    updateDataRows
+  )
+  return { organisationDetails, userEmail }
+}
 
 // Examples
 // dataRows = [{ material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor'}, { material: 'Steel (R4)', wasteProcessingType: 'Exporter'}]
@@ -45,7 +99,10 @@ export async function createLinkedOrganisation(dataRows) {
     if (dataRow.material !== '') {
       material = dataRow.material
     }
-    const registration = new Registration(orgId, refNo)
+    let registration = new Registration(orgId, refNo)
+    if (dataRow.street !== '') {
+      registration = new Registration(orgId, refNo, dataRow.street)
+    }
     payload =
       dataRow.wasteProcessingType === 'Reprocessor'
         ? registration.toAllMaterialsPayload(material, glassRecyclingProcess)
@@ -162,8 +219,8 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
     email = process.env.ENVIRONMENT
       ? fakerEN_GB.internet.email()
       : data.submitterContactDetails.email
-    data.submitterContactDetails.email = email
   }
+  data.submitterContactDetails.email = email
 
   data.status = updateDataRows[0].status
 
