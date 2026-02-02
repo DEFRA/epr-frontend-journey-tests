@@ -91,7 +91,8 @@ export const config = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 2 * oneMinute,
-    grep: process.env.GREP || ''
+    grep: process.env.GREP || '',
+    invert: process.env.GREP_INVERT === 'true'
   },
   //
   // =====
