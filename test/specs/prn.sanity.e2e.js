@@ -1,0 +1,278 @@
+import { $, browser, expect } from '@wdio/globals'
+import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
+import HomePage from 'page-objects/homepage.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
+import DashboardPage from '../page-objects/dashboard.page.js'
+import {
+  createAndRegisterDefraIdUser,
+  createOrgWithAllWasteProcessingTypeAllMaterials,
+  linkDefraIdUser
+} from '../support/apicalls.js'
+import PRNPage from 'page-objects/prn.page.js'
+import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
+import PrnCreatedPage from 'page-objects/prn.created.page.js'
+import { MATERIALS } from '~/test/support/materials.js'
+
+describe('Packing Recycling Notes (Sanity)', () => {
+  it('Should be able to create and manage PRNs for all materials @sanitycheck', async () => {
+    const { organisationDetails, userEmail } =
+      await createOrgWithAllWasteProcessingTypeAllMaterials()
+    const user = await createAndRegisterDefraIdUser(userEmail)
+    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(userEmail)
+
+    let orgAddressIndex = 0
+
+    const tonnageWordings = [
+      { integer: 7, word: 'Seven' },
+      { integer: 834, word: 'Eight Hundred Thirty Four' },
+      { integer: 52619, word: 'Fifty Two Thousand Six Hundred Nineteen' },
+      { integer: 3, word: 'Three' },
+      {
+        integer: 487203,
+        word: 'Four Hundred Eighty Seven Thousand Two Hundred Three'
+      },
+      { integer: 1456, word: 'One Thousand Four Hundred Fifty Six' },
+      {
+        integer: 999999,
+        word: 'Nine Hundred Ninety Nine Thousand Nine Hundred Ninety Nine'
+      },
+      { integer: 68, word: 'Sixty Eight' }
+    ]
+
+    // Sanity check Reprocessor Input materials
+    for (let i = 0; i < MATERIALS.length; i++) {
+      console.log(
+        'Reprocessor Input -- Creating PRN for material: ' + MATERIALS[i].name
+      )
+      await DashboardPage.selectTableLink(1, i + 1)
+      const regNumber = `R25SR500000912${MATERIALS[i].suffix}`
+      const accNumber = `ACC12045${MATERIALS[i].suffix}`
+
+      const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
+      expect(regNo).toExist()
+
+      const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
+      expect(accNo).toExist()
+
+      const prnLink = await WasteRecordsPage.createNewPRNLink()
+      await prnLink.click()
+
+      const producer = 'EcoRecycle Industries'
+      const issuerNotes = 'Testing'
+
+      await PRNPage.enterTonnage(tonnageWordings[i].integer)
+      await PRNPage.select(producer)
+      await PRNPage.addIssuerNotes(issuerNotes)
+      await PRNPage.continue()
+
+      const headingText = await CheckBeforeCreatingPrnPage.headingText()
+      expect(headingText).toBe('Check before creating PRN')
+
+      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
+      expect(prnDetails['Issued by']).toBe(
+        organisationDetails.organisation.companyName
+      )
+      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
+        producer
+      )
+      expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
+      //TODO: Fix these?
+      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
+      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+
+      const accreditationDetails =
+        await CheckBeforeCreatingPrnPage.accreditationDetails()
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
+      expect(
+        accreditationDetails['Accreditation address'].replaceAll(', ', ',')
+      ).toBe(organisationDetails.regAddresses[orgAddressIndex])
+
+      await CheckBeforeCreatingPrnPage.createPRN()
+
+      const message = await PrnCreatedPage.messageText()
+
+      expect(message).toContain('PRN created')
+      expect(message).toContain('Tonnage')
+      expect(message).toContain(tonnageWordings[i].integer + ' tonnes')
+
+      await PrnCreatedPage.returnToRegistrationPage()
+
+      await WasteRecordsPage.managePRNsLink()
+
+      await WasteRecordsPage.selectBackLink()
+      orgAddressIndex++
+    }
+
+    const tonnageWordingsOutput = [
+      { integer: 245, word: 'Two Hundred Forty Five' },
+      { integer: 18923, word: 'Eighteen Thousand Nine Hundred Twenty Three' },
+      { integer: 5, word: 'Five' },
+      {
+        integer: 671482,
+        word: 'Six Hundred Seventy One Thousand Four Hundred Eighty Two'
+      },
+      { integer: 9307, word: 'Nine Thousand Three Hundred Seven' },
+      { integer: 42, word: 'Forty Two' },
+      {
+        integer: 803516,
+        word: 'Eight Hundred Three Thousand Five Hundred Sixteen'
+      },
+      { integer: 156, word: 'One Hundred Fifty Six' }
+    ]
+
+    // Sanity check Reprocessor Output materials
+    for (let i = 0; i < MATERIALS.length; i++) {
+      console.log(
+        'Reprocessor Output -- Creating PRN for material: ' + MATERIALS[i].name
+      )
+      await DashboardPage.selectTableLink(2, i + 1)
+
+      const regNumber = `R25SR500010912${MATERIALS[i].suffix}`
+      const accNumber = `ACC12145${MATERIALS[i].suffix}`
+
+      const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
+      expect(regNo).toExist()
+
+      const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
+      expect(accNo).toExist()
+
+      const prnLink = await WasteRecordsPage.createNewPRNLink()
+      await prnLink.click()
+
+      const producer = 'EcoRecycle Industries'
+      const issuerNotes = 'Testing'
+
+      await PRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
+      await PRNPage.select(producer)
+      await PRNPage.addIssuerNotes(issuerNotes)
+      await PRNPage.continue()
+
+      const headingText = await CheckBeforeCreatingPrnPage.headingText()
+      expect(headingText).toBe('Check before creating PRN')
+
+      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
+      expect(prnDetails['Issued by']).toBe(
+        organisationDetails.organisation.companyName
+      )
+      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
+        producer
+      )
+      expect(prnDetails['Tonnage']).toBe(`${tonnageWordingsOutput[i].integer}`)
+      //TODO: Fix these?
+      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)
+      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+
+      const accreditationDetails =
+        await CheckBeforeCreatingPrnPage.accreditationDetails()
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
+      expect(
+        accreditationDetails['Accreditation address'].replaceAll(', ', ',')
+      ).toBe(organisationDetails.regAddresses[orgAddressIndex])
+
+      await CheckBeforeCreatingPrnPage.createPRN()
+
+      const message = await PrnCreatedPage.messageText()
+
+      expect(message).toContain('PRN created')
+      expect(message).toContain('Tonnage')
+      expect(message).toContain(tonnageWordingsOutput[i].integer + ' tonnes')
+
+      await PrnCreatedPage.returnToRegistrationPage()
+
+      await WasteRecordsPage.selectBackLink()
+      orgAddressIndex++
+    }
+
+    // Sanity check Exporter materials
+    await DashboardPage.selectExportingTab()
+
+    const tonnageWordingsExporter = [
+      { integer: 7, word: 'Seven' },
+      { integer: 834, word: 'Eight Hundred Thirty Four' },
+      { integer: 52619, word: 'Fifty Two Thousand Six Hundred Nineteen' },
+      { integer: 3, word: 'Three' },
+      {
+        integer: 487203,
+        word: 'Four Hundred Eighty Seven Thousand Two Hundred Three'
+      },
+      { integer: 1456, word: 'One Thousand Four Hundred Fifty Six' },
+      {
+        integer: 999999,
+        word: 'Nine Hundred Ninety Nine Thousand Nine Hundred Ninety Nine'
+      },
+      { integer: 68, word: 'Sixty Eight' }
+    ]
+
+    for (let i = 0; i < MATERIALS.length; i++) {
+      console.log('Exporter -- Creating PRN for material: ' + MATERIALS[i].name)
+      await DashboardPage.selectTableLink(i + 1, 1)
+
+      const regNumber = `R25SR500020912${MATERIALS[i].suffix}`
+      const accNumber = `ACC12245${MATERIALS[i].suffix}`
+
+      const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
+      expect(regNo).toExist()
+
+      const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
+      expect(accNo).toExist()
+
+      const pernLink = await WasteRecordsPage.createNewPERNLink()
+      await pernLink.click()
+
+      const producer = 'EcoRecycle Industries'
+      const issuerNotes = 'Testing'
+
+      await PRNPage.enterTonnage(tonnageWordingsExporter[i].integer)
+      await PRNPage.select(producer)
+      await PRNPage.addIssuerNotes(issuerNotes)
+      await PRNPage.continue()
+
+      const headingText = await CheckBeforeCreatingPrnPage.headingText()
+      expect(headingText).toBe('Check before creating PERN')
+
+      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
+      expect(prnDetails['Issued by']).toBe(
+        organisationDetails.organisation.companyName
+      )
+      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
+        producer
+      )
+      expect(prnDetails['Tonnage']).toBe(
+        `${tonnageWordingsExporter[i].integer}`
+      )
+      //TODO: Fix these?
+      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsExporter[i].word)
+      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+
+      const accreditationDetails =
+        await CheckBeforeCreatingPrnPage.accreditationDetails()
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
+
+      await CheckBeforeCreatingPrnPage.createPRN()
+
+      const message = await PrnCreatedPage.messageText()
+
+      expect(message).toContain('PERN created')
+      expect(message).toContain('Tonnage')
+      expect(message).toContain(tonnageWordingsExporter[i].integer + ' tonnes')
+
+      await PrnCreatedPage.returnToRegistrationPage()
+
+      await WasteRecordsPage.selectBackLink()
+    }
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+})

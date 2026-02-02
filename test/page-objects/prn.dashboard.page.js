@@ -57,6 +57,10 @@ class PRNDashboardPage {
     return await materialElement.getText()
   }
 
+  async getAwaitingActionTable() {
+    return await $('#awaiting-action > table')
+  }
+
   async wasteBalanceAmount() {
     const element = await $('[data-testid="waste-balance-amount"]')
     await element.waitForExist({ timeout: 5000 })

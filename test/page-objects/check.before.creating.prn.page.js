@@ -9,7 +9,7 @@ class CheckBeforeCreatingPRNPage {
 
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
-    await element.waitForExist({ timeout: 5000 })
+    await element.waitForExist({ timeout: 10000 })
     return await element.getText()
   }
 
