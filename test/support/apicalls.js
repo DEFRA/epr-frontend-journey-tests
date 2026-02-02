@@ -47,12 +47,14 @@ export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
   const updateDataRows = []
   for (let i = 0; i < wasteProcessingTypes.length; i++) {
     for (const material of MATERIALS) {
+      let prefix = 'E'
       const updateDataRow = {}
       if (wasteProcessingTypes[i].type !== '') {
         updateDataRow.reprocessingType = wasteProcessingTypes[i].type
+        prefix = 'R'
       }
-      updateDataRow.regNumber = `R25SR5000${i}0912${material.suffix}`
-      updateDataRow.accNumber = `ACC12${i}45${material.suffix}`
+      updateDataRow.regNumber = `${prefix}25SR5000${i}0912${material.suffix}`
+      updateDataRow.accNumber = `${prefix}-ACC12${i}45${material.suffix}`
       updateDataRow.status = 'approved'
       updateDataRows.push(updateDataRow)
     }

@@ -51,7 +51,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       )
       await DashboardPage.selectTableLink(1, i + 1)
       const regNumber = `R25SR500000912${MATERIALS[i].suffix}`
-      const accNumber = `ACC12045${MATERIALS[i].suffix}`
+      const accNumber = `R-ACC12045${MATERIALS[i].suffix}`
 
       const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
       expect(regNo).toExist()
@@ -135,7 +135,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await DashboardPage.selectTableLink(2, i + 1)
 
       const regNumber = `R25SR500010912${MATERIALS[i].suffix}`
-      const accNumber = `ACC12145${MATERIALS[i].suffix}`
+      const accNumber = `R-ACC12145${MATERIALS[i].suffix}`
 
       const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
       expect(regNo).toExist()
@@ -216,8 +216,8 @@ describe('Packing Recycling Notes (Sanity)', () => {
       console.log('Exporter -- Creating PRN for material: ' + MATERIALS[i].name)
       await DashboardPage.selectTableLink(i + 1, 1)
 
-      const regNumber = `R25SR500020912${MATERIALS[i].suffix}`
-      const accNumber = `ACC12245${MATERIALS[i].suffix}`
+      const regNumber = `E25SR500020912${MATERIALS[i].suffix}`
+      const accNumber = `E-ACC12245${MATERIALS[i].suffix}`
 
       const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
       expect(regNo).toExist()
