@@ -1,6 +1,6 @@
 import { $, $$ } from '@wdio/globals'
 
-class CheckBeforeCreatingPRNPage {
+class PRNViewPage {
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
     await element.waitForExist({ timeout: 10000 })
@@ -32,13 +32,9 @@ class CheckBeforeCreatingPRNPage {
     return dataMap
   }
 
-  async createPRN() {
-    await $('#main-content button[type=submit]').click()
-  }
-
-  async discardAndStartAgain() {
-    await $('a=Discard and start again').click()
+  async returnToPRNList() {
+    await $('a*=Return to PRN list').click()
   }
 }
 
-export default new CheckBeforeCreatingPRNPage()
+export default new PRNViewPage()

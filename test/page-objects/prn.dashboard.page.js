@@ -1,27 +1,13 @@
-import { browser, $ } from '@wdio/globals'
+import { $, $$ } from '@wdio/globals'
 
 class PRNDashboardPage {
-  open(orgId) {
-    return browser.url(`/organisations/${orgId}`)
-  }
-
   async dashboardHeaderText() {
     return $('#main-content > div > div > div > h1').getText()
   }
 
   async selectAwaitingAuthorisationLink(index) {
     const linkElement = await $(
-      '#main-content table.govuk-table:nth-of-type(1) tr:nth-child(' +
-        index +
-        ') a.govuk-link'
-    )
-    await linkElement.waitForExist({ timeout: 5000 })
-    await linkElement.click()
-  }
-
-  async selectAwaitingCancellationLink(index) {
-    const linkElement = await $(
-      '#main-content table.govuk-table:nth-of-type(2) tr:nth-child(' +
+      '#awaiting-action > table.govuk-table tr:nth-child(' +
         index +
         ') a.govuk-link'
     )
@@ -37,30 +23,39 @@ class PRNDashboardPage {
     await $('//a[normalize-space()="Awaiting action"]').click()
   }
 
-  async getAwaitingAuthorisationIssuedTo(rowIndex) {
-    const materialElement = await $(
-      '#main-content table.govuk-table:nth-of-type(1) tr:nth-child(' +
-        rowIndex +
-        ') > td:nth-child(1)'
+  async getAwaitingAuthorisationRow(rowIndex) {
+    const authRow = new Map()
+    const tableHeaders = await $$(
+      '#awaiting-action > table.govuk-table > thead > tr th'
     )
-    await materialElement.waitForExist({ timeout: 5000 })
-    return await materialElement.getText()
-  }
+    const headerText = await tableHeaders.map((element) => {
+      return element.getText()
+    })
 
-  async getAwaitingCancellationIssuedTo(rowIndex) {
-    const materialElement = await $(
-      '#main-content table.govuk-table:nth-of-type(2) tr:nth-child(' +
+    const tableData = await $$(
+      '#awaiting-action > table.govuk-table > tbody > tr:nth-child(' +
         rowIndex +
-        ') > td:nth-child(1)'
+        ') td'
     )
-    await materialElement.waitForExist({ timeout: 5000 })
-    return await materialElement.getText()
+
+    const rowText = await tableData.map((element) => {
+      return element.getText()
+    })
+
+    for (let i = 0; i < headerText.length; i++) {
+      authRow.set(headerText[i], rowText[i])
+    }
+    return authRow
   }
 
   async wasteBalanceAmount() {
     const element = await $('[data-testid="waste-balance-amount"]')
     await element.waitForExist({ timeout: 5000 })
     return await element.getText()
+  }
+
+  async selectBackLink() {
+    await $('a*=Back').click()
   }
 }
 

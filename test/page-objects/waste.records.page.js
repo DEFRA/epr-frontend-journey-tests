@@ -29,6 +29,10 @@ class WasteRecordsPage {
     return await $('a*=Create new PERN')
   }
 
+  async selectBackLink() {
+    await $('a*=Back').click()
+  }
+
   async wasteBalanceAmount() {
     const element = await $('[data-testid="waste-balance-amount"]')
     await element.waitForExist({ timeout: 5000 })
