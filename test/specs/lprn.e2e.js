@@ -148,7 +148,6 @@ describe('Lumpy Packing Recycling Notes', () => {
     await prnLink.click()
 
     const producer = 'EcoRecycle Industries'
-    const issuer = 'producer-3'
     const issuerNotes = 'Testing'
 
     await PRNPage.enterTonnage(tonnageWordings.integer)
@@ -213,7 +212,7 @@ describe('Lumpy Packing Recycling Notes', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(awaitingAuthRow.get('Issued to')).toEqual(issuer)
+    expect(awaitingAuthRow.get('Issued to')).toEqual(producer)
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -222,7 +221,7 @@ describe('Lumpy Packing Recycling Notes', () => {
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await checkViewPrnDetails(
       organisationDetails,
-      issuer,
+      producer,
       tonnageWordings,
       issuerNotes,
       awaitingAuthorisationStatus,
@@ -261,7 +260,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     let prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + issuer)
+    expect(prnIssuedText).toContain('PRN issued to ' + producer)
     expect(prnIssuedText).toContain('PRN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
@@ -273,7 +272,7 @@ describe('Lumpy Packing Recycling Notes', () => {
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPrnDetails(
       organisationDetails,
-      issuer,
+      producer,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
@@ -301,7 +300,6 @@ describe('Lumpy Packing Recycling Notes', () => {
       word: 'Nineteen'
     }
     const newIssuerNotes = 'Testing another PRN'
-    const newIssuer = 'producer-2'
 
     await PRNPage.enterTonnage(newTonnageWordings.integer)
     await PRNPage.select(newProducer)
@@ -335,7 +333,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(newAwaitingAuthRow.get('Issued to')).toEqual(newIssuer)
+    expect(newAwaitingAuthRow.get('Issued to')).toEqual(newProducer)
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
       `${newTonnageWordings.integer}`
@@ -348,7 +346,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await checkViewPrnDetails(
       organisationDetails,
-      newIssuer,
+      newProducer,
       newTonnageWordings,
       newIssuerNotes,
       awaitingAuthorisationStatus,
@@ -360,7 +358,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + newIssuer)
+    expect(prnIssuedText).toContain('PRN issued to ' + newProducer)
     expect(prnIssuedText).toContain('PRN number:')
 
     prnNumber = await PrnIssuedPage.prnNumberText()

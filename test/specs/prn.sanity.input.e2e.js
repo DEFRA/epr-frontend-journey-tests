@@ -105,7 +105,6 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await prnLink.click()
 
       const producer = 'EcoRecycle Industries'
-      const issuer = 'producer-3'
       const issuerNotes = 'Testing'
 
       await PRNPage.enterTonnage(tonnageWordings[i].integer)
@@ -166,7 +165,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-      expect(awaitingAuthRow.get('Issued to')).toEqual(issuer)
+      expect(awaitingAuthRow.get('Issued to')).toEqual(producer)
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -179,7 +178,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Issued by']).toBe(
         organisationDetails.organisation.companyName
       )
-      expect(prnViewDetails['Buyer']).toBe(issuer)
+      expect(prnViewDetails['Buyer']).toBe(producer)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       //TODO: Fix these?
