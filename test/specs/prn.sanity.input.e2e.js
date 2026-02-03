@@ -126,7 +126,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       //TODO: Fix these?
       // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
-      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
       expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
       const accreditationDetails =
@@ -184,7 +184,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       //TODO: Fix these?
       // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
-      // expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
 
       const accreditationViewDetails = await PrnViewPage.accreditationDetails()
       if (MATERIALS[i].prnName) {
