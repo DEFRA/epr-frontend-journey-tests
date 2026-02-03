@@ -35,6 +35,10 @@ class PRNViewPage {
   async returnToPRNList() {
     await $('a*=Return to PRN list').click()
   }
+
+  async issuePRNButton() {
+    await $('#main-content > div > div > form > div > button').click()
+  }
 }
 
 export default new PRNViewPage()
