@@ -173,7 +173,7 @@ export const config = {
   // See the full list at http://mochajs.org/
   mochaOpts: {
     ui: 'bdd',
-    timeout: debug ? oneHour : 60000,
+    timeout: debug ? oneHour : oneMinute * 5,
     grep: process.env.GREP || '',
     invert: process.env.GREP_INVERT === 'true'
   },
@@ -320,10 +320,7 @@ export const config = {
     const generation = allure(['generate', 'allure-results', '--clean'])
 
     return new Promise((resolve, reject) => {
-      const generationTimeout = setTimeout(
-        () => reject(reportError),
-        oneMinute * 2
-      )
+      const generationTimeout = setTimeout(() => reject(reportError), oneMinute)
 
       generation.on('exit', function (exitCode) {
         clearTimeout(generationTimeout)

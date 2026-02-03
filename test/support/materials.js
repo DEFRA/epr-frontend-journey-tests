@@ -8,7 +8,7 @@ export const MATERIALS = [
   {
     material: 'Fibre-based composite material (R3)',
     suffix: 'FB',
-    name: 'Fibre',
+    name: 'Fibre based composite',
     process: 'R3'
   },
   {

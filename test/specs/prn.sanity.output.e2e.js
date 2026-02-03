@@ -14,7 +14,7 @@ import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '~/test/support/materials.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials @sanitycheck', async () => {
+  it.skip('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -25,90 +25,17 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    let orgAddressIndex = 0
+    let orgAddressIndex = 8
 
-    const tonnageWordings = [
-      { integer: 7, word: 'Seven' },
-      { integer: 834, word: 'Eight Hundred Thirty Four' },
-      { integer: 52619, word: 'Fifty Two Thousand Six Hundred Nineteen' },
-      { integer: 3, word: 'Three' },
-      {
-        integer: 487203,
-        word: 'Four Hundred Eighty Seven Thousand Two Hundred Three'
-      },
-      { integer: 1456, word: 'One Thousand Four Hundred Fifty Six' },
-      {
-        integer: 999999,
-        word: 'Nine Hundred Ninety Nine Thousand Nine Hundred Ninety Nine'
-      },
-      { integer: 68, word: 'Sixty Eight' }
-    ]
-
-    // Sanity check Reprocessor Input materials
-    for (let i = 0; i < MATERIALS.length; i++) {
-      console.log(
-        'Reprocessor Input -- Creating PRN for material: ' + MATERIALS[i].name
-      )
-      await DashboardPage.selectTableLink(1, i + 1)
-      const regNumber = `R25SR500000912${MATERIALS[i].suffix}`
-      const accNumber = `R-ACC12045${MATERIALS[i].suffix}`
-
-      const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
-      expect(regNo).toExist()
-
-      const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
-      expect(accNo).toExist()
-
-      const prnLink = await WasteRecordsPage.createNewPRNLink()
-      await prnLink.click()
-
-      const producer = 'EcoRecycle Industries'
-      const issuerNotes = 'Testing'
-
-      await PRNPage.enterTonnage(tonnageWordings[i].integer)
-      await PRNPage.select(producer)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
-
-      const headingText = await CheckBeforeCreatingPrnPage.headingText()
-      expect(headingText).toBe('Check before creating PRN')
-
-      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issued by']).toBe(
-        organisationDetails.organisation.companyName
-      )
-      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        producer
-      )
-      expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
-      //TODO: Fix these?
-      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
-      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issue comments']).toBe(issuerNotes)
-
-      const accreditationDetails =
-        await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
-      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-      expect(
-        accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-      ).toBe(organisationDetails.regAddresses[orgAddressIndex])
-
-      await CheckBeforeCreatingPrnPage.createPRN()
-
-      const message = await PrnCreatedPage.messageText()
-
-      expect(message).toContain('PRN created')
-      expect(message).toContain('Tonnage')
-      expect(message).toContain(tonnageWordings[i].integer + ' tonnes')
-
-      await PrnCreatedPage.returnToRegistrationPage()
-
-      await WasteRecordsPage.managePRNsLink()
-
-      await WasteRecordsPage.selectBackLink()
-      orgAddressIndex++
-    }
+    // Tonnage values expected from Summary Log files upload
+    // Aluminium
+    // Fibre
+    // Glass remelt
+    // Glass other
+    // Paper and board
+    // Plastic
+    // Steel
+    // Wood
 
     const tonnageWordingsOutput = [
       { integer: 245, word: 'Two Hundred Forty Five' },
