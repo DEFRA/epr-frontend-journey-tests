@@ -117,7 +117,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(headingText).toBe('Check before creating PRN')
 
       const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issued by']).toBe(
+      expect(prnDetails['Issuer']).toBe(
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
@@ -127,11 +127,15 @@ describe('Packing Recycling Notes (Sanity)', () => {
       //TODO: Fix these?
       // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
       // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+      expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
       const accreditationDetails =
         await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      if (MATERIALS[i].prnName) {
+        expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
+      } else {
+        expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      }
       expect(accreditationDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')
@@ -183,7 +187,11 @@ describe('Packing Recycling Notes (Sanity)', () => {
       // expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
 
       const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-      expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].name)
+      if (MATERIALS[i].prnName) {
+        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].prnName)
+      } else {
+        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].name)
+      }
       expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')

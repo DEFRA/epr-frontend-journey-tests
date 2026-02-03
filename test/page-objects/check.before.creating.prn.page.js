@@ -36,8 +36,8 @@ class CheckBeforeCreatingPRNPage {
     await $('#main-content button[type=submit]').click()
   }
 
-  async cancelWithoutSaving() {
-    await $('#main-content div.govuk-button-group a[role=button]').click()
+  async discardAndStartAgain() {
+    await $('a=Discard and start again').click()
   }
 }
 
