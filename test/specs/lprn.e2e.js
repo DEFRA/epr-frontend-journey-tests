@@ -16,6 +16,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import { checkBodyText } from '~/test/support/checks.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
+import PrnIssuedPage from 'page-objects/prn.issued.page.js'
 
 async function checkPrnDetails(
   organisationDetails,
@@ -33,9 +34,9 @@ async function checkPrnDetails(
     producer
   )
   expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  //TODO: Fix these?
+  //TODO: Fix this?
   // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  // expect(prnDetails['Process to be used']).toBe('R3')
+  expect(prnDetails['Process to be used']).toBe('R3')
   expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
   const accreditationDetails =
@@ -47,6 +48,35 @@ async function checkPrnDetails(
     accreditationDetails['Accreditation address'].replaceAll(', ', ',')
   ).toBe(organisationDetails.regAddresses[0])
   return { prnDetails }
+}
+
+async function checkViewPrnDetails(
+  organisationDetails,
+  issuer,
+  tonnageWordings,
+  issuerNotes,
+  status,
+  materialDesc,
+  accNumber
+) {
+  const prnViewDetails = await PrnViewPage.prnDetails()
+  expect(prnViewDetails['Issued by']).toBe(
+    organisationDetails.organisation.companyName
+  )
+  expect(prnViewDetails['Buyer']).toBe(issuer)
+  expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
+  expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
+  expect(prnViewDetails['Status']).toBe(status)
+  //TODO: Fix this?
+  // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
+  expect(prnViewDetails['Process to be used']).toBe('R3')
+
+  const accreditationViewDetails = await PrnViewPage.accreditationDetails()
+  expect(accreditationViewDetails['Material']).toBe(materialDesc)
+  expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
+  expect(
+    accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
+  ).toBe(organisationDetails.regAddresses[0])
 }
 
 describe('Lumpy Packing Recycling Notes', () => {
@@ -114,7 +144,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const prnLink = await WasteRecordsPage.createNewPRNLink()
+    let prnLink = await WasteRecordsPage.createNewPRNLink()
     await prnLink.click()
 
     const producer = 'EcoRecycle Industries'
@@ -165,56 +195,191 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await PrnCreatedPage.returnToRegistrationPage()
 
-    const managePrnLink = await WasteRecordsPage.managePRNsLink()
+    let managePrnLink = await WasteRecordsPage.managePRNsLink()
     await managePrnLink.click()
 
-    let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
-    expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
+    const awaitingAuthorisationStatus = 'Awaiting authorisation'
 
+    // PRN Dashboard checks - Waste Balance Amount, Awaiting Authorisation table values
+    let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
+
+    expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
     const today = new Date()
+
     const expectedCreateDate = today.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     })
-
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
     expect(awaitingAuthRow.get('Issued to')).toEqual(issuer)
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
-    expect(awaitingAuthRow.get('Status')).toEqual('Awaiting authorisation')
+    expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
+    // End of PRN Dashboard checks
 
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
-
-    const prnViewDetails = await PrnViewPage.prnDetails()
-    expect(prnViewDetails['Issued by']).toBe(
-      organisationDetails.organisation.companyName
+    await checkViewPrnDetails(
+      organisationDetails,
+      issuer,
+      tonnageWordings,
+      issuerNotes,
+      awaitingAuthorisationStatus,
+      materialDesc,
+      accNumber
     )
-    expect(prnViewDetails['Buyer']).toBe(issuer)
-    expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-    expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
-    //TODO: Fix these?
-    // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
-    // expect(prnViewDetails['Process to be used']).toBe('R3')
-
-    const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-    expect(accreditationViewDetails['Material']).toBe(materialDesc)
-    expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
-    expect(
-      accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
-    ).toBe(organisationDetails.regAddresses[0])
 
     await PrnViewPage.returnToPRNList()
+
+    // Make sure Create a PRN button works and brings to PRN creation page
+    await PrnDashboardPage.createAPrnButton()
+
+    // Check Create PRN validation errors
+    const createAPrnPageHeading = await PRNPage.headingText()
+    expect(createAPrnPageHeading).toBe('Create a PRN')
+
+    await PRNPage.continue()
+
+    const errorMessages = await PRNPage.errorMessages()
+    expect(errorMessages.length).toBe(2)
+    expect(errorMessages).toEqual([
+      'Enter a whole number',
+      'Select who this will be issued to'
+    ])
+    // End of Check Create PRN validation errors
+
+    await HomePage.homeLink()
+
+    await DashboardPage.selectTableLink(1, 1)
+    const managePrnsLink = await WasteRecordsPage.managePRNsLink()
+    await managePrnsLink.click()
+
+    // Issue the created PRN
+    await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
+    await PrnViewPage.issuePRNButton()
+
+    let prnIssuedText = await PrnIssuedPage.messageText()
+
+    expect(prnIssuedText).toContain('PRN issued to ' + issuer)
+    expect(prnIssuedText).toContain('PRN number:')
+
+    let prnNumber = await PrnIssuedPage.prnNumberText()
+    const prnNoPattern = /ER\d{6}/
+    expect(prnNoPattern.test(prnNumber)).toEqual(true)
+
+    await PrnIssuedPage.viewPdfButton()
+
+    const awaitingAcceptanceStatus = 'Awaiting acceptance'
+    await checkViewPrnDetails(
+      organisationDetails,
+      issuer,
+      tonnageWordings,
+      issuerNotes,
+      awaitingAcceptanceStatus,
+      materialDesc,
+      accNumber
+    )
+
+    await PrnViewPage.returnToPRNList()
+
+    const noPrnMessage = await PrnDashboardPage.getNoPrnMessage()
+    expect(noPrnMessage).toBe('No PRNs or PERNs have been created yet.')
 
     await PrnDashboardPage.selectBackLink()
 
     wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
+
+    // Create a new PRN
+    prnLink = await WasteRecordsPage.createNewPRNLink()
+    await prnLink.click()
+
+    const newProducer = 'BigCo Waste Solutions'
+    const newTonnageWordings = {
+      integer: 19,
+      word: 'Nineteen'
+    }
+    const newIssuerNotes = 'Testing another PRN'
+    const newIssuer = 'producer-2'
+
+    await PRNPage.enterTonnage(newTonnageWordings.integer)
+    await PRNPage.select(newProducer)
+    await PRNPage.addIssuerNotes(newIssuerNotes)
+    await PRNPage.continue()
+
+    headingText = await CheckBeforeCreatingPrnPage.headingText()
+    expect(headingText).toBe('Check before creating PRN')
+    await checkPrnDetails(
+      organisationDetails,
+      materialDesc,
+      newProducer,
+      newTonnageWordings,
+      newIssuerNotes,
+      accNumber
+    )
+
+    await CheckBeforeCreatingPrnPage.createPRN()
+
+    const newMessage = await PrnCreatedPage.messageText()
+
+    expect(newMessage).toContain('PRN created')
+    expect(newMessage).toContain('Tonnage')
+    expect(newMessage).toContain(newTonnageWordings.integer + ' tonnes')
+    // End of new PRN creation
+
+    await PrnCreatedPage.returnToRegistrationPage()
+
+    managePrnLink = await WasteRecordsPage.managePRNsLink()
+    await managePrnLink.click()
+
+    const newAwaitingAuthRow =
+      await PrnDashboardPage.getAwaitingAuthorisationRow(1)
+    expect(newAwaitingAuthRow.get('Issued to')).toEqual(newIssuer)
+    expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
+    expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
+      `${newTonnageWordings.integer}`
+    )
+    expect(newAwaitingAuthRow.get('Status')).toEqual(
+      awaitingAuthorisationStatus
+    )
+
+    await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
+
+    await checkViewPrnDetails(
+      organisationDetails,
+      newIssuer,
+      newTonnageWordings,
+      newIssuerNotes,
+      awaitingAuthorisationStatus,
+      materialDesc,
+      accNumber
+    )
+
+    await PrnViewPage.issuePRNButton()
+
+    prnIssuedText = await PrnIssuedPage.messageText()
+
+    expect(prnIssuedText).toContain('PRN issued to ' + newIssuer)
+    expect(prnIssuedText).toContain('PRN number:')
+
+    prnNumber = await PrnIssuedPage.prnNumberText()
+    expect(prnNoPattern.test(prnNumber)).toEqual(true)
+
+    // Both Manage PRNs and Issue another PRN links should point to the same page
+    const managePRNsElement = await PrnIssuedPage.managePRNs()
+    const issueAnotherPRNElement = await PrnIssuedPage.issueAnotherPRN()
+    expect(managePRNsElement.getAttribute('href')).toEqual(
+      issueAnotherPRNElement.getAttribute('href')
+    )
+
+    await PrnIssuedPage.returnToHomePage()
+
     await WasteRecordsPage.selectBackLink()
 
+    const expectedUpdatedWasteBalance = '170.28'
     const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe(expectedWasteBalance)
+    expect(availableWasteBalance).toBe(expectedUpdatedWasteBalance)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

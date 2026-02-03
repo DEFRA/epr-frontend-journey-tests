@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 
 class PRNPage {
   open(orgId, regId) {
@@ -28,6 +28,21 @@ class PRNPage {
 
   async addIssuerNotes(notes) {
     await $('#notes').setValue(notes)
+  }
+
+  async errorMessages() {
+    await browser.waitUntil(
+      async () => {
+        const elements = await $$('#main-content div[role=alert] ul li a')
+        return elements.length > 0
+      },
+      {
+        timeout: 5000,
+        timeoutMsg: 'Expected to find error list items'
+      }
+    )
+    const errorLinks = await $$('#main-content div[role=alert] ul li a')
+    return await errorLinks.map((el) => el.getText())
   }
 }
 
