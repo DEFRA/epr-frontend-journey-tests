@@ -45,12 +45,10 @@ class Users {
 
   async tokenPayload(sessionId) {
     return {
-      // eslint-disable-next-line camelcase
-      client_id: '63983fc2-cfff-45bb-8ec2-959e21062b9a',
-      // eslint-disable-next-line camelcase
-      client_secret: 'test_value',
-      // eslint-disable-next-line camelcase
-      grant_type: 'authorization_code',
+      client_id: '63983fc2-cfff-45bb-8ec2-959e21062b9a', // eslint-disable-line camelcase
+      // deepcode ignore HardcodedNonCryptoSecret: intentional test fixture, not a real credential
+      client_secret: 'test_value', // eslint-disable-line camelcase
+      grant_type: 'authorization_code', // eslint-disable-line camelcase
       code: `${sessionId}`
     }
   }
