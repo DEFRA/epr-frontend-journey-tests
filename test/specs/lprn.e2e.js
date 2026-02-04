@@ -249,9 +249,9 @@ describe('Lumpy Packing Recycling Notes', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(
-      awaitingAuthRow.get('Packaging waste producer or compliance scheme')
-    ).toEqual(producer)
+    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+      producer
+    )
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -392,9 +392,9 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(
-      newAwaitingAuthRow.get('Packaging waste producer or compliance scheme')
-    ).toEqual(newProducer)
+    expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+      newProducer
+    )
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
       `${newTonnageWordings.integer}`
