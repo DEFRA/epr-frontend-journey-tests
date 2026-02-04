@@ -268,11 +268,35 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await CreatePRNPage.continue()
 
-    const errorMessages = await CreatePRNPage.errorMessages()
+    let errorMessages = await CreatePRNPage.errorMessages()
     expect(errorMessages.length).toBe(2)
     expect(errorMessages).toEqual([
       'Enter a whole number',
       'Select who this will be issued to'
+    ])
+
+    // Create a new PRN, this time we exceed the available waste balance (189.28)
+    const exceedingTonnageWordings = {
+      integer: 190,
+      word: 'One hundred ninety'
+    }
+
+    await createAndCheckPrnDetails(
+      exceedingTonnageWordings,
+      producer,
+      issuerNotes,
+      issuerNotes,
+      organisationDetails,
+      materialDesc,
+      accNumber
+    )
+    await CheckBeforeCreatingPrnPage.createPRN()
+
+    // Now we see an error message related to tonnage exceeding waste balance
+    errorMessages = await CreatePRNPage.errorMessages()
+    expect(errorMessages.length).toBe(1)
+    expect(errorMessages).toEqual([
+      'The tonnage you entered exceeds your available waste balance'
     ])
     // End of Check Create PRN validation errors
 
