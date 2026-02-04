@@ -11,7 +11,7 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-// import PRNPage from 'page-objects/prn.page.js'
+// import CreatePRNPage from 'page-objects/create.prn.page.js'
 
 describe('Summary Logs Reprocessor Output', () => {
   it('Should be able to submit a (Steel) Reprocessor Output Summary Log spreadsheet (6 rows total, but only 1 added for waste balance) @reproOutput', async () => {
@@ -124,7 +124,7 @@ describe('Summary Logs Reprocessor Output', () => {
     // const prnLink = await WasteRecordsPage.createNewPRNLink()
     // await prnLink.click()
 
-    // const prnHeading = await PRNPage.headingText()
+    // const prnHeading = await CreatePRNPage.headingText()
     // expect(prnHeading).toBe('Create a PRN')
 
     await HomePage.signOut()

@@ -11,7 +11,7 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 
@@ -86,10 +86,10 @@ describe('Packing Recycling Notes', () => {
     const producer = 'EcoRecycle Industries'
     const issuerNotes = 'Testing'
 
-    await PRNPage.enterTonnage(10)
-    await PRNPage.select(producer)
-    await PRNPage.addIssuerNotes(issuerNotes)
-    await PRNPage.continue()
+    await CreatePRNPage.enterTonnage(10)
+    await CreatePRNPage.select(producer)
+    await CreatePRNPage.addIssuerNotes(issuerNotes)
+    await CreatePRNPage.continue()
 
     const headingText = await CheckBeforeCreatingPrnPage.headingText()
     expect(headingText).toBe('Check before creating PRN')

@@ -9,14 +9,15 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '~/test/support/checks.js'
+import { checkBodyText } from '../support/checks.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
+import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
 
 async function checkPrnDetails(
   organisationDetails,
@@ -79,18 +80,19 @@ async function checkViewPrnDetails(
   ).toBe(organisationDetails.regAddresses[0])
 }
 
-async function createPrn(
+async function createAndCheckPrnDetails(
   tonnageWordings,
   producer,
   issuerNotes,
+  issuerNotesToCheck,
   organisationDetails,
   materialDesc,
   accNumber
 ) {
-  await PRNPage.enterTonnage(tonnageWordings.integer)
-  await PRNPage.select(producer)
-  await PRNPage.addIssuerNotes(issuerNotes)
-  await PRNPage.continue()
+  await CreatePRNPage.enterTonnage(tonnageWordings.integer)
+  await CreatePRNPage.select(producer)
+  await CreatePRNPage.addIssuerNotes(issuerNotes)
+  await CreatePRNPage.continue()
 
   const headingText = await CheckBeforeCreatingPrnPage.headingText()
   expect(headingText).toBe('Check before creating PRN')
@@ -99,7 +101,7 @@ async function createPrn(
     materialDesc,
     producer,
     tonnageWordings,
-    issuerNotes,
+    issuerNotesToCheck,
     accNumber
   )
 }
@@ -120,7 +122,7 @@ async function performSummaryLogUpload(accNumber, regNumber) {
 }
 
 describe('Lumpy Packing Recycling Notes', () => {
-  it.skip('Should be able to create and manage PRNs for Paper (Reprocessor Input) @lumpyprn', async () => {
+  it('Should be able to create and manage PRNs for Paper (Reprocessor Input) @lumpyprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -177,27 +179,38 @@ describe('Lumpy Packing Recycling Notes', () => {
     await prnLink.click()
 
     const producer = 'EcoRecycle Industries'
-    const issuerNotes = 'Testing'
+    let issuerNotes = ''
 
-    await createPrn(
+    // Empty issuer notes, PRN created should say "Not provided"
+    await createAndCheckPrnDetails(
       tonnageWordings,
       producer,
       issuerNotes,
+      'Not provided',
       organisationDetails,
       materialDesc,
       accNumber
     )
-
+    // Discard the first attempt
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
+    const discardHeading = await ConfirmDiscardPRNPage.headingText()
+    expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
+    await ConfirmDiscardPRNPage.discardAndStartAgain()
 
-    await createPrn(
+    issuerNotes = 'Testing'
+    await createAndCheckPrnDetails(
       tonnageWordings,
       producer,
+      issuerNotes,
       issuerNotes,
       organisationDetails,
       materialDesc,
       accNumber
     )
+
+    // This time we go to the discard page, and check the back link works
+    await CheckBeforeCreatingPrnPage.discardAndStartAgain()
+    await ConfirmDiscardPRNPage.selectBackLink()
 
     await CheckBeforeCreatingPrnPage.createPRN()
 
@@ -250,12 +263,12 @@ describe('Lumpy Packing Recycling Notes', () => {
     await PrnDashboardPage.createAPrnButton()
 
     // Check Create PRN validation errors
-    const createAPrnPageHeading = await PRNPage.headingText()
+    const createAPrnPageHeading = await CreatePRNPage.headingText()
     expect(createAPrnPageHeading).toBe('Create a PRN')
 
-    await PRNPage.continue()
+    await CreatePRNPage.continue()
 
-    const errorMessages = await PRNPage.errorMessages()
+    const errorMessages = await CreatePRNPage.errorMessages()
     expect(errorMessages.length).toBe(2)
     expect(errorMessages).toEqual([
       'Enter a whole number',
@@ -316,9 +329,10 @@ describe('Lumpy Packing Recycling Notes', () => {
     }
     const newIssuerNotes = 'Testing another PRN'
 
-    await createPrn(
+    await createAndCheckPrnDetails(
       newTonnageWordings,
       newProducer,
+      newIssuerNotes,
       newIssuerNotes,
       organisationDetails,
       materialDesc,

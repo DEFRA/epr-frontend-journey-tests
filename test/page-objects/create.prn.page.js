@@ -1,6 +1,6 @@
 import { browser, $, $$ } from '@wdio/globals'
 
-class PRNPage {
+class CreatePRNPage {
   open(orgId, regId) {
     return browser.url(
       `/organisations/${orgId}/registrations/${regId}/create-prn`
@@ -46,4 +46,4 @@ class PRNPage {
   }
 }
 
-export default new PRNPage()
+export default new CreatePRNPage()

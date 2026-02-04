@@ -12,7 +12,7 @@ import { fakerEN_GB } from '@faker-js/faker'
 import { DefraIdStub } from './defra-id-stub.js'
 import Users from './users.js'
 import { FormData } from 'undici'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from './materials.js'
 
 export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
   const wasteProcessingTypes = [

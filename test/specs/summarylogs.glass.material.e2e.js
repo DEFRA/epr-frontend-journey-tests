@@ -10,7 +10,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '~/test/support/checks.js'
+import { checkBodyText } from '../support/checks.js'
 
 describe('Summary Logs (Glass Material)', () => {
   it('Should be able to distinguish between Glass Re-Melt and Glass Other @glassMaterial', async () => {

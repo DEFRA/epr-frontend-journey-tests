@@ -8,10 +8,10 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import PRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it.skip('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {

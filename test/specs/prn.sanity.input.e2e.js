@@ -8,12 +8,12 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '~/test/support/checks.js'
+import { checkBodyText } from '../support/checks.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 
@@ -107,10 +107,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const producer = 'EcoRecycle Industries'
       const issuerNotes = 'Testing'
 
-      await PRNPage.enterTonnage(tonnageWordings[i].integer)
-      await PRNPage.select(producer)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
+      await CreatePRNPage.enterTonnage(tonnageWordings[i].integer)
+      await CreatePRNPage.select(producer)
+      await CreatePRNPage.addIssuerNotes(issuerNotes)
+      await CreatePRNPage.continue()
 
       const headingText = await CheckBeforeCreatingPrnPage.headingText()
       expect(headingText).toBe('Check before creating PRN')

@@ -8,10 +8,10 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it.skip('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
@@ -76,10 +76,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const producer = 'EcoRecycle Industries'
       const issuerNotes = 'Testing'
 
-      await PRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
-      await PRNPage.select(producer)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
+      await CreatePRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
+      await CreatePRNPage.select(producer)
+      await CreatePRNPage.addIssuerNotes(issuerNotes)
+      await CreatePRNPage.continue()
 
       const headingText = await CheckBeforeCreatingPrnPage.headingText()
       expect(headingText).toBe('Check before creating PRN')
