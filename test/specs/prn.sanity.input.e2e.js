@@ -107,6 +107,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const producer = 'EcoRecycle Industries'
       const issuerNotes = 'Testing'
 
+      const materialDetails = await CreatePRNPage.materialDetails()
+      expect(materialDetails).toBe('Material: ' + MATERIALS[i].prnName)
+
       await CreatePRNPage.enterTonnage(tonnageWordings[i].integer)
       await CreatePRNPage.select(producer)
       await CreatePRNPage.addIssuerNotes(issuerNotes)
@@ -130,11 +133,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const accreditationDetails =
         await CheckBeforeCreatingPrnPage.accreditationDetails()
-      if (MATERIALS[i].prnName) {
-        expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
-      } else {
-        expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
-      }
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')
@@ -165,7 +164,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-      expect(awaitingAuthRow.get('Issued to')).toEqual(producer)
+      expect(
+        awaitingAuthRow.get('Packaging waste producer or compliance scheme')
+      ).toEqual(producer)
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -186,11 +187,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
 
       const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-      if (MATERIALS[i].prnName) {
-        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].prnName)
-      } else {
-        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].name)
-      }
+      expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
