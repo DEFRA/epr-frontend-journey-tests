@@ -232,6 +232,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
+    // No tabs yet as no PRNs have been issued
     const cancelHintText = await PrnDashboardPage.cancelHintText()
     expect(cancelHintText).toBe(
       'If you delete or cancel a PRN, its tonnage will be added to your available waste balance.'
