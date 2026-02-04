@@ -12,9 +12,11 @@ import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
+import { checkBodyText } from '~/test/support/checks.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it.skip('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -27,29 +29,19 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     let orgAddressIndex = 8
 
-    // Tonnage values expected from Summary Log files upload
-    // Aluminium
-    // Fibre
-    // Glass remelt
-    // Glass other
-    // Paper and board
-    // Plastic
-    // Steel
-    // Wood
-
     const tonnageWordingsOutput = [
       { integer: 245, word: 'Two Hundred Forty Five' },
       { integer: 18923, word: 'Eighteen Thousand Nine Hundred Twenty Three' },
       { integer: 5, word: 'Five' },
       {
-        integer: 671482,
-        word: 'Six Hundred Seventy One Thousand Four Hundred Eighty Two'
+        integer: 571482,
+        word: 'Five Hundred Seventy One Thousand Four Hundred Eighty Two'
       },
       { integer: 9307, word: 'Nine Thousand Three Hundred Seven' },
       { integer: 42, word: 'Forty Two' },
       {
-        integer: 803516,
-        word: 'Eight Hundred Three Thousand Five Hundred Sixteen'
+        integer: 83516,
+        word: 'Eighty Thousand Five Hundred Sixteen'
       },
       { integer: 156, word: 'One Hundred Fifty Six' }
     ]
@@ -70,6 +62,23 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
       expect(accNo).toExist()
 
+      await WasteRecordsPage.submitSummaryLogLink()
+
+      await UploadSummaryLogPage.uploadFile(
+        `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
+      )
+      await UploadSummaryLogPage.continue()
+
+      await checkBodyText('Your file is being checked', 30)
+      await checkBodyText('Check before confirming upload', 30)
+      await UploadSummaryLogPage.confirmAndSubmit()
+
+      await checkBodyText('Your waste records are being updated', 30)
+      await checkBodyText('Summary log uploaded', 30)
+      await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+      await DashboardPage.selectTableLink(2, i + 1)
+
       const prnLink = await WasteRecordsPage.createNewPRNLink()
       await prnLink.click()
 
@@ -85,7 +94,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(headingText).toBe('Check before creating PRN')
 
       const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issued by']).toBe(
+      expect(prnDetails['Issuer']).toBe(
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
@@ -94,12 +103,12 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordingsOutput[i].integer}`)
       //TODO: Fix these?
       // expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)
-      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+      expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
       const accreditationDetails =
         await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')

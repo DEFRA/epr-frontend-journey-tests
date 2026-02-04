@@ -27,16 +27,6 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    // Tonnage values expected from Summary Log files upload
-    // Aluminium
-    // Fibre
-    // Glass remelt
-    // Glass other
-    // Paper and board
-    // Plastic
-    // Steel
-    // Wood
-
     // Sanity check Exporter materials
     await DashboardPage.selectExportingTab()
 
