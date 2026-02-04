@@ -231,8 +231,16 @@ describe('Lumpy Packing Recycling Notes', () => {
     let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
 
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
-    const today = new Date()
 
+    const cancelHintText = await PrnDashboardPage.cancelHintText()
+    expect(cancelHintText).toBe(
+      'If you delete or cancel a PRN, its tonnage will be added to your available waste balance.'
+    )
+
+    const selectPRNHeadingText = await PrnDashboardPage.selectPrnHeadingText()
+    expect(selectPRNHeadingText).toBe('Select a PRN')
+
+    const today = new Date()
     const expectedCreateDate = today.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'long',
@@ -240,7 +248,9 @@ describe('Lumpy Packing Recycling Notes', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(awaitingAuthRow.get('Issued to')).toEqual(producer)
+    expect(
+      awaitingAuthRow.get('Packaging waste producer or compliance scheme')
+    ).toEqual(producer)
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -265,13 +275,15 @@ describe('Lumpy Packing Recycling Notes', () => {
     // Check Create PRN validation errors
     const createAPrnPageHeading = await CreatePRNPage.headingText()
     expect(createAPrnPageHeading).toBe('Create a PRN')
+    const materialDetails = await CreatePRNPage.materialDetails()
+    expect(materialDetails).toBe('Material: Paper and board')
 
     await CreatePRNPage.continue()
 
     let errorMessages = await CreatePRNPage.errorMessages()
     expect(errorMessages.length).toBe(2)
     expect(errorMessages).toEqual([
-      'Enter a whole number',
+      'Enter PRN tonnage as a whole number',
       'Select who this will be issued to'
     ])
 
@@ -379,7 +391,9 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(newAwaitingAuthRow.get('Issued to')).toEqual(newProducer)
+    expect(
+      newAwaitingAuthRow.get('Packaging waste producer or compliance scheme')
+    ).toEqual(newProducer)
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
       `${newTonnageWordings.integer}`

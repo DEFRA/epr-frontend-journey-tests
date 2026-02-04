@@ -48,6 +48,14 @@ class PRNDashboardPage {
     return authRow
   }
 
+  async cancelHintText() {
+    return await $('#awaiting-action > div.govuk-inset-text').getText()
+  }
+
+  async selectPrnHeadingText() {
+    return await $('#main-content > div > div > h2').getText()
+  }
+
   async getNoPrnMessage() {
     return await $('#awaiting-action > p').getText()
   }

@@ -30,6 +30,10 @@ class CreatePRNPage {
     await $('#notes').setValue(notes)
   }
 
+  async materialDetails() {
+    return await $('#main-content > div > div > form > p').getText()
+  }
+
   async errorMessages() {
     await browser.waitUntil(
       async () => {
