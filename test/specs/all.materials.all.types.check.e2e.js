@@ -7,7 +7,7 @@ import HomePage from 'page-objects/homepage.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import DashboardPage from 'page-objects/dashboard.page.js'
 import { expect } from '@wdio/globals'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
 
 describe('All materials and all waste processing types @allMaterials', () => {
   it('Should be able to see all waste processing types and all materials on the User Interface', async () => {

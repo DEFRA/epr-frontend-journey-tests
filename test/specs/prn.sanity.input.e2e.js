@@ -8,12 +8,12 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '~/test/support/checks.js'
+import { checkBodyText } from '../support/checks.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 
@@ -33,19 +33,19 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     const tonnageWordings = [
       { integer: 7, word: 'Seven' },
-      { integer: 257, word: 'Two Hundred Fifty Seven' },
+      { integer: 257, word: 'Two hundred and fifty seven' },
       { integer: 19, word: 'Nineteen' },
-      { integer: 306, word: 'Three Hundred Six' },
+      { integer: 306, word: 'Three hundred and six' },
       {
         integer: 203,
-        word: 'Two Hundred Three'
+        word: 'Two hundred and three'
       },
-      { integer: 156, word: 'One Hundred Fifty Six' },
+      { integer: 156, word: 'One hundred and fifty six' },
       {
         integer: 99,
-        word: 'Ninety Nine'
+        word: 'Ninety nine'
       },
-      { integer: 68, word: 'Sixty Eight' }
+      { integer: 68, word: 'Sixty eight' }
     ]
 
     // Tonnage values expected from Summary Log files upload
@@ -107,10 +107,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const producer = 'EcoRecycle Industries'
       const issuerNotes = 'Testing'
 
-      await PRNPage.enterTonnage(tonnageWordings[i].integer)
-      await PRNPage.select(producer)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
+      const materialDetails = await CreatePRNPage.materialDetails()
+      expect(materialDetails).toBe('Material: ' + MATERIALS[i].prnName)
+
+      await CreatePRNPage.enterTonnage(tonnageWordings[i].integer)
+      await CreatePRNPage.select(producer)
+      await CreatePRNPage.addIssuerNotes(issuerNotes)
+      await CreatePRNPage.continue()
 
       const headingText = await CheckBeforeCreatingPrnPage.headingText()
       expect(headingText).toBe('Check before creating PRN')
@@ -123,18 +126,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
         producer
       )
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
-      //TODO: Fix these?
-      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
+      expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
       expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
       expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
       const accreditationDetails =
         await CheckBeforeCreatingPrnPage.accreditationDetails()
-      if (MATERIALS[i].prnName) {
-        expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
-      } else {
-        expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
-      }
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')
@@ -165,7 +163,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-      expect(awaitingAuthRow.get('Issued to')).toEqual(producer)
+      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+        producer
+      )
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -181,16 +181,11 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Buyer']).toBe(producer)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
-      //TODO: Fix these?
-      // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
+      expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
       expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
 
       const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-      if (MATERIALS[i].prnName) {
-        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].prnName)
-      } else {
-        expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].name)
-      }
+      expect(accreditationViewDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
