@@ -27,70 +27,35 @@ app.get('/waste-organisations/organisations', checkAuth, (req, res) => {
     res.json({
       "organisations": [
         {
-          "id": "20970aa3-b705-4d05-949b-c03feb41e1e1",
-          "name": "COUNCIL FARM LIMITED",
-          "tradingName": "Council Farm Trading",
-          "businessCountry": "GB-ENG",
-          "companiesHouseNumber": "73457667",
+          "id": "9eb099a7-bda0-456c-96ba-e0af3fdb9cde",
+          "name": "Looney Tunes",
+          "tradingName": "Acme Compliance Scheme",
           "address": {
-            "addressLine1": "1",
-            "addressLine2": "Council Farm Six Mile Bottom Road",
-            "town": "Cambridge",
-            "county": null,
-            "postcode": "CB21 5LD",
-            "country": "England"
-          },
-          "registrations": [
-            {
-              "status": "REGISTERED",
-              "type": "COMPLIANCE_SCHEME",
-              "registrationYear": 2026
-            }
-          ]
+            "addressLine1": "37th Place",
+            "town": "Ashfield",
+            "county": "Chicago",
+            "postcode": "W1 L3Y"
+          }
         },
         {
-          "id": "fcdee15c-6f14-41e8-9f4c-ce1288a72b8e",
-          "name": "DLOWCAMP CIC",
-          "tradingName": "Dlowcamp Trading",
-          "businessCountry": "GB-ENG",
-          "companiesHouseNumber": "45019220",
+          "id": "dd793573-b218-47a7-be85-1c777ca0d0d8",
+          "name": "Bigco Packaging Ltd",
           "address": {
-            "addressLine1": "7",
-            "addressLine2": "Rosenthorpe Road",
-            "town": "London",
-            "county": null,
-            "postcode": "SE15 3EG",
-            "country": "England"
-          },
-          "registrations": [
-            {
-              "status": "REGISTERED",
-              "type": "COMPLIANCE_SCHEME",
-              "registrationYear": 2026
-            }
-          ]
+            "addressLine1": "Zig Zag road",
+            "addressLine2": "Box Hill",
+            "town": "Tadworth",
+            "postcode": "KT20 7LB"
+          }
         },
         {
-          "id": "2a477323-6c7b-46c5-b141-3bf34ac5e030",
-          "name": "ROCO DIGITAL LTD",
-          "tradingName": "Roco Digital Limited",
-          "businessCountry": "GB-ENG",
-          "companiesHouseNumber": "94629328",
+          "id": "b7b158e1-c72f-45d4-8868-5c6e14bc10af",
+          "name": "Green Waste Solutions",
           "address": {
-            "addressLine1": "TEST BUILDING",
-            "addressLine2": "1 STREET NAME",
-            "town": "Tester Town",
-            "county": "Tester County",
-            "postcode": "T1 1TT",
-            "country": "United Kingdom"
-          },
-          "registrations": [
-            {
-              "status": "REGISTERED",
-              "type": "COMPLIANCE_SCHEME",
-              "registrationYear": 2026
-            }
-          ]
+            "addressLine1": "1 Worlds End Lane",
+            "town": "Green St Green",
+            "postcode": "BR6 6AG",
+            "country": "England"
+          }
         }
       ]
     })
