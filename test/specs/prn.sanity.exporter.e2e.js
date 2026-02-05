@@ -13,7 +13,6 @@ import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.p
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '~/test/support/checks.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it.skip('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
@@ -62,18 +61,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await WasteRecordsPage.submitSummaryLogLink()
 
-      await UploadSummaryLogPage.uploadFile(
+      await UploadSummaryLogPage.performUploadAndReturnToHomepage(
         `resources/sanity/exporter_${accNumber}_${regNumber}.xlsx`
       )
-      await UploadSummaryLogPage.continue()
-
-      await checkBodyText('Your file is being checked', 30)
-      await checkBodyText('Check before confirming upload', 30)
-      await UploadSummaryLogPage.confirmAndSubmit()
-
-      await checkBodyText('Your waste records are being updated', 30)
-      await checkBodyText('Summary log uploaded', 30)
-      await UploadSummaryLogPage.clickOnReturnToHomePage()
 
       await DashboardPage.selectExportingTab()
       await DashboardPage.selectTableLink(i + 1, 1)
@@ -81,7 +71,8 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const pernLink = await WasteRecordsPage.createNewPERNLink()
       await pernLink.click()
 
-      const producer = 'EcoRecycle Industries'
+      const producer =
+        'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
 
       await PRNPage.enterTonnage(tonnageWordingsExporter[i].integer)
@@ -118,8 +109,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const message = await PrnCreatedPage.messageText()
 
       expect(message).toContain('PERN created')
-      expect(message).toContain('Tonnage')
-      expect(message).toContain(tonnageWordingsExporter[i].integer + ' tonnes')
+      expect(message).toContain('Awaiting authorisation')
 
       await PrnCreatedPage.returnToRegistrationPage()
 

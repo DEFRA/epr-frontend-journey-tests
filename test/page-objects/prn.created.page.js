@@ -9,7 +9,7 @@ class PRNCreatedPage {
   }
 
   async returnToRegistrationPage() {
-    await $('a*=Return to registration dashboard').click()
+    await $('a*=Return to home').click()
   }
 }
 

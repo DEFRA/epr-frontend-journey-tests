@@ -72,7 +72,7 @@ async function createAndCheckPrnDetails(
 }
 
 describe('Creating Packing Recycling Notes', () => {
-  it.skip('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
+  it('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -112,7 +112,8 @@ describe('Creating Packing Recycling Notes', () => {
     const prnLink = await WasteRecordsPage.createNewPRNLink()
     await prnLink.click()
 
-    const producer = 'EcoRecycle Industries'
+    const producer =
+      'Acme Compliance Scheme, 37th Place, Ashfield, Chicago, W1 L3Y'
     let issuerNotes = ''
 
     // Empty issuer notes, PRN created should say "Not provided"

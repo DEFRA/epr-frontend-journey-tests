@@ -85,7 +85,8 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const prnLink = await WasteRecordsPage.createNewPRNLink()
       await prnLink.click()
 
-      const producer = 'EcoRecycle Industries'
+      const producer =
+        'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
 
       await CreatePRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
@@ -121,12 +122,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const message = await PrnCreatedPage.messageText()
 
       expect(message).toContain('PRN created')
-      expect(message).toContain('Tonnage')
-      expect(message).toContain(tonnageWordingsOutput[i].integer + ' tonnes')
+      expect(message).toContain('Awaiting authorisation')
 
       await PrnCreatedPage.returnToRegistrationPage()
 
-      await WasteRecordsPage.selectBackLink()
       orgAddressIndex++
     }
 

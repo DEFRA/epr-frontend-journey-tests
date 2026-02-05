@@ -8,7 +8,7 @@ class UploadSummaryLogPage {
     )
   }
 
-  async performUpload(filePath) {
+  async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
 
