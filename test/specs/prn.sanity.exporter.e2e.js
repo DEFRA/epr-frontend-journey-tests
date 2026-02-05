@@ -26,9 +26,6 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    // Sanity check Exporter materials
-    await DashboardPage.selectExportingTab()
-
     const tonnageWordingsExporter = [
       { integer: 1456, word: 'One thousand four hundred and fifty six' },
       { integer: 834, word: 'Eight hundred and thirty four' },
@@ -37,7 +34,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       { integer: 3, word: 'Three' },
       {
         integer: 487203,
-        word: 'Four hundred eighty seven thousand two hundred and three'
+        word: 'Four hundred and eighty seven thousand two hundred and three'
       },
       {
         integer: 929999,
@@ -48,6 +45,8 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     for (let i = 0; i < MATERIALS.length; i++) {
       console.log('Exporter -- Creating PRN for material: ' + MATERIALS[i].name)
+
+      await DashboardPage.selectExportingTab()
       await DashboardPage.selectTableLink(i + 1, 1)
 
       const regNumber = `E25SR500020912${MATERIALS[i].suffix}`
@@ -112,8 +111,6 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(message).toContain('Awaiting authorisation')
 
       await PrnCreatedPage.returnToRegistrationPage()
-
-      await WasteRecordsPage.selectBackLink()
     }
 
     await HomePage.signOut()

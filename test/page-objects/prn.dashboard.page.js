@@ -87,6 +87,14 @@ class PRNDashboardPage {
     return await $('#awaiting-action > p').getText()
   }
 
+  async getNoIssuedPrnMessage() {
+    return await $('#issued > p').getText()
+  }
+
+  async getNoCreatedPrnMessage() {
+    return await $('#main-content > div > div > p').getText()
+  }
+
   async wasteBalanceAmount() {
     const element = await $('[data-testid="waste-balance-amount"]')
     await element.waitForExist({ timeout: 5000 })
