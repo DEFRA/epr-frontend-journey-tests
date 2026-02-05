@@ -106,8 +106,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await CheckBeforeCreatingPrnPage.createPRN()
 
       const message = await PrnCreatedPage.messageText()
-      // TODO: FIXME - should be PERN
-      expect(message).toContain('PRN created')
+      expect(message).toContain('PERN created')
       expect(message).toContain('Awaiting authorisation')
 
       await PrnCreatedPage.returnToRegistrationPage()

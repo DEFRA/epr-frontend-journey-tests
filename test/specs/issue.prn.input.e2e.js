@@ -55,7 +55,8 @@ async function checkViewPrnDetails(
   issuerNotes,
   status,
   materialDesc,
-  accNumber
+  accNumber,
+  issuedDate = ''
 ) {
   const prnViewDetails = await PrnViewPage.prnDetails()
   expect(prnViewDetails['Issued by']).toBe(
@@ -64,6 +65,7 @@ async function checkViewPrnDetails(
   expect(prnViewDetails['Buyer']).toBe(issuer)
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
+  expect(prnViewDetails['Issued date']).toBe(issuedDate)
   expect(prnViewDetails['Status']).toBe(status)
   expect(prnViewDetails['December waste']).toBe('No')
   expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
@@ -120,7 +122,8 @@ describe('Issuing Packing Recycling Notes', () => {
           accNumber,
           status: 'approved'
         }
-      ]
+      ],
+      'sepa'
     )
 
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -235,7 +238,7 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(prnIssuedText).toContain('PRN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
-    const prnNoPattern = /ER\d{6}/
+    const prnNoPattern = /SR\d{6,8}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
     let originalWindow = await browser.getWindowHandle()
@@ -266,7 +269,8 @@ describe('Issuing Packing Recycling Notes', () => {
       issuerNotes,
       awaitingAcceptanceStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      expectedCreateDate
     )
 
     await PrnViewPage.returnToPRNList()
@@ -410,7 +414,8 @@ describe('Issuing Packing Recycling Notes', () => {
       issuerNotes,
       awaitingAcceptanceStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      expectedCreateDate
     )
 
     await PrnViewPage.returnToPRNList()

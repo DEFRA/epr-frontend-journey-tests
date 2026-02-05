@@ -83,8 +83,7 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     const awaitingAuthorisationStatus = 'Awaiting authorisation'
 
-    //TODO: FIXME -- This should say PERN created, not PRN for Exporter
-    expect(message).toContain('PRN created')
+    expect(message).toContain('PERN created')
     expect(message).toContain(awaitingAuthorisationStatus)
 
     await PrnCreatedPage.returnToRegistrationPage()
