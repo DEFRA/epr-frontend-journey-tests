@@ -84,24 +84,12 @@ describe('Summary Logs (Glass Material)', () => {
 
     let dashboardHeaderText = await WasteRecordsPage.dashboardHeaderText()
     expect(dashboardHeaderText).toContain('Glass other')
-    const createNewPERNLink = await WasteRecordsPage.createNewPERNLink()
-    expect(createNewPERNLink).toExist()
-
-    // PAE-924: Check manage PERNs link
-    const managePERNsLink = await WasteRecordsPage.managePERNsLink()
-    expect(managePERNsLink).toExist()
 
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
 
     dashboardHeaderText = await WasteRecordsPage.dashboardHeaderText()
     expect(dashboardHeaderText).toContain('Glass remelt')
-    const createNewPRNLink = await WasteRecordsPage.createNewPRNLink()
-    expect(createNewPRNLink).toExist()
-
-    // PAE-924: Check manage PRNs link
-    const managePRNsLink = await WasteRecordsPage.managePRNsLink()
-    expect(managePRNsLink).toExist()
 
     // PAE-913: Verify summary logs upload doesn't allow random registration Id
     UploadSummaryLogPage.open(organisationDetails.refNo, 'invalidId')

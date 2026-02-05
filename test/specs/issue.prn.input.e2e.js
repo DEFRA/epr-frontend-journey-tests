@@ -20,7 +20,7 @@ import PrnIssuedPage from 'page-objects/prn.issued.page.js'
 async function checkPrnDetails(
   organisationDetails,
   materialDesc,
-  producer,
+  tradingName,
   tonnageWordings,
   issuerNotes,
   accNumber
@@ -30,7 +30,7 @@ async function checkPrnDetails(
     organisationDetails.organisation.companyName
   )
   expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    producer
+    tradingName
   )
   expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
@@ -65,6 +65,7 @@ async function checkViewPrnDetails(
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
   expect(prnViewDetails['Status']).toBe(status)
+  expect(prnViewDetails['December waste']).toBe('No')
   expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
   expect(prnViewDetails['Process to be used']).toBe('R3')
 
@@ -79,6 +80,7 @@ async function checkViewPrnDetails(
 async function createAndCheckPrnDetails(
   tonnageWordings,
   producer,
+  tradingName,
   issuerNotes,
   issuerNotesToCheck,
   organisationDetails,
@@ -91,7 +93,7 @@ async function createAndCheckPrnDetails(
   await checkPrnDetails(
     organisationDetails,
     materialDesc,
-    producer,
+    tradingName,
     tonnageWordings,
     issuerNotesToCheck,
     accNumber
@@ -99,7 +101,7 @@ async function createAndCheckPrnDetails(
 }
 
 describe('Issuing Packing Recycling Notes', () => {
-  it.skip('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprn', async () => {
+  it('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -143,20 +145,21 @@ describe('Issuing Packing Recycling Notes', () => {
     await WasteRecordsPage.submitSummaryLogLink()
 
     const filePath = `resources/sanity/reprocessorInput_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUpload(filePath)
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
 
     await DashboardPage.selectTableLink(1, 1)
 
-    let prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    await WasteRecordsPage.createNewPRNLink()
 
-    const producer = 'EcoRecycle Industries'
+    const tradingName = 'Bigco Packaging Ltd'
+    const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
     await createAndCheckPrnDetails(
       tonnageWordings,
       producer,
+      tradingName,
       issuerNotes,
       issuerNotes,
       organisationDetails,
@@ -168,16 +171,16 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const message = await PrnCreatedPage.messageText()
 
+    const awaitingAuthorisationStatus = 'Awaiting authorisation'
+
     expect(message).toContain('PRN created')
-    expect(message).toContain('Tonnage')
-    expect(message).toContain(tonnageWordings.integer + ' tonnes')
+    expect(message).toContain(awaitingAuthorisationStatus)
 
     await PrnCreatedPage.returnToRegistrationPage()
 
-    let managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    await DashboardPage.selectTableLink(1, 1)
 
-    const awaitingAuthorisationStatus = 'Awaiting authorisation'
+    await WasteRecordsPage.managePRNsLink()
 
     // PRN Dashboard checks - Waste Balance Amount, Awaiting Authorisation table values
     let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
@@ -202,7 +205,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
     expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      producer
+      tradingName
     )
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
@@ -212,7 +215,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await checkViewPrnDetails(
       organisationDetails,
-      producer,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAuthorisationStatus,
@@ -228,14 +231,14 @@ describe('Issuing Packing Recycling Notes', () => {
 
     let prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + producer)
+    expect(prnIssuedText).toContain('PRN issued to ' + tradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
     const prnNoPattern = /ER\d{6}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
-    const originalWindow = await browser.getWindowHandle()
+    let originalWindow = await browser.getWindowHandle()
 
     await PrnIssuedPage.viewPdfButton()
 
@@ -244,8 +247,8 @@ describe('Issuing Packing Recycling Notes', () => {
       { timeout: 5000, timeoutMsg: 'New tab did not open' }
     )
 
-    const handles = await browser.getWindowHandles()
-    const newWindow = handles.find((handle) => handle !== originalWindow)
+    let handles = await browser.getWindowHandles()
+    let newWindow = handles.find((handle) => handle !== originalWindow)
     await browser.switchToWindow(newWindow)
 
     // Now switch back to original tab to close it
@@ -258,7 +261,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPrnDetails(
       organisationDetails,
-      producer,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
@@ -277,10 +280,11 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
     // Create a new PRN
-    prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    await WasteRecordsPage.createNewPRNLink()
 
-    const newProducer = 'BigCo Waste Solutions'
+    const newTradingName = 'Green Waste Solutions'
+    const newProducer =
+      'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
     const newTonnageWordings = {
       integer: 19,
       word: 'Nineteen'
@@ -290,6 +294,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await createAndCheckPrnDetails(
       newTonnageWordings,
       newProducer,
+      newTradingName,
       newIssuerNotes,
       newIssuerNotes,
       organisationDetails,
@@ -302,19 +307,18 @@ describe('Issuing Packing Recycling Notes', () => {
     const newMessage = await PrnCreatedPage.messageText()
 
     expect(newMessage).toContain('PRN created')
-    expect(newMessage).toContain('Tonnage')
-    expect(newMessage).toContain(newTonnageWordings.integer + ' tonnes')
+    expect(message).toContain(awaitingAuthorisationStatus)
     // End of new PRN creation
 
     await PrnCreatedPage.returnToRegistrationPage()
+    await DashboardPage.selectTableLink(1, 1)
 
-    managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    await WasteRecordsPage.managePRNsLink()
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
     expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      newProducer
+      newTradingName
     )
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
@@ -328,7 +332,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await checkViewPrnDetails(
       organisationDetails,
-      newProducer,
+      newTradingName,
       newTonnageWordings,
       newIssuerNotes,
       awaitingAuthorisationStatus,
@@ -340,7 +344,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + newProducer)
+    expect(prnIssuedText).toContain('PRN issued to ' + newTradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     prnNumber = await PrnIssuedPage.prnNumberText()
@@ -354,6 +358,63 @@ describe('Issuing Packing Recycling Notes', () => {
     )
 
     await PrnIssuedPage.returnToHomePage()
+
+    await WasteRecordsPage.managePRNsLink()
+
+    // Check issued PRNs
+    await PrnDashboardPage.selectIssuedTab()
+
+    const issuedRow = await PrnDashboardPage.getIssuedRow(1)
+
+    const expectedPrnNumber = issuedRow.get('PRN number')
+    expect(prnNoPattern.test(expectedPrnNumber)).toEqual(true)
+    expect(issuedRow.get('Producer or compliance scheme')).toEqual(tradingName)
+    expect(issuedRow.get('Date issued')).toEqual(expectedCreateDate)
+    expect(issuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
+
+    const secondIssuedRow = await PrnDashboardPage.getIssuedRow(2)
+    const expectedSecondPrnNumber = secondIssuedRow.get('PRN number')
+    expect(prnNoPattern.test(expectedSecondPrnNumber)).toEqual(true)
+    expect(secondIssuedRow.get('Producer or compliance scheme')).toEqual(
+      newTradingName
+    )
+    expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
+    expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
+
+    originalWindow = await browser.getWindowHandle()
+
+    // Check first Issued PRN details
+    await PrnDashboardPage.selectIssuedLink(1)
+
+    await browser.waitUntil(
+      async () => (await browser.getWindowHandles()).length === 2,
+      { timeout: 5000, timeoutMsg: 'New tab did not open' }
+    )
+
+    handles = await browser.getWindowHandles()
+    newWindow = handles.find((handle) => handle !== originalWindow)
+    await browser.switchToWindow(newWindow)
+
+    // Now switch back to original tab to close it
+    await browser.switchToWindow(originalWindow)
+    await browser.closeWindow()
+
+    // Switch back to the new tab (now the only one)
+    await browser.switchToWindow(newWindow)
+
+    // Check Issued PRN details
+    await checkViewPrnDetails(
+      organisationDetails,
+      tradingName,
+      tonnageWordings,
+      issuerNotes,
+      awaitingAcceptanceStatus,
+      materialDesc,
+      accNumber
+    )
+
+    await PrnViewPage.returnToPRNList()
+    await PrnDashboardPage.selectBackLink()
 
     await WasteRecordsPage.selectBackLink()
 

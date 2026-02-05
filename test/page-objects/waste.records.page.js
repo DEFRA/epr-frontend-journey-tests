@@ -14,19 +14,19 @@ class WasteRecordsPage {
   }
 
   async createNewPRNLink() {
-    return await $('a*=Create new PRN')
+    await $('a*=Create new PRN').click()
   }
 
   async managePRNsLink() {
-    return await $('a*=Manage PRNs')
+    await $('a*=Manage PRNs').click()
   }
 
   async managePERNsLink() {
-    return await $('a*=Manage PRNs')
+    await $('a*=Manage PERNs').click()
   }
 
   async createNewPERNLink() {
-    return await $('a*=Create new PERN')
+    await $('a*=Create new PERN').click()
   }
 
   async selectBackLink() {
