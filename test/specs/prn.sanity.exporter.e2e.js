@@ -15,7 +15,7 @@ import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it.skip('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -71,6 +71,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const pernLink = await WasteRecordsPage.createNewPERNLink()
       await pernLink.click()
 
+      const tradingName = 'Green Waste Solutions'
       const producer =
         'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
@@ -88,7 +89,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        producer
+        tradingName
       )
       expect(prnDetails['Tonnage']).toBe(
         `${tonnageWordingsExporter[i].integer}`

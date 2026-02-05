@@ -13,8 +13,37 @@ class PRNDashboardPage {
     await linkElement.click()
   }
 
+  async selectIssuedLink(index) {
+    const linkElement = await $(
+      '#issued table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
+    )
+    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.click()
+  }
+
   async selectIssuedTab() {
     await $('//a[normalize-space()="Issued"]').click()
+  }
+
+  async getIssuedRow(rowIndex) {
+    const issuedRow = new Map()
+    const tableHeaders = await $$('#issued table.govuk-table > thead > tr th')
+    const headerText = await tableHeaders.map((element) => {
+      return element.getText()
+    })
+
+    const tableData = await $$(
+      '#issued table.govuk-table > tbody > tr:nth-child(' + rowIndex + ') td'
+    )
+
+    const rowText = await tableData.map((element) => {
+      return element.getText()
+    })
+
+    for (let i = 0; i < headerText.length; i++) {
+      issuedRow.set(headerText[i], rowText[i])
+    }
+    return issuedRow
   }
 
   async selectAwaitingActionTab() {

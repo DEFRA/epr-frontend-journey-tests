@@ -44,7 +44,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       { integer: 42, word: 'Forty two' },
       {
         integer: 83516,
-        word: 'Eighty thousand five hundred and sixteen'
+        word: 'Eighty three thousand five hundred and sixteen'
       },
       { integer: 156, word: 'One hundred and fifty six' }
     ]
@@ -85,6 +85,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const prnLink = await WasteRecordsPage.createNewPRNLink()
       await prnLink.click()
 
+      const tradingName = 'Green Waste Solutions'
       const producer =
         'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
@@ -102,7 +103,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        producer
+        tradingName
       )
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordingsOutput[i].integer}`)
       expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)

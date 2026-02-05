@@ -20,7 +20,7 @@ import PrnIssuedPage from 'page-objects/prn.issued.page.js'
 async function checkPrnDetails(
   organisationDetails,
   materialDesc,
-  producer,
+  tradingName,
   tonnageWordings,
   issuerNotes,
   accNumber
@@ -30,7 +30,7 @@ async function checkPrnDetails(
     organisationDetails.organisation.companyName
   )
   expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    producer
+    tradingName
   )
   expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
@@ -61,11 +61,11 @@ async function checkViewPrnDetails(
   expect(prnViewDetails['Issued by']).toBe(
     organisationDetails.organisation.companyName
   )
-  //TODO: FIXME
-  // expect(prnViewDetails['Buyer']).toBe(issuer)
+  expect(prnViewDetails['Buyer']).toBe(issuer)
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
   expect(prnViewDetails['Status']).toBe(status)
+  expect(prnViewDetails['December waste']).toBe('No')
   expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
   expect(prnViewDetails['Process to be used']).toBe('R3')
 
@@ -80,6 +80,7 @@ async function checkViewPrnDetails(
 async function createAndCheckPrnDetails(
   tonnageWordings,
   producer,
+  tradingName,
   issuerNotes,
   issuerNotesToCheck,
   organisationDetails,
@@ -92,7 +93,7 @@ async function createAndCheckPrnDetails(
   await checkPrnDetails(
     organisationDetails,
     materialDesc,
-    producer,
+    tradingName,
     tonnageWordings,
     issuerNotesToCheck,
     accNumber
@@ -151,14 +152,15 @@ describe('Issuing Packing Recycling Notes', () => {
     let prnLink = await WasteRecordsPage.createNewPRNLink()
     await prnLink.click()
 
-    const producer =
-      'Bigco Packaging Ltd, Zig Zag road, Box Hill, Tadworth, KT20 7LB'
+    const tradingName = 'Bigco Packaging Ltd'
+    const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
     await createAndCheckPrnDetails(
       tonnageWordings,
       producer,
+      tradingName,
       issuerNotes,
       issuerNotes,
       organisationDetails,
@@ -204,10 +206,9 @@ describe('Issuing Packing Recycling Notes', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    //TODO: FIXME
-    // expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-    //   producer
-    // )
+    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+      tradingName
+    )
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -216,7 +217,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await checkViewPrnDetails(
       organisationDetails,
-      producer,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAuthorisationStatus,
@@ -232,15 +233,14 @@ describe('Issuing Packing Recycling Notes', () => {
 
     let prnIssuedText = await PrnIssuedPage.messageText()
 
-    //TODO: FIXME
-    // expect(prnIssuedText).toContain('PRN issued to ' + producer)
+    expect(prnIssuedText).toContain('PRN issued to ' + tradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
     const prnNoPattern = /ER\d{6}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
-    const originalWindow = await browser.getWindowHandle()
+    let originalWindow = await browser.getWindowHandle()
 
     await PrnIssuedPage.viewPdfButton()
 
@@ -249,8 +249,8 @@ describe('Issuing Packing Recycling Notes', () => {
       { timeout: 5000, timeoutMsg: 'New tab did not open' }
     )
 
-    const handles = await browser.getWindowHandles()
-    const newWindow = handles.find((handle) => handle !== originalWindow)
+    let handles = await browser.getWindowHandles()
+    let newWindow = handles.find((handle) => handle !== originalWindow)
     await browser.switchToWindow(newWindow)
 
     // Now switch back to original tab to close it
@@ -263,7 +263,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPrnDetails(
       organisationDetails,
-      producer,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
@@ -285,6 +285,7 @@ describe('Issuing Packing Recycling Notes', () => {
     prnLink = await WasteRecordsPage.createNewPRNLink()
     await prnLink.click()
 
+    const newTradingName = 'Green Waste Solutions'
     const newProducer =
       'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
     const newTonnageWordings = {
@@ -296,6 +297,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await createAndCheckPrnDetails(
       newTonnageWordings,
       newProducer,
+      newTradingName,
       newIssuerNotes,
       newIssuerNotes,
       organisationDetails,
@@ -319,10 +321,9 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    //TODO: FIXME
-    // expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-    //   newProducer
-    // )
+    expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+      newTradingName
+    )
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
       `${newTonnageWordings.integer}`
@@ -335,7 +336,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await checkViewPrnDetails(
       organisationDetails,
-      newProducer,
+      newTradingName,
       newTonnageWordings,
       newIssuerNotes,
       awaitingAuthorisationStatus,
@@ -347,8 +348,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     prnIssuedText = await PrnIssuedPage.messageText()
 
-    //TODO: FIXME
-    // expect(prnIssuedText).toContain('PRN issued to ' + newProducer)
+    expect(prnIssuedText).toContain('PRN issued to ' + newTradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     prnNumber = await PrnIssuedPage.prnNumberText()
@@ -362,6 +362,64 @@ describe('Issuing Packing Recycling Notes', () => {
     )
 
     await PrnIssuedPage.returnToHomePage()
+
+    const managePRNsLink = await WasteRecordsPage.managePRNsLink()
+    await managePRNsLink.click()
+
+    // Check issued PRNs
+    await PrnDashboardPage.selectIssuedTab()
+
+    const issuedRow = await PrnDashboardPage.getIssuedRow(1)
+
+    const expectedPrnNumber = issuedRow.get('PRN number')
+    expect(prnNoPattern.test(expectedPrnNumber)).toEqual(true)
+    expect(issuedRow.get('Producer or compliance scheme')).toEqual(tradingName)
+    expect(issuedRow.get('Date issued')).toEqual(expectedCreateDate)
+    expect(issuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
+
+    const secondIssuedRow = await PrnDashboardPage.getIssuedRow(2)
+    const expectedSecondPrnNumber = secondIssuedRow.get('PRN number')
+    expect(prnNoPattern.test(expectedSecondPrnNumber)).toEqual(true)
+    expect(secondIssuedRow.get('Producer or compliance scheme')).toEqual(
+      newTradingName
+    )
+    expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
+    expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
+
+    originalWindow = await browser.getWindowHandle()
+
+    // Check first Issued PRN details
+    await PrnDashboardPage.selectIssuedLink(1)
+
+    await browser.waitUntil(
+      async () => (await browser.getWindowHandles()).length === 2,
+      { timeout: 5000, timeoutMsg: 'New tab did not open' }
+    )
+
+    handles = await browser.getWindowHandles()
+    newWindow = handles.find((handle) => handle !== originalWindow)
+    await browser.switchToWindow(newWindow)
+
+    // Now switch back to original tab to close it
+    await browser.switchToWindow(originalWindow)
+    await browser.closeWindow()
+
+    // Switch back to the new tab (now the only one)
+    await browser.switchToWindow(newWindow)
+
+    // Check Issued PRN details
+    await checkViewPrnDetails(
+      organisationDetails,
+      tradingName,
+      tonnageWordings,
+      issuerNotes,
+      awaitingAcceptanceStatus,
+      materialDesc,
+      accNumber
+    )
+
+    await PrnViewPage.returnToPRNList()
+    await PrnDashboardPage.selectBackLink()
 
     await WasteRecordsPage.selectBackLink()
 

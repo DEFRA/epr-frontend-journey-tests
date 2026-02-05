@@ -14,7 +14,7 @@ import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.p
 import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 
-async function checkPrnDetails(
+async function checkPernDetails(
   organisationDetails,
   materialDesc,
   producer,
@@ -31,7 +31,7 @@ async function checkPrnDetails(
   )
   expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnDetails['Process to be used']).toBe('R3')
+  expect(prnDetails['Process to be used']).toBe('R4')
   expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
   const accreditationDetails =
@@ -39,9 +39,6 @@ async function checkPrnDetails(
 
   expect(accreditationDetails['Material']).toBe(materialDesc)
   expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-  expect(
-    accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(organisationDetails.regAddresses[0])
   return { prnDetails }
 }
 
@@ -61,8 +58,8 @@ async function createAndCheckPrnDetails(
   await CreatePRNPage.continue()
 
   const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PRN')
-  await checkPrnDetails(
+  expect(headingText).toBe('Check before creating PERN')
+  await checkPernDetails(
     organisationDetails,
     materialDesc,
     tradingName,
@@ -72,22 +69,21 @@ async function createAndCheckPrnDetails(
   )
 }
 
-describe('Creating Packing Recycling Notes', () => {
-  it('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
-    const regNumber = 'R25SR500000912PA'
-    const accNumber = 'R-ACC12045PA'
+describe('Create Packing Recycling Notes (Exporter)', () => {
+  it('Should test various (Unhappy) paths for Create PRN Exporter @prnexporter', async () => {
+    const regNumber = 'E25SR500020912AL'
+    const accNumber = 'E-ACC12245AL'
 
-    const materialDesc = 'Paper and board'
+    const materialDesc = 'Aluminium'
 
     const organisationDetails = await createLinkedOrganisation([
-      { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
+      { material: 'Aluminium (R4)', wasteProcessingType: 'Exporter' }
     ])
 
     const userEmail = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
-          reprocessingType: 'input',
           regNumber,
           accNumber,
           status: 'approved'
@@ -110,15 +106,15 @@ describe('Creating Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    const pernLink = await WasteRecordsPage.createNewPERNLink()
+    await pernLink.click()
 
     const tradingName = 'Acme Compliance Scheme'
     const producer =
       'Acme Compliance Scheme, 37th Place, Ashfield, Chicago, W1 L3Y'
     let issuerNotes = ''
 
-    // Empty issuer notes, PRN created should say "Not provided"
+    // Empty issuer notes, PERN created should say "Not provided"
     await createAndCheckPrnDetails(
       tonnageWordings,
       producer,
@@ -132,7 +128,7 @@ describe('Creating Packing Recycling Notes', () => {
     // Discard the first attempt
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
     const discardHeading = await ConfirmDiscardPRNPage.headingText()
-    expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
+    expect(discardHeading).toBe('Are you sure you want to discard this PERN?')
     await ConfirmDiscardPRNPage.discardAndStartAgain()
 
     issuerNotes = 'Testing'
@@ -155,16 +151,16 @@ describe('Creating Packing Recycling Notes', () => {
 
     // Check Create PRN validation errors
     let createAPrnPageHeading = await CreatePRNPage.headingText()
-    expect(createAPrnPageHeading).toBe('Create a PRN')
+    expect(createAPrnPageHeading).toBe('Create a PERN')
     let materialDetails = await CreatePRNPage.materialDetails()
-    expect(materialDetails).toBe('Material: Paper and board')
+    expect(materialDetails).toBe('Material: Aluminium')
 
     await CreatePRNPage.continue()
 
     let errorMessages = await CreatePRNPage.errorMessages()
     expect(errorMessages.length).toBe(2)
     expect(errorMessages).toEqual([
-      'Enter PRN tonnage as a whole number',
+      'Enter PERN tonnage as a whole number',
       'Select who this will be issued to'
     ])
 
@@ -186,20 +182,20 @@ describe('Creating Packing Recycling Notes', () => {
     expect(errorMessages).toEqual([
       'The tonnage you entered exceeds your available waste balance'
     ])
-    // End of Check Create PRN validation errors
+    // End of Check Create PERN validation errors
 
-    // Check Create a PRN page is accessible from PRN Dashboard button
+    // Check Create a PERN page is accessible from PERN Dashboard button
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
-    const managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    const managePernLink = await WasteRecordsPage.managePERNsLink()
+    await managePernLink.click()
     await PrnDashboardPage.createAPrnButton()
 
-    // Check we are on Create a PRN Page
+    // Check we are on Create a PERN Page
     createAPrnPageHeading = await CreatePRNPage.headingText()
-    expect(createAPrnPageHeading).toBe('Create a PRN')
+    expect(createAPrnPageHeading).toBe('Create a PERN')
     materialDetails = await CreatePRNPage.materialDetails()
-    expect(materialDetails).toBe('Material: Paper and board')
+    expect(materialDetails).toBe('Material: Aluminium')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

@@ -94,6 +94,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const prnLink = await WasteRecordsPage.createNewPRNLink()
       await prnLink.click()
 
+      const tradingName = 'Green Waste Solutions'
       const producer =
         'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
@@ -114,7 +115,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        producer
+        tradingName
       )
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
@@ -155,10 +156,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-      //TODO: FIXME
-      // expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      //   producer
-      // )
+
+      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+        tradingName
+      )
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -171,8 +172,8 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Issued by']).toBe(
         organisationDetails.organisation.companyName
       )
-      // TODO: FIXME
-      // expect(prnViewDetails['Buyer']).toBe(producer)
+
+      expect(prnViewDetails['Buyer']).toBe(tradingName)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
