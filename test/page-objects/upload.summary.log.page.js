@@ -1,10 +1,24 @@
 import { browser, $ } from '@wdio/globals'
+import { checkBodyText } from '../support/checks.js'
 
 class UploadSummaryLogPage {
   open(orgId, regId) {
     return browser.url(
       `/organisations/${orgId}/registrations/${regId}/summary-logs/upload`
     )
+  }
+
+  async performUpload(filePath) {
+    await this.uploadFile(filePath)
+    await this.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Check before confirming upload', 30)
+    await this.confirmAndSubmit()
+
+    await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyText('Summary log uploaded', 30)
+    await this.clickOnReturnToHomePage()
   }
 
   async uploadFile(filePath) {

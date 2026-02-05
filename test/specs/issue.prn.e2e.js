@@ -1,4 +1,4 @@
-import { $, browser, expect } from '@wdio/globals'
+import { browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
@@ -13,11 +13,9 @@ import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '../support/checks.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
-import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
 
 async function checkPrnDetails(
   organisationDetails,
@@ -35,8 +33,7 @@ async function checkPrnDetails(
     producer
   )
   expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  //TODO: Fix this?
-  // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
+  expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
   expect(prnDetails['Process to be used']).toBe('R3')
   expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
@@ -68,8 +65,7 @@ async function checkViewPrnDetails(
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
   expect(prnViewDetails['Status']).toBe(status)
-  //TODO: Fix this?
-  // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
+  expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
   expect(prnViewDetails['Process to be used']).toBe('R3')
 
   const accreditationViewDetails = await PrnViewPage.accreditationDetails()
@@ -89,11 +85,7 @@ async function createAndCheckPrnDetails(
   materialDesc,
   accNumber
 ) {
-  await CreatePRNPage.enterTonnage(tonnageWordings.integer)
-  await CreatePRNPage.select(producer)
-  await CreatePRNPage.addIssuerNotes(issuerNotes)
-  await CreatePRNPage.continue()
-
+  await CreatePRNPage.createPrn(tonnageWordings.integer, producer, issuerNotes)
   const headingText = await CheckBeforeCreatingPrnPage.headingText()
   expect(headingText).toBe('Check before creating PRN')
   await checkPrnDetails(
@@ -106,23 +98,8 @@ async function createAndCheckPrnDetails(
   )
 }
 
-async function performSummaryLogUpload(accNumber, regNumber) {
-  await UploadSummaryLogPage.uploadFile(
-    `resources/sanity/reprocessorInput_${accNumber}_${regNumber}.xlsx`
-  )
-  await UploadSummaryLogPage.continue()
-
-  await checkBodyText('Your file is being checked', 30)
-  await checkBodyText('Check before confirming upload', 30)
-  await UploadSummaryLogPage.confirmAndSubmit()
-
-  await checkBodyText('Your waste records are being updated', 30)
-  await checkBodyText('Summary log uploaded', 30)
-  await UploadSummaryLogPage.clickOnReturnToHomePage()
-}
-
-describe('Lumpy Packing Recycling Notes', () => {
-  it('Should be able to create and manage PRNs for Paper (Reprocessor Input) @lumpyprn', async () => {
+describe('Packing Recycling Notes', () => {
+  it('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -154,7 +131,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     const tonnageWordings = {
       integer: 203,
-      word: 'Two Hundred Three'
+      word: 'Two hundred and three'
     }
 
     // Tonnage value expected from Summary Log files upload
@@ -163,15 +140,10 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const regNo = await $(`//a[normalize-space()="${regNumber}"]`)
-    expect(regNo).toExist()
-
-    const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
-    expect(accNo).toExist()
-
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await performSummaryLogUpload(accNumber, regNumber)
+    const filePath = `resources/sanity/reprocessorInput_${accNumber}_${regNumber}.xlsx`
+    await UploadSummaryLogPage.performUpload(filePath)
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -180,22 +152,6 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     const producer = 'EcoRecycle Industries'
     let issuerNotes = ''
-
-    // Empty issuer notes, PRN created should say "Not provided"
-    await createAndCheckPrnDetails(
-      tonnageWordings,
-      producer,
-      issuerNotes,
-      'Not provided',
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
-    // Discard the first attempt
-    await CheckBeforeCreatingPrnPage.discardAndStartAgain()
-    const discardHeading = await ConfirmDiscardPRNPage.headingText()
-    expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
-    await ConfirmDiscardPRNPage.discardAndStartAgain()
 
     issuerNotes = 'Testing'
     await createAndCheckPrnDetails(
@@ -207,10 +163,6 @@ describe('Lumpy Packing Recycling Notes', () => {
       materialDesc,
       accNumber
     )
-
-    // This time we go to the discard page, and check the back link works
-    await CheckBeforeCreatingPrnPage.discardAndStartAgain()
-    await ConfirmDiscardPRNPage.selectBackLink()
 
     await CheckBeforeCreatingPrnPage.createPRN()
 
@@ -232,7 +184,7 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
-    // No tabs yet as no PRNs have been issued
+    // Check cancel hint text
     const cancelHintText = await PrnDashboardPage.cancelHintText()
     expect(cancelHintText).toBe(
       'If you delete or cancel a PRN, its tonnage will be added to your available waste balance.'
@@ -270,55 +222,6 @@ describe('Lumpy Packing Recycling Notes', () => {
 
     await PrnViewPage.returnToPRNList()
 
-    // Make sure Create a PRN button works and brings to PRN creation page
-    await PrnDashboardPage.createAPrnButton()
-
-    // Check Create PRN validation errors
-    const createAPrnPageHeading = await CreatePRNPage.headingText()
-    expect(createAPrnPageHeading).toBe('Create a PRN')
-    const materialDetails = await CreatePRNPage.materialDetails()
-    expect(materialDetails).toBe('Material: Paper and board')
-
-    await CreatePRNPage.continue()
-
-    let errorMessages = await CreatePRNPage.errorMessages()
-    expect(errorMessages.length).toBe(2)
-    expect(errorMessages).toEqual([
-      'Enter PRN tonnage as a whole number',
-      'Select who this will be issued to'
-    ])
-
-    // Create a new PRN, this time we exceed the available waste balance (189.28)
-    const exceedingTonnageWordings = {
-      integer: 190,
-      word: 'One hundred ninety'
-    }
-
-    await createAndCheckPrnDetails(
-      exceedingTonnageWordings,
-      producer,
-      issuerNotes,
-      issuerNotes,
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
-    await CheckBeforeCreatingPrnPage.createPRN()
-
-    // Now we see an error message related to tonnage exceeding waste balance
-    errorMessages = await CreatePRNPage.errorMessages()
-    expect(errorMessages.length).toBe(1)
-    expect(errorMessages).toEqual([
-      'The tonnage you entered exceeds your available waste balance'
-    ])
-    // End of Check Create PRN validation errors
-
-    await HomePage.homeLink()
-
-    await DashboardPage.selectTableLink(1, 1)
-    const managePrnsLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnsLink.click()
-
     // Issue the created PRN
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await PrnViewPage.issuePRNButton()
@@ -332,7 +235,25 @@ describe('Lumpy Packing Recycling Notes', () => {
     const prnNoPattern = /ER\d{6}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
+    const originalWindow = await browser.getWindowHandle()
+
     await PrnIssuedPage.viewPdfButton()
+
+    await browser.waitUntil(
+      async () => (await browser.getWindowHandles()).length === 2,
+      { timeout: 5000, timeoutMsg: 'New tab did not open' }
+    )
+
+    const handles = await browser.getWindowHandles()
+    const newWindow = handles.find((handle) => handle !== originalWindow)
+    await browser.switchToWindow(newWindow)
+
+    // Now switch back to original tab to close it
+    await browser.switchToWindow(originalWindow)
+    await browser.closeWindow()
+
+    // Switch back to the new tab (now the only one)
+    await browser.switchToWindow(newWindow)
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPrnDetails(

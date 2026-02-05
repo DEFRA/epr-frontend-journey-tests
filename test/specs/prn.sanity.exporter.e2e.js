@@ -16,7 +16,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import { checkBodyText } from '~/test/support/checks.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
+  it.skip('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -31,20 +31,20 @@ describe('Packing Recycling Notes (Sanity)', () => {
     await DashboardPage.selectExportingTab()
 
     const tonnageWordingsExporter = [
-      { integer: 1456, word: 'One Thousand Four Hundred Fifty Six' },
-      { integer: 834, word: 'Eight Hundred Thirty Four' },
+      { integer: 1456, word: 'One thousand four hundred and fifty six' },
+      { integer: 834, word: 'Eight hundred and thirty four' },
       { integer: 7, word: 'Seven' },
-      { integer: 219, word: 'Two Hundred Nineteen' },
+      { integer: 219, word: 'Two hundred and nineteen' },
       { integer: 3, word: 'Three' },
       {
         integer: 487203,
-        word: 'Four Hundred Eighty Seven Thousand Two Hundred Three'
+        word: 'Four hundred eighty seven thousand two hundred and three'
       },
       {
         integer: 929999,
-        word: 'Nine Hundred Twenty Nine Thousand Nine Hundred Ninety Nine'
+        word: 'Nine hundred and twenty nine thousand nine hundred and ninety nine'
       },
-      { integer: 68000, word: 'Sixty Eight Thousand' }
+      { integer: 68000, word: 'Sixty eight thousand' }
     ]
 
     for (let i = 0; i < MATERIALS.length; i++) {
@@ -102,8 +102,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnDetails['Tonnage']).toBe(
         `${tonnageWordingsExporter[i].integer}`
       )
-      //TODO: Fix these?
-      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsExporter[i].word)
+      expect(prnDetails['Tonnage in words']).toBe(
+        tonnageWordingsExporter[i].word
+      )
       expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
       expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 

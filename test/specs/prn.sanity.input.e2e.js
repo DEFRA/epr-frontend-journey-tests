@@ -33,19 +33,19 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     const tonnageWordings = [
       { integer: 7, word: 'Seven' },
-      { integer: 257, word: 'Two Hundred Fifty Seven' },
+      { integer: 257, word: 'Two hundred and fifty seven' },
       { integer: 19, word: 'Nineteen' },
-      { integer: 306, word: 'Three Hundred Six' },
+      { integer: 306, word: 'Three hundred and six' },
       {
         integer: 203,
-        word: 'Two Hundred Three'
+        word: 'Two hundred and three'
       },
-      { integer: 156, word: 'One Hundred Fifty Six' },
+      { integer: 156, word: 'One hundred and fifty six' },
       {
         integer: 99,
-        word: 'Ninety Nine'
+        word: 'Ninety nine'
       },
-      { integer: 68, word: 'Sixty Eight' }
+      { integer: 68, word: 'Sixty eight' }
     ]
 
     // Tonnage values expected from Summary Log files upload
@@ -126,8 +126,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         producer
       )
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
-      //TODO: Fix these?
-      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
+      expect(prnDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
       expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
       expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
@@ -164,9 +163,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-      expect(
-        awaitingAuthRow.get('Packaging waste producer or compliance scheme')
-      ).toEqual(producer)
+      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+        producer
+      )
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -182,8 +181,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       expect(prnViewDetails['Buyer']).toBe(producer)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
-      //TODO: Fix these?
-      // expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
+      expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
       expect(prnViewDetails['Process to be used']).toBe(MATERIALS[i].process)
 
       const accreditationViewDetails = await PrnViewPage.accreditationDetails()

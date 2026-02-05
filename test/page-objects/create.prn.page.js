@@ -14,6 +14,13 @@ class CreatePRNPage {
     return await headingElement.getText()
   }
 
+  async createPrn(tonnage, producer, issuerNotes) {
+    await this.enterTonnage(tonnage)
+    await this.select(producer)
+    await this.addIssuerNotes(issuerNotes)
+    await this.continue()
+  }
+
   async enterTonnage(tonnes) {
     await $('#tonnage').setValue(tonnes)
   }
