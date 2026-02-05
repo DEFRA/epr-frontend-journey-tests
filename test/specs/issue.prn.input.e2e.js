@@ -120,7 +120,8 @@ describe('Issuing Packing Recycling Notes', () => {
           accNumber,
           status: 'approved'
         }
-      ]
+      ],
+      'sepa'
     )
 
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -235,7 +236,7 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(prnIssuedText).toContain('PRN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
-    const prnNoPattern = /ER\d{6}/
+    const prnNoPattern = /SR\d{6,8}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
     let originalWindow = await browser.getWindowHandle()

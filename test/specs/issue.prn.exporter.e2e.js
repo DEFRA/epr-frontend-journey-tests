@@ -166,8 +166,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     const awaitingAuthorisationStatus = 'Awaiting authorisation'
 
-    //TODO: FIXME -- This should say PERN created, not PRN for Exporter
-    expect(message).toContain('PRN created')
+    expect(message).toContain('PERN created')
     expect(message).toContain(awaitingAuthorisationStatus)
 
     await PrnCreatedPage.returnToRegistrationPage()
@@ -229,7 +228,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(prnIssuedText).toContain('PERN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
-    const pernNoPattern = /EX\d{6}/
+    const pernNoPattern = /EX\d{6,8}/
     expect(pernNoPattern.test(prnNumber)).toEqual(true)
 
     let originalWindow = await browser.getWindowHandle()
@@ -273,7 +272,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
-    // Create a new PRN
+    // Create a new PERN
     await WasteRecordsPage.createNewPERNLink()
 
     const newTradingName = 'Green Waste Solutions'
@@ -300,9 +299,9 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     const newMessage = await PrnCreatedPage.messageText()
 
-    expect(newMessage).toContain('PRN created')
+    expect(newMessage).toContain('PERN created')
     expect(message).toContain(awaitingAuthorisationStatus)
-    // End of new PRN creation
+    // End of new PERN creation
 
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
