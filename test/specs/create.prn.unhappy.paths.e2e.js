@@ -110,8 +110,7 @@ describe('Creating Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    await WasteRecordsPage.createNewPRNLink()
 
     const tradingName = 'Acme Compliance Scheme'
     const producer =
@@ -191,8 +190,7 @@ describe('Creating Packing Recycling Notes', () => {
     // Check Create a PRN page is accessible from PRN Dashboard button
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
-    const managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    await WasteRecordsPage.managePRNsLink()
     await PrnDashboardPage.createAPrnButton()
 
     // Check we are on Create a PRN Page

@@ -91,8 +91,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await DashboardPage.selectTableLink(1, i + 1)
 
-      const prnLink = await WasteRecordsPage.createNewPRNLink()
-      await prnLink.click()
+      await WasteRecordsPage.createNewPRNLink()
 
       const tradingName = 'Green Waste Solutions'
       const producer =
@@ -141,8 +140,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await DashboardPage.selectTableLink(1, i + 1)
 
-      const managePrnLink = await WasteRecordsPage.managePRNsLink()
-      await managePrnLink.click()
+      await WasteRecordsPage.managePRNsLink()
 
       let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
       expect(wasteBalanceAmount).toBe(expectedWasteBalances[i] + ' tonnes')

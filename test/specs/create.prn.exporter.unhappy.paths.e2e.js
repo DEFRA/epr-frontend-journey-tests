@@ -106,8 +106,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const pernLink = await WasteRecordsPage.createNewPERNLink()
-    await pernLink.click()
+    await WasteRecordsPage.createNewPERNLink()
 
     const tradingName = 'Acme Compliance Scheme'
     const producer =
@@ -187,8 +186,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
     // Check Create a PERN page is accessible from PERN Dashboard button
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
-    const managePernLink = await WasteRecordsPage.managePERNsLink()
-    await managePernLink.click()
+    await WasteRecordsPage.managePERNsLink()
     await PrnDashboardPage.createAPrnButton()
 
     // Check we are on Create a PERN Page

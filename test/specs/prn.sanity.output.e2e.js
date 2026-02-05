@@ -13,7 +13,6 @@ import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.p
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { checkBodyText } from '../support/checks.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
@@ -67,23 +66,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await WasteRecordsPage.submitSummaryLogLink()
 
-      await UploadSummaryLogPage.uploadFile(
+      await UploadSummaryLogPage.performUploadAndReturnToHomepage(
         `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
       )
-      await UploadSummaryLogPage.continue()
-
-      await checkBodyText('Your file is being checked', 30)
-      await checkBodyText('Check before confirming upload', 30)
-      await UploadSummaryLogPage.confirmAndSubmit()
-
-      await checkBodyText('Your waste records are being updated', 30)
-      await checkBodyText('Summary log uploaded', 30)
-      await UploadSummaryLogPage.clickOnReturnToHomePage()
 
       await DashboardPage.selectTableLink(2, i + 1)
 
-      const prnLink = await WasteRecordsPage.createNewPRNLink()
-      await prnLink.click()
+      await WasteRecordsPage.createNewPRNLink()
 
       const tradingName = 'Green Waste Solutions'
       const producer =

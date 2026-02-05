@@ -149,8 +149,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    let prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    await WasteRecordsPage.createNewPRNLink()
 
     const tradingName = 'Bigco Packaging Ltd'
     const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
@@ -181,8 +180,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    let managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    await WasteRecordsPage.managePRNsLink()
 
     // PRN Dashboard checks - Waste Balance Amount, Awaiting Authorisation table values
     let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
@@ -282,8 +280,7 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
     // Create a new PRN
-    prnLink = await WasteRecordsPage.createNewPRNLink()
-    await prnLink.click()
+    await WasteRecordsPage.createNewPRNLink()
 
     const newTradingName = 'Green Waste Solutions'
     const newProducer =
@@ -316,8 +313,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
 
-    managePrnLink = await WasteRecordsPage.managePRNsLink()
-    await managePrnLink.click()
+    await WasteRecordsPage.managePRNsLink()
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
@@ -363,8 +359,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await PrnIssuedPage.returnToHomePage()
 
-    const managePRNsLink = await WasteRecordsPage.managePRNsLink()
-    await managePRNsLink.click()
+    await WasteRecordsPage.managePRNsLink()
 
     // Check issued PRNs
     await PrnDashboardPage.selectIssuedTab()

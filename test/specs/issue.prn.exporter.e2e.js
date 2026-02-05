@@ -142,8 +142,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    let pernLink = await WasteRecordsPage.createNewPERNLink()
-    await pernLink.click()
+    await WasteRecordsPage.createNewPERNLink()
 
     const tradingName = 'Bigco Packaging Ltd'
     const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
@@ -175,8 +174,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    let managePernLink = await WasteRecordsPage.managePERNsLink()
-    await managePernLink.click()
+    await WasteRecordsPage.managePERNsLink()
 
     // PRN Dashboard checks - Waste Balance Amount, Awaiting Authorisation table values
     let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
@@ -276,8 +274,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
     // Create a new PRN
-    pernLink = await WasteRecordsPage.createNewPERNLink()
-    await pernLink.click()
+    await WasteRecordsPage.createNewPERNLink()
 
     const newTradingName = 'Green Waste Solutions'
     const newProducer =
@@ -310,8 +307,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
 
-    managePernLink = await WasteRecordsPage.managePERNsLink()
-    await managePernLink.click()
+    await WasteRecordsPage.managePERNsLink()
 
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
@@ -357,8 +353,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await PrnIssuedPage.returnToHomePage()
 
-    const managePRNsLink = await WasteRecordsPage.managePERNsLink()
-    await managePRNsLink.click()
+    await WasteRecordsPage.managePERNsLink()
 
     // Check issued PERNs
     await PrnDashboardPage.selectIssuedTab()
