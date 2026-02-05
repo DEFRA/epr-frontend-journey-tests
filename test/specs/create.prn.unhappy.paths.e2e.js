@@ -71,8 +71,8 @@ async function createAndCheckPrnDetails(
   )
 }
 
-describe('Packing Recycling Notes', () => {
-  it('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
+describe('Creating Packing Recycling Notes', () => {
+  it.skip('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 

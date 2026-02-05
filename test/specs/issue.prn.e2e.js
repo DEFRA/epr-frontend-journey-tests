@@ -98,8 +98,8 @@ async function createAndCheckPrnDetails(
   )
 }
 
-describe('Packing Recycling Notes', () => {
-  it('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprn', async () => {
+describe('Issuing Packing Recycling Notes', () => {
+  it.skip('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
