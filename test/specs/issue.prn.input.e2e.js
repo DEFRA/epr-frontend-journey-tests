@@ -55,7 +55,8 @@ async function checkViewPrnDetails(
   issuerNotes,
   status,
   materialDesc,
-  accNumber
+  accNumber,
+  issuedDate = ''
 ) {
   const prnViewDetails = await PrnViewPage.prnDetails()
   expect(prnViewDetails['Issued by']).toBe(
@@ -64,6 +65,7 @@ async function checkViewPrnDetails(
   expect(prnViewDetails['Buyer']).toBe(issuer)
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
+  expect(prnViewDetails['Issued date']).toBe(issuedDate)
   expect(prnViewDetails['Status']).toBe(status)
   expect(prnViewDetails['December waste']).toBe('No')
   expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
@@ -267,7 +269,8 @@ describe('Issuing Packing Recycling Notes', () => {
       issuerNotes,
       awaitingAcceptanceStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      expectedCreateDate
     )
 
     await PrnViewPage.returnToPRNList()
@@ -411,7 +414,8 @@ describe('Issuing Packing Recycling Notes', () => {
       issuerNotes,
       awaitingAcceptanceStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      expectedCreateDate
     )
 
     await PrnViewPage.returnToPRNList()
