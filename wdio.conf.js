@@ -24,11 +24,11 @@ export const config = {
   specs: ['./test/specs/**/*.js'],
   // Tests to exclude
   exclude: [],
-  maxInstances: 5,
+  maxInstances: 3,
 
   capabilities: [
     {
-      maxInstances: 5,
+      maxInstances: 3,
       ...(process.env.HTTP_PROXY && {
         proxy: {
           proxyType: 'manual',
