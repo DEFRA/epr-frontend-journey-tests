@@ -59,12 +59,12 @@ async function checkViewPernDetails(
   status,
   materialDesc,
   accNumber,
+  prnNumber,
   issuedDate = ''
 ) {
   const prnViewDetails = await PrnViewPage.prnDetails()
-  expect(prnViewDetails['Issued by']).toBe(
-    organisationDetails.organisation.companyName
-  )
+
+  expect(prnViewDetails['PERN number']).toBe(prnNumber)
   expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
     issuer
   )
@@ -221,7 +221,8 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       issuerNotes,
       awaitingAuthorisationStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      ''
     )
 
     await PrnViewPage.returnToPERNList()
@@ -235,7 +236,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(prnIssuedText).toContain('PERN issued to ' + name)
     expect(prnIssuedText).toContain('PERN number:')
 
-    let prnNumber = await PrnIssuedPage.prnNumberText()
+    const prnNumber = await PrnIssuedPage.prnNumberText()
     const pernNoPattern = /EX\d{5,9}/
     expect(pernNoPattern.test(prnNumber)).toEqual(true)
 
@@ -268,6 +269,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       awaitingAcceptanceStatus,
       materialDesc,
       accNumber,
+      prnNumber,
       expectedCreateDate
     )
 
@@ -335,7 +337,8 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       newIssuerNotes,
       awaitingAuthorisationStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      ''
     )
 
     await PrnViewPage.issuePRNButton()
@@ -345,8 +348,8 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(prnIssuedText).toContain('PERN issued to ' + newName)
     expect(prnIssuedText).toContain('PERN number:')
 
-    prnNumber = await PrnIssuedPage.prnNumberText()
-    expect(pernNoPattern.test(prnNumber)).toEqual(true)
+    const secondPrnNumber = await PrnIssuedPage.prnNumberText()
+    expect(pernNoPattern.test(secondPrnNumber)).toEqual(true)
 
     // Both Manage PRNs and Issue another PRN links should point to the same page
     const managePRNsElement = await PrnIssuedPage.managePRNs()
@@ -409,6 +412,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       awaitingAcceptanceStatus,
       materialDesc,
       accNumber,
+      prnNumber,
       expectedCreateDate
     )
 

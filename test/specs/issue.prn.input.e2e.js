@@ -62,12 +62,11 @@ async function checkViewPrnDetails(
   status,
   materialDesc,
   accNumber,
+  prnNumber,
   issuedDate = ''
 ) {
   const prnViewDetails = await PrnViewPage.prnDetails()
-  expect(prnViewDetails['Issued by']).toBe(
-    organisationDetails.organisation.companyName
-  )
+  expect(prnViewDetails['PRN number']).toBe(prnNumber)
   expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
     issuer
   )
@@ -229,7 +228,8 @@ describe('Issuing Packing Recycling Notes', () => {
       issuerNotes,
       awaitingAuthorisationStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      ''
     )
 
     await PrnViewPage.returnToPRNList()
@@ -243,7 +243,7 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(prnIssuedText).toContain('PRN issued to ' + name)
     expect(prnIssuedText).toContain('PRN number:')
 
-    let prnNumber = await PrnIssuedPage.prnNumberText()
+    const prnNumber = await PrnIssuedPage.prnNumberText()
     const prnNoPattern = /SR\d{5,9}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
@@ -276,6 +276,7 @@ describe('Issuing Packing Recycling Notes', () => {
       awaitingAcceptanceStatus,
       materialDesc,
       accNumber,
+      prnNumber,
       expectedCreateDate
     )
 
@@ -343,7 +344,8 @@ describe('Issuing Packing Recycling Notes', () => {
       newIssuerNotes,
       awaitingAuthorisationStatus,
       materialDesc,
-      accNumber
+      accNumber,
+      ''
     )
 
     await PrnViewPage.issuePRNButton()
@@ -353,8 +355,8 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(prnIssuedText).toContain('PRN issued to ' + newName)
     expect(prnIssuedText).toContain('PRN number:')
 
-    prnNumber = await PrnIssuedPage.prnNumberText()
-    expect(prnNoPattern.test(prnNumber)).toEqual(true)
+    const secondPrnNumber = await PrnIssuedPage.prnNumberText()
+    expect(prnNoPattern.test(secondPrnNumber)).toEqual(true)
 
     // Both Manage PRNs and Issue another PRN links should point to the same page
     const managePRNsElement = await PrnIssuedPage.managePRNs()
@@ -417,6 +419,7 @@ describe('Issuing Packing Recycling Notes', () => {
       awaitingAcceptanceStatus,
       materialDesc,
       accNumber,
+      prnNumber,
       expectedCreateDate
     )
 
