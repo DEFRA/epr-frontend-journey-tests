@@ -13,6 +13,7 @@ import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.p
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
+import { tradingName } from '../support/fixtures.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
@@ -69,13 +70,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await WasteRecordsPage.createNewPERNLink()
 
-      const tradingName = 'Green Waste Solutions'
-      const producer =
-        'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
 
       await PRNPage.enterTonnage(tonnageWordingsExporter[i].integer)
-      await PRNPage.select(producer)
+      await PRNPage.enterValue(tradingName)
       await PRNPage.addIssuerNotes(issuerNotes)
       await PRNPage.continue()
 

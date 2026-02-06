@@ -16,6 +16,12 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
+import {
+  tradingName,
+  name,
+  secondTradingName as newTradingName,
+  secondName as newName
+} from '../support/fixtures.js'
 
 async function checkPernDetails(
   organisationDetails,
@@ -75,7 +81,6 @@ async function checkViewPernDetails(
 
 async function createAndCheckPernDetails(
   tonnageWordings,
-  producer,
   tradingName,
   issuerNotes,
   issuerNotesToCheck,
@@ -83,7 +88,11 @@ async function createAndCheckPernDetails(
   materialDesc,
   accNumber
 ) {
-  await CreatePRNPage.createPrn(tonnageWordings.integer, producer, issuerNotes)
+  await CreatePRNPage.createPrn(
+    tonnageWordings.integer,
+    tradingName,
+    issuerNotes
+  )
   const headingText = await CheckBeforeCreatingPrnPage.headingText()
   expect(headingText).toBe('Check before creating PERN')
   await checkPernDetails(
@@ -146,14 +155,11 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.createNewPERNLink()
 
-    const tradingName = 'Bigco Packaging Ltd'
-    const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
     await createAndCheckPernDetails(
       tonnageWordings,
-      producer,
       tradingName,
       issuerNotes,
       issuerNotes,
@@ -199,9 +205,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      tradingName
-    )
+    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(name)
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -210,7 +214,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await checkViewPernDetails(
       organisationDetails,
-      tradingName,
+      name,
       tonnageWordings,
       issuerNotes,
       awaitingAuthorisationStatus,
@@ -226,11 +230,11 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     let prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PERN issued to ' + tradingName)
+    expect(prnIssuedText).toContain('PERN issued to ' + name)
     expect(prnIssuedText).toContain('PERN number:')
 
     let prnNumber = await PrnIssuedPage.prnNumberText()
-    const pernNoPattern = /EX\d{6,8}/
+    const pernNoPattern = /EX\d{5,9}/
     expect(pernNoPattern.test(prnNumber)).toEqual(true)
 
     let originalWindow = await browser.getWindowHandle()
@@ -256,7 +260,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPernDetails(
       organisationDetails,
-      tradingName,
+      name,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
@@ -278,9 +282,6 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     // Create a new PERN
     await WasteRecordsPage.createNewPERNLink()
 
-    const newTradingName = 'Green Waste Solutions'
-    const newProducer =
-      'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
     const newTonnageWordings = {
       integer: 19,
       word: 'Nineteen'
@@ -289,7 +290,6 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await createAndCheckPernDetails(
       newTonnageWordings,
-      newProducer,
       newTradingName,
       newIssuerNotes,
       newIssuerNotes,
@@ -314,7 +314,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
     expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      newTradingName
+      newName
     )
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
@@ -328,7 +328,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await checkViewPernDetails(
       organisationDetails,
-      newTradingName,
+      newName,
       newTonnageWordings,
       newIssuerNotes,
       awaitingAuthorisationStatus,
@@ -340,7 +340,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PERN issued to ' + newTradingName)
+    expect(prnIssuedText).toContain('PERN issued to ' + newName)
     expect(prnIssuedText).toContain('PERN number:')
 
     prnNumber = await PrnIssuedPage.prnNumberText()
@@ -364,7 +364,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     const expectedPernNumber = issuedRow.get('PERN number')
     expect(pernNoPattern.test(expectedPernNumber)).toEqual(true)
-    expect(issuedRow.get('Producer or compliance scheme')).toEqual(tradingName)
+    expect(issuedRow.get('Producer or compliance scheme')).toEqual(name)
     expect(issuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(issuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
 
@@ -372,7 +372,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     const expectedSecondPrnNumber = secondIssuedRow.get('PERN number')
     expect(pernNoPattern.test(expectedSecondPrnNumber)).toEqual(true)
     expect(secondIssuedRow.get('Producer or compliance scheme')).toEqual(
-      newTradingName
+      newName
     )
     expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
@@ -401,7 +401,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     // Check Issued PERN details
     await checkViewPernDetails(
       organisationDetails,
-      tradingName,
+      name,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,

@@ -16,7 +16,7 @@ class CreatePRNPage {
 
   async createPrn(tonnage, producer, issuerNotes) {
     await this.enterTonnage(tonnage)
-    await this.select(producer)
+    await this.enterValue(producer)
     await this.addIssuerNotes(issuerNotes)
     await this.continue()
   }
@@ -25,8 +25,8 @@ class CreatePRNPage {
     await $('#tonnage').setValue(tonnes)
   }
 
-  async select(producer) {
-    await $('#recipient').selectByVisibleText(producer)
+  async enterValue(producer) {
+    await $('#recipient').setValue(producer)
   }
 
   async continue() {
@@ -41,11 +41,11 @@ class CreatePRNPage {
     return await $('#main-content > div > div > form > p').getText()
   }
 
-  async errorMessages() {
+  async errorMessages(expectedAmount) {
     await browser.waitUntil(
       async () => {
         const elements = await $$('#main-content div[role=alert] ul li a')
-        return elements.length > 0
+        return elements.length === expectedAmount
       },
       {
         timeout: 5000,
