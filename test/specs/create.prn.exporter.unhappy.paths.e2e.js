@@ -13,6 +13,7 @@ import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
+import { secondTradingName as tradingName } from '../support/fixtures.js'
 
 async function checkPernDetails(
   organisationDetails,
@@ -44,7 +45,6 @@ async function checkPernDetails(
 
 async function createAndCheckPrnDetails(
   tonnageWordings,
-  producer,
   tradingName,
   issuerNotes,
   issuerNotesToCheck,
@@ -53,7 +53,7 @@ async function createAndCheckPrnDetails(
   accNumber
 ) {
   await CreatePRNPage.enterTonnage(tonnageWordings.integer)
-  await CreatePRNPage.select(producer)
+  await CreatePRNPage.enterValue(tradingName)
   await CreatePRNPage.addIssuerNotes(issuerNotes)
   await CreatePRNPage.continue()
 
@@ -108,15 +108,11 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.createNewPERNLink()
 
-    const tradingName = 'Acme Compliance Scheme'
-    const producer =
-      'Acme Compliance Scheme, 37th Place, Ashfield, Chicago, W1 L3Y'
     let issuerNotes = ''
 
     // Empty issuer notes, PERN created should say "Not provided"
     await createAndCheckPrnDetails(
       tonnageWordings,
-      producer,
       tradingName,
       issuerNotes,
       'Not provided',
@@ -133,7 +129,6 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
     issuerNotes = 'Testing'
     await createAndCheckPrnDetails(
       tonnageWordings,
-      producer,
       tradingName,
       issuerNotes,
       issuerNotes,
@@ -156,8 +151,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await CreatePRNPage.continue()
 
-    let errorMessages = await CreatePRNPage.errorMessages()
-    expect(errorMessages.length).toBe(2)
+    let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
       'Enter PERN tonnage as a whole number',
       'Select who this will be issued to'
@@ -165,7 +159,6 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await createAndCheckPrnDetails(
       tonnageWordings,
-      producer,
       tradingName,
       issuerNotes,
       issuerNotes,
@@ -176,8 +169,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
     await CheckBeforeCreatingPrnPage.createPRN()
 
     // Now we see an error message related to tonnage exceeding waste balance
-    errorMessages = await CreatePRNPage.errorMessages()
-    expect(errorMessages.length).toBe(1)
+    errorMessages = await CreatePRNPage.errorMessages(1)
     expect(errorMessages).toEqual([
       'The tonnage you entered exceeds your available waste balance'
     ])

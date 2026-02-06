@@ -15,6 +15,10 @@ import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
+import {
+  secondTradingName as tradingName,
+  secondName as name
+} from '../support/fixtures.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Reprocessor Input @sanitycheck', async () => {
@@ -93,16 +97,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await WasteRecordsPage.createNewPRNLink()
 
-      const tradingName = 'Green Waste Solutions'
-      const producer =
-        'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
 
       const materialDetails = await CreatePRNPage.materialDetails()
       expect(materialDetails).toBe('Material: ' + MATERIALS[i].prnName)
 
       await CreatePRNPage.enterTonnage(tonnageWordings[i].integer)
-      await CreatePRNPage.select(producer)
+      await CreatePRNPage.enterValue(tradingName)
       await CreatePRNPage.addIssuerNotes(issuerNotes)
       await CreatePRNPage.continue()
 
@@ -155,9 +156,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
 
-      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-        tradingName
-      )
+      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(name)
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -171,7 +170,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         organisationDetails.organisation.companyName
       )
 
-      expect(prnViewDetails['Buyer']).toBe(tradingName)
+      expect(prnViewDetails['Buyer']).toBe(name)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)

@@ -16,6 +16,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import ConfirmDeletePRNPage from 'page-objects/confirm.delete.prn.page.js'
+import { tradingName } from '../support/fixtures.js'
 
 describe('Deleting Packing Recycling Notes (Exporter)', () => {
   it('Should be able to create and delete PRN for Fibre (Exporter) @delprnexp', async () => {
@@ -62,16 +63,19 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
+    const expectedWasteBalance = '1,532.99 tonnes'
+    // Check waste balance amount from upload
+    let wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+    expect(wasteBalanceAmount).toBe(expectedWasteBalance)
+
     await WasteRecordsPage.createNewPERNLink()
 
-    const tradingName = 'Bigco Packaging Ltd'
-    const producer = `${tradingName}, Zig Zag road, Box Hill, Tadworth, KT20 7LB`
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
     await CreatePRNPage.createPrn(
       tonnageWordings.integer,
-      producer,
+      tradingName,
       issuerNotes
     )
 
@@ -88,6 +92,12 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
+
+    const expectedDeductedWasteBalance = '1,329.99 tonnes'
+    // Check waste balance amount is deducted from creation
+    wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+    expect(wasteBalanceAmount).toBe(expectedDeductedWasteBalance)
+
     await WasteRecordsPage.managePERNsLink()
 
     // Check No PERNs have been issued yet message
@@ -118,6 +128,12 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     const noCreatedPrnMessage = await PrnDashboardPage.getNoCreatedPrnMessage()
     expect(noCreatedPrnMessage).toBe('You have not created any PERNs.')
+
+    await PrnDashboardPage.selectBackLink()
+
+    // Check waste balance amount is now from the uploaded value and "returned" from the deleted PRN
+    wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
+    expect(wasteBalanceAmount).toBe(expectedWasteBalance)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

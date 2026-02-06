@@ -1,0 +1,6 @@
+export const tradingName = 'Council Farm Trading'
+export const name = 'COUNCIL FARM LIMITED'
+export const secondTradingName = 'Dlowcamp Trading'
+export const secondName = 'DLOWCAMP CIC'
+export const thirdTradingName = 'Arslan Ali Group Limited'
+export const thirdName = 'ARSLAN ALI GROUP LTD'
