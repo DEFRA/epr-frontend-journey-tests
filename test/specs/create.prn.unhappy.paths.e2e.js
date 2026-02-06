@@ -1,18 +1,18 @@
 import { browser, expect } from '@wdio/globals'
+import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
+import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import WasteRecordsPage from '../page-objects/waste.records.page.js'
+import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import CreatePRNPage from 'page-objects/create.prn.page.js'
-import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
-import ConfirmDiscardPRNPage from 'page-objects/confirm.discard.prn.page.js'
-import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import { thirdTradingName as tradingName } from '../support/fixtures.js'
 
 async function checkPrnDetails(
@@ -158,7 +158,7 @@ describe('Creating Packing Recycling Notes', () => {
     let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
       'Enter PRN tonnage as a whole number',
-      'Select who this will be issued to'
+      'Enter a packaging waste producer or compliance scheme'
     ])
 
     await createAndCheckPrnDetails(
