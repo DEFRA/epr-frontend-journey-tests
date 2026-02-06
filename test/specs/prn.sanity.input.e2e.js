@@ -170,7 +170,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
         organisationDetails.organisation.companyName
       )
 
-      expect(prnViewDetails['Buyer']).toBe(name)
+      expect(
+        prnViewDetails['Packaging waste producer or compliance scheme']
+      ).toBe(name)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
