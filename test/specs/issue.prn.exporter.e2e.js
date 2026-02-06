@@ -65,7 +65,9 @@ async function checkViewPernDetails(
   expect(prnViewDetails['Issued by']).toBe(
     organisationDetails.organisation.companyName
   )
-  expect(prnViewDetails['Buyer']).toBe(issuer)
+  expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
+    issuer
+  )
   expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
   expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
   expect(prnViewDetails['Issued date']).toBe(issuedDate)
