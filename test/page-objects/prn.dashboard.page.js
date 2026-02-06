@@ -7,9 +7,15 @@ class PRNDashboardPage {
 
   async selectAwaitingAuthorisationLink(index) {
     const linkElement = await $(
-      '#awaiting-action > table.govuk-table tr:nth-child(' +
-        index +
-        ') a.govuk-link'
+      '#main-content table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
+    )
+    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.click()
+  }
+
+  async selectIssuedLink(index) {
+    const linkElement = await $(
+      '#issued table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
     )
     await linkElement.waitForExist({ timeout: 5000 })
     await linkElement.click()
@@ -19,6 +25,27 @@ class PRNDashboardPage {
     await $('//a[normalize-space()="Issued"]').click()
   }
 
+  async getIssuedRow(rowIndex) {
+    const issuedRow = new Map()
+    const tableHeaders = await $$('#issued table.govuk-table > thead > tr th')
+    const headerText = await tableHeaders.map((element) => {
+      return element.getText()
+    })
+
+    const tableData = await $$(
+      '#issued table.govuk-table > tbody > tr:nth-child(' + rowIndex + ') td'
+    )
+
+    const rowText = await tableData.map((element) => {
+      return element.getText()
+    })
+
+    for (let i = 0; i < headerText.length; i++) {
+      issuedRow.set(headerText[i], rowText[i])
+    }
+    return issuedRow
+  }
+
   async selectAwaitingActionTab() {
     await $('//a[normalize-space()="Awaiting action"]').click()
   }
@@ -26,14 +53,14 @@ class PRNDashboardPage {
   async getAwaitingAuthorisationRow(rowIndex) {
     const authRow = new Map()
     const tableHeaders = await $$(
-      '#awaiting-action > table.govuk-table > thead > tr th'
+      '#main-content table.govuk-table > thead > tr th'
     )
     const headerText = await tableHeaders.map((element) => {
       return element.getText()
     })
 
     const tableData = await $$(
-      '#awaiting-action > table.govuk-table > tbody > tr:nth-child(' +
+      '#main-content table.govuk-table > tbody > tr:nth-child(' +
         rowIndex +
         ') td'
     )
@@ -48,8 +75,24 @@ class PRNDashboardPage {
     return authRow
   }
 
+  async cancelHintText() {
+    return await $('#main-content div.govuk-inset-text').getText()
+  }
+
+  async selectPrnHeadingText() {
+    return await $('#main-content > div > div > h2').getText()
+  }
+
   async getNoPrnMessage() {
     return await $('#awaiting-action > p').getText()
+  }
+
+  async getNoIssuedPrnMessage() {
+    return await $('#issued > p').getText()
+  }
+
+  async getNoCreatedPrnMessage() {
+    return await $('#main-content > div > div > p').getText()
   }
 
   async wasteBalanceAmount() {

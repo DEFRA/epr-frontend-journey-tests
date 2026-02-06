@@ -12,7 +12,7 @@ import { fakerEN_GB } from '@faker-js/faker'
 import { DefraIdStub } from './defra-id-stub.js'
 import Users from './users.js'
 import { FormData } from 'undici'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from './materials.js'
 
 export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
   const wasteProcessingTypes = [
@@ -140,7 +140,11 @@ export async function createLinkedOrganisation(dataRows) {
 
 // Examples for updateDataRows:
 // [ { reprocessingType: 'input', regNumber: 'R25SR500030912PA', accNumber: 'ACC123456', status: 'approved' }]
-export async function updateMigratedOrganisation(orgId, updateDataRows) {
+export async function updateMigratedOrganisation(
+  orgId,
+  updateDataRows,
+  submittedToRegulator
+) {
   const authClient = new AuthClient()
   const baseAPI = new BaseAPI()
 
@@ -190,6 +194,9 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
         orgUpdateData.glassRecyclingProcess
       ]
     }
+    if (submittedToRegulator) {
+      data.registrations[i].submittedToRegulator = submittedToRegulator
+    }
 
     if (!orgUpdateData.withoutAccreditation) {
       const j = accreditationIndex
@@ -209,8 +216,15 @@ export async function updateMigratedOrganisation(orgId, updateDataRows) {
         ]
       }
       data.accreditations[j].accreditationNumber = orgUpdateData.accNumber
+      if (submittedToRegulator) {
+        data.accreditations[j].submittedToRegulator = submittedToRegulator
+      }
       accreditationIndex++
     }
+  }
+
+  if (submittedToRegulator) {
+    data.submittedToRegulator = submittedToRegulator
   }
 
   let email = ''

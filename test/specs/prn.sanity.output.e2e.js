@@ -8,13 +8,14 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/prn.page.js'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import { MATERIALS } from '~/test/support/materials.js'
+import { MATERIALS } from '../support/materials.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it.skip('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -27,31 +28,24 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
     let orgAddressIndex = 8
 
-    // Tonnage values expected from Summary Log files upload
-    // Aluminium
-    // Fibre
-    // Glass remelt
-    // Glass other
-    // Paper and board
-    // Plastic
-    // Steel
-    // Wood
-
     const tonnageWordingsOutput = [
-      { integer: 245, word: 'Two Hundred Forty Five' },
-      { integer: 18923, word: 'Eighteen Thousand Nine Hundred Twenty Three' },
+      { integer: 245, word: 'Two hundred and forty five' },
+      {
+        integer: 18923,
+        word: 'Eighteen thousand nine hundred and twenty three'
+      },
       { integer: 5, word: 'Five' },
       {
-        integer: 671482,
-        word: 'Six Hundred Seventy One Thousand Four Hundred Eighty Two'
+        integer: 571482,
+        word: 'Five hundred and seventy one thousand four hundred and eighty two'
       },
-      { integer: 9307, word: 'Nine Thousand Three Hundred Seven' },
-      { integer: 42, word: 'Forty Two' },
+      { integer: 9307, word: 'Nine thousand three hundred and seven' },
+      { integer: 42, word: 'Forty two' },
       {
-        integer: 803516,
-        word: 'Eight Hundred Three Thousand Five Hundred Sixteen'
+        integer: 83516,
+        word: 'Eighty three thousand five hundred and sixteen'
       },
-      { integer: 156, word: 'One Hundred Fifty Six' }
+      { integer: 156, word: 'One hundred and fifty six' }
     ]
 
     // Sanity check Reprocessor Output materials
@@ -70,36 +64,44 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const accNo = await $(`//a[normalize-space()="${accNumber}"]`)
       expect(accNo).toExist()
 
-      const prnLink = await WasteRecordsPage.createNewPRNLink()
-      await prnLink.click()
+      await WasteRecordsPage.submitSummaryLogLink()
 
-      const producer = 'EcoRecycle Industries'
+      await UploadSummaryLogPage.performUploadAndReturnToHomepage(
+        `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
+      )
+
+      await DashboardPage.selectTableLink(2, i + 1)
+
+      await WasteRecordsPage.createNewPRNLink()
+
+      const tradingName = 'Green Waste Solutions'
+      const producer =
+        'Green Waste Solutions, 1 Worlds End Lane, Green St Green, BR6 6AG, England'
       const issuerNotes = 'Testing'
 
-      await PRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
-      await PRNPage.select(producer)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
+      await CreatePRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
+      await CreatePRNPage.select(producer)
+      await CreatePRNPage.addIssuerNotes(issuerNotes)
+      await CreatePRNPage.continue()
 
       const headingText = await CheckBeforeCreatingPrnPage.headingText()
       expect(headingText).toBe('Check before creating PRN')
 
       const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issued by']).toBe(
+      expect(prnDetails['Issuer']).toBe(
         organisationDetails.organisation.companyName
       )
       expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        producer
+        tradingName
       )
       expect(prnDetails['Tonnage']).toBe(`${tonnageWordingsOutput[i].integer}`)
-      //TODO: Fix these?
-      // expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)
-      // expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issue comments']).toBe(issuerNotes)
+      expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)
+      expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
+      expect(prnDetails['Issuer notes']).toBe(issuerNotes)
 
       const accreditationDetails =
         await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].name)
+      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
       expect(accreditationDetails['Accreditation number']).toBe(accNumber)
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')
@@ -110,12 +112,10 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const message = await PrnCreatedPage.messageText()
 
       expect(message).toContain('PRN created')
-      expect(message).toContain('Tonnage')
-      expect(message).toContain(tonnageWordingsOutput[i].integer + ' tonnes')
+      expect(message).toContain('Awaiting authorisation')
 
       await PrnCreatedPage.returnToRegistrationPage()
 
-      await WasteRecordsPage.selectBackLink()
       orgAddressIndex++
     }
 
