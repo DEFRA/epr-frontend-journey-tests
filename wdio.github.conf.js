@@ -44,11 +44,11 @@ export const config = {
   ],
   // Tests to exclude
   exclude: [],
-  maxInstances: 3,
+  maxInstances: 5,
 
   capabilities: [
     {
-      maxInstances: 3,
+      maxInstances: 5,
       browserName: 'chrome',
       'goog:chromeOptions': {
         args: [
