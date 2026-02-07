@@ -20,8 +20,28 @@ export const config = {
   hostname: process.env.CHROMEDRIVER_URL || '127.0.0.1',
   port: process.env.CHROMEDRIVER_PORT || 4444,
 
-  // Tests to run
-  specs: ['./test/specs/**/*.js'],
+  // Tests to run — slowest specs listed first so they are dispatched to
+  // separate workers immediately, with fast specs filling the gaps.
+  specs: [
+    './test/specs/summarylogs.exporter.e2e.js',
+    './test/specs/summarylogs.reprocessor.output.e2e.js',
+    './test/specs/issue.prn.exporter.e2e.js',
+    './test/specs/delete.prn.exporter.e2e.js',
+    './test/specs/issue.prn.input.e2e.js',
+    './test/specs/delete.prn.output.e2e.js',
+    './test/specs/summarylogs.reprocessor.input.e2e.js',
+    './test/specs/summarylogs.unhappy.paths.e2e.js',
+    './test/specs/create.prn.exporter.unhappy.paths.e2e.js',
+    './test/specs/create.prn.unhappy.paths.e2e.js',
+    './test/specs/all.materials.all.types.check.e2e.js',
+    './test/specs/accessibility.e2e.js',
+    './test/specs/registered.only.e2e.js',
+    './test/specs/summarylogs.glass.material.e2e.js',
+    './test/specs/homepage.e2e.js',
+    './test/specs/prn.sanity.exporter.e2e.js',
+    './test/specs/prn.sanity.input.e2e.js',
+    './test/specs/prn.sanity.output.e2e.js'
+  ],
   // Tests to exclude
   exclude: [],
   maxInstances: 3,
