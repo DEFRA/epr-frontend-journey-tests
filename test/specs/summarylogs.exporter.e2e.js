@@ -15,6 +15,7 @@ import {
 
 describe('Summary Logs Exporter', () => {
   it('Should be able to submit a Exporter Summary Log spreadsheet @exporter', async () => {
+    console.time('api-setup')
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' },
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
@@ -41,7 +42,9 @@ describe('Summary Logs Exporter', () => {
     const user = await createAndRegisterDefraIdUser(userEmail)
 
     await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    console.timeEnd('api-setup')
 
+    console.time('first-upload-flow')
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
@@ -84,6 +87,9 @@ describe('Summary Logs Exporter', () => {
 
     expect(wasteBalanceAmount).toBe('30.00 tonnes')
 
+    console.timeEnd('first-upload-flow')
+
+    console.time('second-upload-flow')
     await WasteRecordsPage.submitSummaryLogLink()
 
     await UploadSummaryLogPage.uploadFile('resources/exporter-adjustments.xlsx')
@@ -111,6 +117,8 @@ describe('Summary Logs Exporter', () => {
 
     availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('89.00')
+
+    console.timeEnd('second-upload-flow')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
