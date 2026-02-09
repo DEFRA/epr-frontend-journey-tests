@@ -21,7 +21,7 @@ runs:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
 
-    - name: Check for matching epr-frontend branch
+    - name: Check for matching epr-frontend branch if it is Journey Test PR
       if: inputs.journey-test-pr != 'false'
       id: service-branch
       shell: bash
@@ -29,26 +29,30 @@ runs:
         BRANCH="${{ github.head_ref }}"
         if git ls-remote --heads https://github.com/DEFRA/epr-frontend.git "$BRANCH" | grep -q .; then
           echo "ref=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "exists=true" >> $GITHUB_OUTPUT
         else
           echo "ref=main" >> "$GITHUB_OUTPUT"
+          echo "exists=false" >> $GITHUB_OUTPUT
         fi
 
-    - name: Checkout epr-frontend repository if there is a matching service branch
-      if: steps.service-branch.outputs.ref != 'main'
+    - name: Checkout epr-frontend repository if it is Journey Test PR and there is a matching service branch
+      if: inputs.journey-test-pr != 'false' && steps.service-branch.outputs.exists == 'true'
       uses: actions/checkout@v6
       with:
         repository: DEFRA/epr-frontend
         ref: ${{steps.service-branch.outputs.ref}}
         path: epr-frontend
 
-    - name: Build Docker image from epr-frontend if same branch exists
-      if: steps.service-branch.outputs.ref != 'main'
+    - name: Build Docker image from epr-frontend if it is Journey Test PR and same branch exists
+      if: inputs.journey-test-pr != 'false' && steps.service-branch.outputs.exists == 'true'
       id: docker-branch
       shell: bash
       run: |
         cd epr-frontend
-        docker build -t defradigital/epr-frontend:${{github.sha}} .
-        echo "image=defradigital/epr-frontend:${{github.sha}}" >> "GITHUB_OUTPUT"
+        EPR_FRONTEND_SHA=$(git rev-parse --short HEAD)
+        IMAGE_TAG="defradigital/epr-frontend:${EPR_FRONTEND_SHA}"
+        docker build -t $IMAGE_TAG .
+        echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - uses: actions/setup-node@v5
       with:
@@ -67,14 +71,14 @@ runs:
       shell: bash
 
     - name: Start docker compose with matching Service Branch if it is Journey Test PR
-      if: steps.service-branch.outputs.ref != 'main'
+      if: inputs.journey-test-pr != 'false' && steps.service-branch.outputs.exists == 'true'
       shell: bash
       run: |
         EPR_FRONTEND=${{ steps.docker-branch.outputs.image }} \
         docker compose up --wait-timeout 300 -d --quiet-pull
 
     - name: Start docker compose
-      if: inputs.journey-test-pr == 'false'
+      if : steps.service-branch.outputs.exists != 'true'
       shell: bash
       run: |
         EPR_FRONTEND=${{ inputs.epr-frontend }} \
