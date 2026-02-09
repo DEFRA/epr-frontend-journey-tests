@@ -21,7 +21,7 @@ runs:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
 
-    - name: Check for matching service branch
+    - name: Check for matching epr-frontend branch
       if: inputs.journey-test-pr != 'false'
       id: service-branch
       shell: bash
@@ -32,6 +32,23 @@ runs:
         else
           echo "ref=main" >> "$GITHUB_OUTPUT"
         fi
+
+    - name: Checkout epr-frontend repository if there is a matching service branch
+      if: steps.service-branch.outputs.ref != 'main'
+      uses: actions/checkout@v6
+      with:
+        repository: DEFRA/epr-frontend
+        ref: ${{steps.service-branch.outputs.ref}}
+        path: epr-frontend
+
+    - name: Build Docker image from epr-frontend if same branch exists
+      if: steps.service-branch.outputs.ref != 'main'
+      id: docker-branch
+      shell: bash
+      run: |
+        cd epr-frontend
+        docker build -t defradigital/epr-frontend:${{github.sha}} .
+        echo "image=defradigital/epr-frontend:${{github.sha}}" >> "GITHUB_OUTPUT"
 
     - uses: actions/setup-node@v5
       with:
@@ -50,10 +67,10 @@ runs:
       shell: bash
 
     - name: Start docker compose with matching Service Branch if it is Journey Test PR
-      if: inputs.journey-test-pr != 'false'
+      if: steps.service-branch.outputs.ref != 'main'
       shell: bash
       run: |
-        EPR_FRONTEND=${{ steps.service-branch.outputs.ref }} \
+        EPR_FRONTEND=${{ steps.docker-branch.outputs.image }} \
         docker compose up --wait-timeout 300 -d --quiet-pull
 
     - name: Start docker compose
