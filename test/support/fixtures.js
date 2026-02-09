@@ -1,6 +1,4 @@
-export const tradingName = 'Council Farm Trading'
-export const name = 'COUNCIL FARM LIMITED'
-export const secondTradingName = 'Dlowcamp Trading'
-export const secondName = 'DLOWCAMP CIC'
-export const thirdTradingName = 'Arslan Ali Group Limited'
-export const thirdName = 'ARSLAN ALI GROUP LTD'
+export const tradingName = 'CS_GENERATED_3982709_England'
+export const secondTradingName = 'CS_GENERATED_3792475_England'
+export const thirdTradingName =
+  '13 MARLBOROUGH BUILDINGS (BATH) MANAGEMENT COMPANY LTD'

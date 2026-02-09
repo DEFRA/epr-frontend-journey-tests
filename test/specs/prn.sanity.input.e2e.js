@@ -15,10 +15,7 @@ import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
-import {
-  secondTradingName as tradingName,
-  secondName as name
-} from '../support/fixtures.js'
+import { secondTradingName as tradingName } from '../support/fixtures.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Reprocessor Input @sanitycheck', async () => {
@@ -156,7 +153,9 @@ describe('Packing Recycling Notes (Sanity)', () => {
       const awaitingAuthRow =
         await PrnDashboardPage.getAwaitingAuthorisationRow(1)
 
-      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(name)
+      expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+        tradingName
+      )
       expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
       expect(awaitingAuthRow.get('Tonnage')).toEqual(
         `${tonnageWordings[i].integer}`
@@ -166,13 +165,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
 
       const prnViewDetails = await PrnViewPage.prnDetails()
-      expect(prnViewDetails['Issued by']).toBe(
+      expect(prnViewDetails['Issuer']).toBe(
         organisationDetails.organisation.companyName
       )
 
       expect(
         prnViewDetails['Packaging waste producer or compliance scheme']
-      ).toBe(name)
+      ).toBe(tradingName)
       expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings[i].integer}`)
       expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
       expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings[i].word)
