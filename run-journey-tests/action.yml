@@ -20,6 +20,11 @@ runs:
       with:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
+
+    - name: Synchronise service branch
+      if: inputs.journey-test-pr == 'false'
+      id: service-branch
+      uses: actions/checkout@v6
       run: |
         BRANCH="${{ github.head_ref }}"
         if git ls-remote --heads https://github.com/DEFRA/epr-frontend.git "$BRANCH" | grep -q .; then
