@@ -21,8 +21,8 @@ runs:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
 
-    - name: Synchronise service branch
-      if: inputs.journey-test-pr == 'false'
+    - name: Check for matching service branch (If it exists)
+      if: inputs.journey-test-pr != 'false'
       id: service-branch
       shell: bash
       run: |
@@ -49,15 +49,15 @@ runs:
         cat /etc/hosts
       shell: bash
 
-    - name: Start docker compose
-      if: inputs.journey-test-pr == 'false'
+    - name: Start docker compose with matching Service Branch if it is Journey Test PR
+      if: inputs.journey-test-pr != 'false'
       shell: bash
       run: |
         EPR_FRONTEND=${{ steps.service-branch.outputs.ref }} \
         docker compose up --wait-timeout 300 -d --quiet-pull
 
     - name: Start docker compose
-      if: inputs.journey-test-pr != 'false'
+      if: inputs.journey-test-pr == 'false'
       shell: bash
       run: |
         EPR_FRONTEND=${{ inputs.epr-frontend }} \
