@@ -18,9 +18,7 @@ import PrnViewPage from 'page-objects/prn.view.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
 import {
   tradingName,
-  name,
-  thirdTradingName as newTradingName,
-  thirdName as newName
+  thirdTradingName as newTradingName
 } from '../support/fixtures.js'
 
 async function checkPrnDetails(
@@ -214,7 +212,9 @@ describe('Issuing Packing Recycling Notes', () => {
     })
     const awaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
-    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(name)
+    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
+      tradingName
+    )
     expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
     expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
@@ -223,7 +223,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
     await checkViewPrnDetails(
       organisationDetails,
-      name,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAuthorisationStatus,
@@ -240,7 +240,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     let prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + name)
+    expect(prnIssuedText).toContain('PRN issued to ' + tradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     const prnNumber = await PrnIssuedPage.prnNumberText()
@@ -270,7 +270,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPrnDetails(
       organisationDetails,
-      name,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
@@ -325,7 +325,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const newAwaitingAuthRow =
       await PrnDashboardPage.getAwaitingAuthorisationRow(1)
     expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      newName
+      newTradingName
     )
     expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
     expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
@@ -339,7 +339,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await checkViewPrnDetails(
       organisationDetails,
-      newName,
+      newTradingName,
       newTonnageWordings,
       newIssuerNotes,
       awaitingAuthorisationStatus,
@@ -352,7 +352,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     prnIssuedText = await PrnIssuedPage.messageText()
 
-    expect(prnIssuedText).toContain('PRN issued to ' + newName)
+    expect(prnIssuedText).toContain('PRN issued to ' + newTradingName)
     expect(prnIssuedText).toContain('PRN number:')
 
     const secondPrnNumber = await PrnIssuedPage.prnNumberText()
@@ -376,7 +376,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const expectedPrnNumber = issuedRow.get('PRN number')
     expect(prnNoPattern.test(expectedPrnNumber)).toEqual(true)
-    expect(issuedRow.get('Producer or compliance scheme')).toEqual(name)
+    expect(issuedRow.get('Producer or compliance scheme')).toEqual(tradingName)
     expect(issuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(issuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
 
@@ -384,7 +384,7 @@ describe('Issuing Packing Recycling Notes', () => {
     const expectedSecondPrnNumber = secondIssuedRow.get('PRN number')
     expect(prnNoPattern.test(expectedSecondPrnNumber)).toEqual(true)
     expect(secondIssuedRow.get('Producer or compliance scheme')).toEqual(
-      newName
+      newTradingName
     )
     expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
@@ -413,7 +413,7 @@ describe('Issuing Packing Recycling Notes', () => {
     // Check Issued PRN details
     await checkViewPrnDetails(
       organisationDetails,
-      name,
+      tradingName,
       tonnageWordings,
       issuerNotes,
       awaitingAcceptanceStatus,
