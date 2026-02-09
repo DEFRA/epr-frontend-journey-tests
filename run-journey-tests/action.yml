@@ -21,7 +21,7 @@ runs:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
 
-    - name: Check for matching service branch (If it exists)
+    - name: Check for matching service branch
       if: inputs.journey-test-pr != 'false'
       id: service-branch
       shell: bash
