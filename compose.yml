@@ -28,6 +28,8 @@ services:
     image: selenium/standalone-chrome:123.0
     ports:
       - 4444:4444
+    environment:
+      SE_NODE_MAX_SESSIONS: 5
     network_mode: host
 
 ################################################################################

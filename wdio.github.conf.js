@@ -24,10 +24,11 @@ export const config = {
   specs: ['./test/specs/**/*.js'],
   // Tests to exclude
   exclude: [],
-  maxInstances: 1,
+  maxInstances: 5,
 
   capabilities: [
     {
+      maxInstances: 5,
       browserName: 'chrome',
       'goog:chromeOptions': {
         args: [
