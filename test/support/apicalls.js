@@ -175,6 +175,9 @@ export async function updateMigratedOrganisation(
   const currentYear = new Date().getFullYear()
 
   let data = responseData
+
+  //DEBUG What's being returned from the organisations endpoint
+  console.log(data)
   let accreditationIndex = 0
 
   for (let i = 0; i < updateDataRows.length; i++) {
