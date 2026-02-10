@@ -157,6 +157,12 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       'Enter a packaging waste producer or compliance scheme'
     ])
 
+    const originalWasteBalance = '0.00'
+    const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
+    expect(wasteBalanceHint).toBe(
+      `Your waste balance available for creating PERNs is ${originalWasteBalance} tonnes.`
+    )
+
     await createAndCheckPrnDetails(
       tonnageWordings,
       tradingName,
