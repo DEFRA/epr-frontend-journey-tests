@@ -52,6 +52,12 @@ Start application you are testing on the url specified in `baseUrl` [wdio.local.
 npm run test:local
 ```
 
+Running tests with a specific tag locally
+
+```bash
+GREP='@delprnexp' npm run test:local:grep
+```
+
 ### Debugging local tests
 
 ```bash
