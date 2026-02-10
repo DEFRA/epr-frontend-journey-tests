@@ -164,7 +164,7 @@ describe('Creating Packing Recycling Notes', () => {
     const originalWasteBalance = '0.00'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
-      `Your waste balance available for creating PERNs is ${originalWasteBalance} tonnes.`
+      `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
     )
 
     await createAndCheckPrnDetails(
