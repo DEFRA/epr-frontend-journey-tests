@@ -41,6 +41,15 @@ class CreatePRNPage {
     return await $('#main-content > div > div > form > p').getText()
   }
 
+  async wasteBalanceHint() {
+    const wasteBalanceHintElement = await $(
+      '#main-content > div > div > div.govuk-inset-text'
+    )
+
+    await wasteBalanceHintElement.waitForExist({ timeout: 5000 })
+    return wasteBalanceHintElement.getText()
+  }
+
   async errorMessages(expectedAmount) {
     await browser.waitUntil(
       async () => {

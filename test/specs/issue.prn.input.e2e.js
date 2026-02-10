@@ -20,6 +20,7 @@ import {
   tradingName,
   thirdTradingName as newTradingName
 } from '../support/fixtures.js'
+import { checkBodyText } from '../support/checks.js'
 
 async function checkPrnDetails(
   organisationDetails,
@@ -63,6 +64,8 @@ async function checkViewPrnDetails(
   prnNumber,
   issuedDate = ''
 ) {
+  const headingText = await PrnViewPage.headingText()
+  expect(headingText).toBe('Packaging Waste Recycling Note')
   const prnViewDetails = await PrnViewPage.prnDetails()
   expect(prnViewDetails['PRN number']).toBe(prnNumber)
   expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
@@ -165,6 +168,13 @@ describe('Issuing Packing Recycling Notes', () => {
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
+
+    const originalWasteBalance = '392.28'
+    const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
+    expect(wasteBalanceHint).toBe(
+      `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
+    )
+
     await createAndCheckPrnDetails(
       tonnageWordings,
       tradingName,
@@ -183,6 +193,9 @@ describe('Issuing Packing Recycling Notes', () => {
 
     expect(message).toContain('PRN created')
     expect(message).toContain(awaitingAuthorisationStatus)
+
+    checkBodyText('Your available waste balance has been updated.', 10)
+    checkBodyText('You can now issue this PRN through your PRNs page.', 10)
 
     await PrnCreatedPage.returnToRegistrationPage()
 
