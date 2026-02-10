@@ -34,6 +34,8 @@
     "report:publish": "npm run report; ./bin/publish-tests.sh"
   },
   "dependencies": {
+    "@axe-core/webdriverio": "4.11.1",
+    "@faker-js/faker": "10.3.0",
     "@wdio/allure-reporter": "9.23.3",
     "@wdio/browserstack-service": "9.23.3",
     "@wdio/cli": "9.23.3",
@@ -43,17 +45,15 @@
     "@wdio/mocha-framework": "9.23.3",
     "@wdio/spec-reporter": "9.23.3",
     "allure-commandline": "2.36.0",
-    "@faker-js/faker": "10.3.0",
     "esm-module-alias": "2.2.1",
     "global-agent": "4.1.2",
-    "undici": "7.21.0",
-    "@axe-core/webdriverio": "4.11.1"
+    "undici": "7.21.0"
   },
   "overrides": {
     "@isaacs/brace-expansion": "5.0.1"
   },
   "devDependencies": {
-    "eslint": "10.0.0",
+    "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-wdio": "9.23.0",
