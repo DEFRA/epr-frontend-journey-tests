@@ -20,6 +20,7 @@ import {
   tradingName,
   secondTradingName as newTradingName
 } from '../support/fixtures.js'
+import { checkBodyText } from '../support/checks.js'
 
 async function checkPernDetails(
   organisationDetails,
@@ -60,6 +61,9 @@ async function checkViewPernDetails(
   prnNumber,
   issuedDate = ''
 ) {
+  const headingText = await PrnViewPage.headingText()
+  expect(headingText).toBe('Packaging Waste Export Recycling Note')
+
   const prnViewDetails = await PrnViewPage.prnDetails()
 
   expect(prnViewDetails['PERN number']).toBe(prnNumber)
@@ -158,6 +162,13 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     let issuerNotes = ''
 
     issuerNotes = 'Testing'
+
+    const originalWasteBalance = '371,850.05'
+    const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
+    expect(wasteBalanceHint).toBe(
+      `Your waste balance available for creating PERNs is ${originalWasteBalance} tonnes.`
+    )
+
     await createAndCheckPernDetails(
       tonnageWordings,
       tradingName,
@@ -176,6 +187,9 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     expect(message).toContain('PERN created')
     expect(message).toContain(awaitingAuthorisationStatus)
+
+    checkBodyText('Your available waste balance has been updated.', 10)
+    checkBodyText('You can now issue this PERN through your PERNs page.', 10)
 
     await PrnCreatedPage.returnToRegistrationPage()
 
