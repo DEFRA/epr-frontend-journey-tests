@@ -133,8 +133,8 @@ services:
       FEATURE_FLAG_DEV_ENDPOINTS: true
       FEATURE_FLAG_SQS_COMMANDS: true
       COMMAND_QUEUE_SQS_ENDPOINT: http://localstack:4566
-      FEATURE_FLAG_CALCULATE_WASTE_BALANCE_ON_IMPORT: true
       FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
+      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES_EXTERNAL_API: true
       DEFRA_ID_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
       DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       ENTRA_OIDC_WELL_KNOWN_CONFIGURATION_URL: http://epr-re-ex-entra-stub:3010/.well-known/openid-configuration

@@ -4,7 +4,7 @@ import {
   Registration
 } from '../support/generator.js'
 
-import { BaseAPI } from '../apis/base-api.js'
+import { EprBackend } from '../apis/epr-backend.js'
 import { expect } from '@wdio/globals'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
@@ -22,6 +22,15 @@ async function assertSuccessResponse(response, context) {
     )
   }
   return body
+}
+
+async function assertSuccessResponseWithoutBody(response, context) {
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    const body = await response.body.json()
+    throw new Error(
+      `${context}: expected 2xx but got ${response.statusCode}\n${JSON.stringify(body, null, 2)}`
+    )
+  }
 }
 
 export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
@@ -82,7 +91,7 @@ export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
 // Examples
 // dataRows = [{ material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor'}, { material: 'Steel (R4)', wasteProcessingType: 'Exporter'}]
 export async function createLinkedOrganisation(dataRows) {
-  const baseAPI = new BaseAPI()
+  const eprBackend = new EprBackend()
 
   const organisation = new Organisation()
   let payload = ''
@@ -92,7 +101,7 @@ export async function createLinkedOrganisation(dataRows) {
     payload = organisation.toPayload()
   }
 
-  let response = await baseAPI.post(
+  let response = await eprBackend.post(
     '/v1/apply/organisation',
     JSON.stringify(payload)
   )
@@ -119,7 +128,7 @@ export async function createLinkedOrganisation(dataRows) {
       dataRow.wasteProcessingType === 'Reprocessor'
         ? registration.toAllMaterialsPayload(material, glassRecyclingProcess)
         : registration.toExporterPayload(material, glassRecyclingProcess)
-    response = await baseAPI.post(
+    response = await eprBackend.post(
       '/v1/apply/registration',
       JSON.stringify(payload)
     )
@@ -134,7 +143,7 @@ export async function createLinkedOrganisation(dataRows) {
           ? accreditation.toReprocessorPayload(material, glassRecyclingProcess)
           : accreditation.toExporterPayload(material, glassRecyclingProcess)
 
-      response = await baseAPI.post(
+      response = await eprBackend.post(
         '/v1/apply/accreditation',
         JSON.stringify(payload)
       )
@@ -142,7 +151,10 @@ export async function createLinkedOrganisation(dataRows) {
     }
   }
 
-  response = await baseAPI.post(`/v1/dev/form-submissions/${refNo}/migrate`, '')
+  response = await eprBackend.post(
+    `/v1/dev/form-submissions/${refNo}/migrate`,
+    ''
+  )
   expect(response.statusCode).toBe(200)
 
   return { refNo, organisation, regAddresses }
@@ -156,7 +168,7 @@ export async function updateMigratedOrganisation(
   submittedToRegulator
 ) {
   const authClient = new AuthClient()
-  const baseAPI = new BaseAPI()
+  const eprBackend = new EprBackend()
 
   let payload, urlSuffix
   if (process.env.ENVIRONMENT === 'test') {
@@ -176,7 +188,7 @@ export async function updateMigratedOrganisation(
   }
   await authClient.generateToken(payload, urlSuffix)
 
-  let response = await baseAPI.get(
+  let response = await eprBackend.get(
     `/v1/organisations/${orgId}`,
     authClient.authHeader()
   )
@@ -255,7 +267,7 @@ export async function updateMigratedOrganisation(
 
   data = { organisation: data }
 
-  response = await baseAPI.patch(
+  response = await eprBackend.patch(
     `/v1/dev/organisations/${orgId}`,
     JSON.stringify(data)
   )
@@ -286,7 +298,7 @@ export async function createAndRegisterDefraIdUser(
 }
 
 export async function linkDefraIdUser(organisationId, userId, email) {
-  const baseAPI = new BaseAPI()
+  const eprBackend = new EprBackend()
   const defraIdStub = new DefraIdStub()
   const users = new Users()
 
@@ -297,11 +309,25 @@ export async function linkDefraIdUser(organisationId, userId, email) {
   const tokenPayload = await users.tokenPayload(sessionId)
   await defraIdStub.generateToken(JSON.stringify(tokenPayload), userId)
 
-  const linkResponse = await baseAPI.post(
+  const linkResponse = await eprBackend.post(
     `/v1/organisations/${organisationId}/link`,
     '',
     defraIdStub.authHeader(userId)
   )
 
   expect(linkResponse.statusCode).toBe(200)
+}
+
+//TODO: Add auth, and also factor in TEST environment
+export async function externalAPIcancelPrn(prnNumber) {
+  const eprBackend = new EprBackend()
+  const response = await eprBackend.post(
+    `/v1/packaging-recycling-notes/${prnNumber}/reject`,
+    JSON.stringify({ rejectedAt: new Date().toISOString() })
+  )
+
+  await assertSuccessResponseWithoutBody(
+    response,
+    `POST /v1/packaging-recycling-notes/${prnNumber}/reject`
+  )
 }

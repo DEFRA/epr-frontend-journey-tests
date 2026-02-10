@@ -4,6 +4,7 @@ import HomePage from 'page-objects/homepage.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import {
+  externalAPIcancelPrn,
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
@@ -430,7 +431,11 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       expectedCreateDate
     )
 
+    // Now RPD cancels the PRN
+    await externalAPIcancelPrn(prnNumber)
+
     await PrnViewPage.returnToPERNList()
+
     await PrnDashboardPage.selectBackLink()
 
     await WasteRecordsPage.selectBackLink()
