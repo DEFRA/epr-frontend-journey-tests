@@ -14,6 +14,16 @@ import Users from './users.js'
 import { FormData } from 'undici'
 import { MATERIALS } from './materials.js'
 
+async function assertSuccessResponse(response, context) {
+  const body = await response.body.json()
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    throw new Error(
+      `${context}: expected 2xx but got ${response.statusCode}\n${JSON.stringify(body, null, 2)}`
+    )
+  }
+  return body
+}
+
 export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
   const wasteProcessingTypes = [
     {
@@ -170,7 +180,10 @@ export async function updateMigratedOrganisation(
     `/v1/organisations/${orgId}`,
     authClient.authHeader()
   )
-  const responseData = await response.body.json()
+  const responseData = await assertSuccessResponse(
+    response,
+    `GET /v1/organisations/${orgId}`
+  )
 
   const currentYear = new Date().getFullYear()
 
