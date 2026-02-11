@@ -40,6 +40,10 @@ class PRNViewPage {
     await $('a*=Return to PERN list').click()
   }
 
+  async cancelPRNButton() {
+    await $('#main-content > div > div > a').click()
+  }
+
   async deletePRNButton() {
     await $('#main-content > div > div > form > div > a').click()
   }

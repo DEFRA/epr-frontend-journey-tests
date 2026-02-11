@@ -150,8 +150,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
         year: 'numeric'
       })
 
-      const awaitingAuthRow =
-        await PrnDashboardPage.getAwaitingAuthorisationRow(1)
+      const awaitingAuthRow = await PrnDashboardPage.getAwaitingRow(1)
 
       expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
         tradingName
@@ -162,7 +161,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       )
       expect(awaitingAuthRow.get('Status')).toEqual('Awaiting authorisation')
 
-      await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
+      await PrnDashboardPage.selectAwaitingLink(1)
 
       const prnViewDetails = await PrnViewPage.prnDetails()
       expect(prnViewDetails['Issuer']).toBe(

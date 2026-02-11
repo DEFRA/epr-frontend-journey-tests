@@ -5,9 +5,11 @@ class PRNDashboardPage {
     return $('#main-content > div > div > div > h1').getText()
   }
 
-  async selectAwaitingAuthorisationLink(index) {
+  async selectAwaitingLink(index, tableIndex = 1) {
     const linkElement = await $(
-      '#main-content table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
+      `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) tr:nth-child(` +
+        index +
+        ') a.govuk-link'
     )
     await linkElement.waitForExist({ timeout: 5000 })
     await linkElement.click()
@@ -23,6 +25,13 @@ class PRNDashboardPage {
 
   async selectIssuedTab() {
     await $('//a[normalize-space()="Issued"]').click()
+  }
+
+  // Index changes depending on whether PRN cancellation / PRN awaiting authorisation exists
+  async getTableHeading(index = 1) {
+    return await $(
+      `#awaiting-action > h2.govuk-heading-m:nth-of-type(${index})`
+    ).getText()
   }
 
   async getIssuedRow(rowIndex) {
@@ -50,17 +59,26 @@ class PRNDashboardPage {
     await $('//a[normalize-space()="Awaiting action"]').click()
   }
 
-  async getAwaitingAuthorisationRow(rowIndex) {
+  // Depending on whether PRN cancellation / PRN awaiting authorisation exists, the table index might change / shift accordingly
+  async getAwaitingRow(rowIndex, tableIndex = 1) {
     const authRow = new Map()
     const tableHeaders = await $$(
-      '#main-content table.govuk-table > thead > tr th'
+      `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) > thead > tr th`
     )
     const headerText = await tableHeaders.map((element) => {
       return element.getText()
     })
 
+    // #awaiting-action > table > tbody > tr:nth-child(1) > td:nth-child(5) > a
+
+    // console.log(
+    //   `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) > tbody > tr:nth-child(` +
+    //     rowIndex +
+    //     ') td'
+    // )
+
     const tableData = await $$(
-      '#main-content table.govuk-table > tbody > tr:nth-child(' +
+      `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) > tbody > tr:nth-child(` +
         rowIndex +
         ') td'
     )
