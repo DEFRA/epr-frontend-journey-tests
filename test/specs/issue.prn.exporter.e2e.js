@@ -11,7 +11,6 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import CreatePRNPage from 'page-objects/create.prn.page.js'
-import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
@@ -24,95 +23,17 @@ import {
 } from '../support/fixtures.js'
 import { checkBodyText } from '../support/checks.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
-import PrnCancelledPage from 'page-objects/prn.cancelled.page.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
-
-async function checkPernDetails(
-  organisationDetails,
-  materialDesc,
-  tradingName,
-  tonnageWordings,
-  issuerNotes,
-  accNumber
-) {
-  const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-  expect(prnDetails['Issuer']).toBe(
-    organisationDetails.organisation.companyName
-  )
-  expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    tradingName
-  )
-  expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnDetails['Process to be used']).toBe('R3')
-  expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-  const accreditationDetails =
-    await CheckBeforeCreatingPrnPage.accreditationDetails()
-
-  expect(accreditationDetails['Material']).toBe(materialDesc)
-  expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-  return { prnDetails }
-}
-
-async function checkViewPernDetails(
-  organisationDetails,
-  issuer,
-  tonnageWordings,
-  issuerNotes,
-  status,
-  materialDesc,
-  accNumber,
-  prnNumber,
-  issuedDate = ''
-) {
-  const headingText = await PrnViewPage.headingText()
-  expect(headingText).toBe('Packaging Waste Export Recycling Note')
-
-  const prnViewDetails = await PrnViewPage.prnDetails()
-
-  expect(prnViewDetails['PERN number']).toBe(prnNumber)
-  expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
-    issuer
-  )
-  expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
-  expect(prnViewDetails['Issued date']).toBe(issuedDate)
-  expect(prnViewDetails['Status']).toBe(status)
-  expect(prnViewDetails['December waste']).toBe('No')
-  expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnViewDetails['Process to be used']).toBe('R3')
-
-  const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-  expect(accreditationViewDetails['Material']).toBe(materialDesc)
-  expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
-}
-
-async function createAndCheckPernDetails(
-  tonnageWordings,
-  tradingName,
-  issuerNotes,
-  issuerNotesToCheck,
-  organisationDetails,
-  materialDesc,
-  accNumber
-) {
-  await CreatePRNPage.createPrn(
-    tonnageWordings.integer,
-    tradingName,
-    issuerNotes
-  )
-  const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PERN')
-  await checkPernDetails(
-    organisationDetails,
-    materialDesc,
-    tradingName,
-    tonnageWordings,
-    issuerNotesToCheck,
-    accNumber
-  )
-}
+import {
+  cancelPRNAndReturnToPRNsDashboard,
+  checkAwaitingRows,
+  checkIssuedPageLinks,
+  checkIssuedRows,
+  checkViewPrnDetails,
+  createAndCheckPrnDetails,
+  issuePrnAndUpdateDetails
+} from '../support/prnchecks.js'
+import { todayddMMMMyyyy } from '../support/date.js'
 
 describe('Issuing Packing Recycling Notes (Exporter)', () => {
   it('Should be able to create and issue PRNs for Wood (Exporter) @issueprnexp', async function () {
@@ -164,47 +85,39 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.createNewPERNLink()
 
-    let issuerNotes = ''
-
-    issuerNotes = 'Testing'
-
     const originalWasteBalance = '371,850.05'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
       `Your waste balance available for creating PERNs is ${originalWasteBalance} tonnes.`
     )
 
-    await createAndCheckPernDetails(
+    const pernDetails = {
       tonnageWordings,
       tradingName,
-      issuerNotes,
-      issuerNotes,
+      issuerNotes: 'Testing',
       organisationDetails,
+      status: '',
       materialDesc,
-      accNumber
+      accNumber,
+      prnNumber: '',
+      issuedDate: '',
+      createdDate: todayddMMMMyyyy
+    }
+
+    await createAndCheckPrnDetails(pernDetails, true)
+
+    await checkBodyText('Your available waste balance has been updated.', 10)
+    await checkBodyText(
+      'You can now issue this PERN through your PERNs page.',
+      10
     )
 
-    await CheckBeforeCreatingPrnPage.createPRN()
-
-    const message = await PrnCreatedPage.messageText()
-
-    const awaitingAuthorisationStatus = 'Awaiting authorisation'
-
-    expect(message).toContain('PERN created')
-    expect(message).toContain(awaitingAuthorisationStatus)
-
-    checkBodyText('Your available waste balance has been updated.', 10)
-    checkBodyText('You can now issue this PERN through your PERNs page.', 10)
-
     await PrnCreatedPage.returnToRegistrationPage()
-
     await DashboardPage.selectTableLink(1, 1)
-
     await WasteRecordsPage.managePERNsLink()
 
     // PRN Dashboard checks - Waste Balance Amount, Awaiting Authorisation table values
     let wasteBalanceAmount = await PrnDashboardPage.wasteBalanceAmount()
-
     expect(wasteBalanceAmount).toBe(expectedWasteBalance + ' tonnes')
 
     // Check cancel hint text
@@ -212,68 +125,24 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(cancelHintText).toBe(
       'If you delete or cancel a PERN, its tonnage will be added to your available waste balance.'
     )
-
     const selectPERNHeadingText = await PrnDashboardPage.selectPrnHeadingText()
     expect(selectPERNHeadingText).toBe('Select a PERN')
 
-    const today = new Date()
-    const expectedCreateDate = today.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
-    const awaitingAuthRow = await PrnDashboardPage.getAwaitingRow(1)
-    expect(awaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      tradingName
-    )
-    expect(awaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
-    expect(awaitingAuthRow.get('Tonnage')).toEqual(`${tonnageWordings.integer}`)
-    expect(awaitingAuthRow.get('Status')).toEqual(awaitingAuthorisationStatus)
+    await checkAwaitingRows(pernDetails, 1)
     // End of PRN Dashboard checks
 
     await PrnDashboardPage.selectAwaitingLink(1)
-    await checkViewPernDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAuthorisationStatus,
-      materialDesc,
-      accNumber,
-      ''
-    )
-
+    await checkViewPrnDetails(pernDetails, true)
     await PrnViewPage.returnToPERNList()
 
     // Issue the created PERN
     await PrnDashboardPage.selectAwaitingLink(1)
-    await PrnViewPage.issuePRNButton()
-
-    let prnIssuedText = await PrnIssuedPage.messageText()
-
-    expect(prnIssuedText).toContain('PERN issued to ' + tradingName)
-    expect(prnIssuedText).toContain('PERN number:')
-
-    const prnNumber = await PrnIssuedPage.prnNumberText()
-    const pernNoPattern = /EX\d{5,9}/
-    expect(pernNoPattern.test(prnNumber)).toEqual(true)
+    await issuePrnAndUpdateDetails(pernDetails, 'EX', true)
 
     await PrnIssuedPage.viewPdfButton()
-
     await switchToNewTabAndClosePreviousTab()
 
-    const awaitingAcceptanceStatus = 'Awaiting acceptance'
-    await checkViewPernDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAcceptanceStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+    await checkViewPrnDetails(pernDetails, true)
 
     await PrnViewPage.returnToPERNList()
 
@@ -294,22 +163,19 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     }
     const newIssuerNotes = 'Testing another PERN'
 
-    await createAndCheckPernDetails(
-      newTonnageWordings,
-      newTradingName,
-      newIssuerNotes,
-      newIssuerNotes,
+    const newPernDetails = {
+      tonnageWordings: newTonnageWordings,
+      tradingName: newTradingName,
+      issuerNotes: newIssuerNotes,
       organisationDetails,
+      status: '',
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      prnNumber: '',
+      issuedDate: ''
+    }
 
-    await CheckBeforeCreatingPrnPage.createPRN()
-
-    const newMessage = await PrnCreatedPage.messageText()
-
-    expect(newMessage).toContain('PERN created')
-    expect(message).toContain(awaitingAuthorisationStatus)
+    await createAndCheckPrnDetails(newPernDetails, true)
     // End of new PERN creation
 
     await PrnCreatedPage.returnToRegistrationPage()
@@ -317,113 +183,39 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.managePERNsLink()
 
-    const newAwaitingAuthRow = await PrnDashboardPage.getAwaitingRow(1)
-    expect(newAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      newTradingName
-    )
-    expect(newAwaitingAuthRow.get('Date created')).toEqual(expectedCreateDate)
-    expect(newAwaitingAuthRow.get('Tonnage')).toEqual(
-      `${newTonnageWordings.integer}`
-    )
-    expect(newAwaitingAuthRow.get('Status')).toEqual(
-      awaitingAuthorisationStatus
-    )
+    await checkAwaitingRows(newPernDetails, 1)
 
     await PrnDashboardPage.selectAwaitingLink(1)
 
-    await checkViewPernDetails(
-      organisationDetails,
-      newTradingName,
-      newTonnageWordings,
-      newIssuerNotes,
-      awaitingAuthorisationStatus,
-      materialDesc,
-      accNumber,
-      ''
-    )
+    await checkViewPrnDetails(newPernDetails, true)
 
-    await PrnViewPage.issuePRNButton()
-
-    prnIssuedText = await PrnIssuedPage.messageText()
-
-    expect(prnIssuedText).toContain('PERN issued to ' + newTradingName)
-    expect(prnIssuedText).toContain('PERN number:')
-
-    const secondPrnNumber = await PrnIssuedPage.prnNumberText()
-    expect(pernNoPattern.test(secondPrnNumber)).toEqual(true)
-
-    // Both Manage PRNs and Issue another PRN links should point to the same page
-    const managePRNsElement = await PrnIssuedPage.managePRNs()
-    const issueAnotherPRNElement = await PrnIssuedPage.issueAnotherPRN()
-    expect(managePRNsElement.getAttribute('href')).toEqual(
-      issueAnotherPRNElement.getAttribute('href')
-    )
+    await issuePrnAndUpdateDetails(newPernDetails, 'EX', true)
+    await checkIssuedPageLinks()
 
     await PrnIssuedPage.returnToHomePage()
-
     await WasteRecordsPage.managePERNsLink()
 
     // Check issued PERNs
     await PrnDashboardPage.selectIssuedTab()
-
-    const issuedRow = await PrnDashboardPage.getIssuedRow(1)
-
-    const expectedPernNumber = issuedRow.get('PERN number')
-    expect(pernNoPattern.test(expectedPernNumber)).toEqual(true)
-    expect(issuedRow.get('Producer or compliance scheme')).toEqual(tradingName)
-    expect(issuedRow.get('Date issued')).toEqual(expectedCreateDate)
-    expect(issuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
-
-    const secondIssuedRow = await PrnDashboardPage.getIssuedRow(2)
-    const expectedSecondPrnNumber = secondIssuedRow.get('PERN number')
-    expect(pernNoPattern.test(expectedSecondPrnNumber)).toEqual(true)
-    expect(secondIssuedRow.get('Producer or compliance scheme')).toEqual(
-      newTradingName
-    )
-    expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
-    expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
+    await checkIssuedRows(pernDetails, 1, true)
+    await checkIssuedRows(newPernDetails, 2, true)
 
     // Check first Issued PRN details
     await PrnDashboardPage.selectIssuedLink(1)
-
     await switchToNewTabAndClosePreviousTab()
 
     // Check Issued PERN details
-    await checkViewPernDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAcceptanceStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+    await checkViewPrnDetails(pernDetails, true)
 
-    // Now RPD cancels the PRN
-    await externalAPIcancelPrn(prnNumber)
+    // Now RPD cancels the PERN
+    await externalAPIcancelPrn(pernDetails)
 
     await PrnViewPage.returnToPERNList()
 
     // See that on the PRN Dashboard page, only PERNs awaiting cancellation are shown
     const tableHeading = await PrnDashboardPage.getTableHeading()
     expect(tableHeading).toBe('PERNs awaiting cancellation')
-
-    const awaitingCancellationStatus = 'Awaiting cancellation'
-    let awaitingCancellationRow = await PrnDashboardPage.getAwaitingRow(1)
-    expect(
-      awaitingCancellationRow.get('Producer or compliance scheme')
-    ).toEqual(tradingName)
-    expect(awaitingCancellationRow.get('Date created')).toEqual(
-      expectedCreateDate
-    )
-    expect(awaitingCancellationRow.get('Tonnage')).toEqual(
-      `${tonnageWordings.integer}`
-    )
-    expect(awaitingCancellationRow.get('Status')).toEqual(
-      awaitingCancellationStatus
-    )
+    await checkAwaitingRows(pernDetails, 1)
 
     await PrnDashboardPage.selectBackLink()
 
@@ -435,22 +227,19 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       word: 'Fifteen'
     }
 
-    await createAndCheckPernDetails(
-      updatedTonnageWordings,
-      updatedTradingName,
-      newIssuerNotes,
-      newIssuerNotes,
+    const updatedPernDetails = {
+      tonnageWordings: updatedTonnageWordings,
+      tradingName: updatedTradingName,
+      issuerNotes: newIssuerNotes,
+      status: '',
       organisationDetails,
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      prnNumber: '',
+      issuedDate: ''
+    }
 
-    await CheckBeforeCreatingPrnPage.createPRN()
-
-    const updatedMessage = await PrnCreatedPage.messageText()
-
-    expect(updatedMessage).toContain('PERN created')
-    expect(message).toContain(awaitingAuthorisationStatus)
+    await createAndCheckPrnDetails(updatedPernDetails, true)
     // End of new PERN creation
 
     await PrnCreatedPage.pernsPageLink()
@@ -459,79 +248,31 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     const awaitingAuthHeading = await PrnDashboardPage.getTableHeading()
     expect(awaitingAuthHeading).toBe('PERNs awaiting authorisation')
 
-    // const awaitingCancellationStatus = 'Awaiting cancellation'
-    const updatedAwaitingAuthRow = await PrnDashboardPage.getAwaitingRow(1)
-    expect(updatedAwaitingAuthRow.get('Producer or compliance scheme')).toEqual(
-      updatedTradingName
-    )
-    expect(updatedAwaitingAuthRow.get('Date created')).toEqual(
-      expectedCreateDate
-    )
-    expect(updatedAwaitingAuthRow.get('Tonnage')).toEqual(
-      `${updatedTonnageWordings.integer}`
-    )
-    expect(updatedAwaitingAuthRow.get('Status')).toEqual(
-      awaitingAuthorisationStatus
-    )
+    await checkAwaitingRows(updatedPernDetails, 1)
 
     const awaitingCancellationHeading =
       await PrnDashboardPage.getTableHeading(2)
     expect(awaitingCancellationHeading).toBe('PERNs awaiting cancellation')
-
-    awaitingCancellationRow = await PrnDashboardPage.getAwaitingRow(1, 2)
-    expect(
-      awaitingCancellationRow.get('Producer or compliance scheme')
-    ).toEqual(tradingName)
-    expect(awaitingCancellationRow.get('Date created')).toEqual(
-      expectedCreateDate
-    )
-    expect(awaitingCancellationRow.get('Tonnage')).toEqual(
-      `${tonnageWordings.integer}`
-    )
-    expect(awaitingCancellationRow.get('Status')).toEqual(
-      awaitingCancellationStatus
-    )
+    await checkAwaitingRows(pernDetails, 1, 2)
 
     // Select awaiting cancellation PRN
     await PrnDashboardPage.selectAwaitingLink(1, 2)
 
-    await checkViewPernDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingCancellationStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+    await checkViewPrnDetails(pernDetails, true)
 
     // Test back link of cancellation page
     await PrnViewPage.cancelPRNButton()
 
-    let confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
+    const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
     expect(confirmCancelHeading).toBe('Confirm cancellation of this PERN')
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await PrnViewPage.cancelPRNButton()
-    confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
-    expect(confirmCancelHeading).toBe('Confirm cancellation of this PERN')
+    await cancelPRNAndReturnToPRNsDashboard(true)
 
-    await ConfirmCancelPrnPage.confirmCancelPrn()
-
-    const cancelledMessageText = await PrnCancelledPage.messageText()
-    expect(cancelledMessageText).toContain('PERN cancelled')
-
-    const prnStatus = await PrnCancelledPage.statusText()
-    expect(prnStatus).toContain('Cancelled')
-
-    await PrnCancelledPage.pernsPage()
     // End of PERN cancellation test
 
     await PrnDashboardPage.selectBackLink()
-
     await WasteRecordsPage.selectBackLink()
 
     // Check that the waste balance has been updated from the cancelled PRN

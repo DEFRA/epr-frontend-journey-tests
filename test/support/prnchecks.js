@@ -9,7 +9,7 @@ import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import PrnCancelledPage from 'page-objects/prn.cancelled.page.js'
 
-export async function checkPrnDetails(expectedPrnDetails) {
+export async function checkPrnDetails(expectedPrnDetails, isPern = false) {
   const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
   expect(prnDetails['Issuer']).toBe(
     expectedPrnDetails.organisationDetails.organisation.companyName
@@ -33,16 +33,25 @@ export async function checkPrnDetails(expectedPrnDetails) {
   expect(accreditationDetails['Accreditation number']).toBe(
     expectedPrnDetails.accNumber
   )
-  expect(
-    accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+  if (!isPern) {
+    expect(
+      accreditationDetails['Accreditation address'].replaceAll(', ', ',')
+    ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+  }
 }
 
-export async function checkViewPrnDetails(expectedPrnDetails) {
+export async function checkViewPrnDetails(expectedPrnDetails, isPern = false) {
+  const prnWording = isPern ? 'PERN' : 'PRN'
   const headingText = await PrnViewPage.headingText()
-  expect(headingText).toBe('Packaging Waste Recycling Note')
+  if (!isPern) {
+    expect(headingText).toBe('Packaging Waste Recycling Note')
+  } else {
+    expect(headingText).toBe('Packaging Waste Export Recycling Note')
+  }
   const prnViewDetails = await PrnViewPage.prnDetails()
-  expect(prnViewDetails['PRN number']).toBe(expectedPrnDetails.prnNumber)
+  expect(prnViewDetails[`${prnWording} number`]).toBe(
+    expectedPrnDetails.prnNumber
+  )
   expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
     expectedPrnDetails.tradingName
   )
@@ -65,12 +74,15 @@ export async function checkViewPrnDetails(expectedPrnDetails) {
   expect(accreditationViewDetails['Accreditation number']).toBe(
     expectedPrnDetails.accNumber
   )
-  expect(
-    accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+  if (!isPern) {
+    expect(
+      accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
+    ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+  }
 }
 
-export async function createAndCheckPrnDetails(prnDetails) {
+export async function createAndCheckPrnDetails(prnDetails, isPern = false) {
+  const prnWording = isPern ? 'PERN' : 'PRN'
   await CreatePRNPage.createPrn(
     prnDetails.tonnageWordings.integer,
     prnDetails.tradingName,
@@ -78,11 +90,11 @@ export async function createAndCheckPrnDetails(prnDetails) {
   )
 
   const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PRN')
-  await checkPrnDetails(prnDetails)
+  expect(headingText).toBe(`Check before creating ${prnWording}`)
+  await checkPrnDetails(prnDetails, isPern)
   await CheckBeforeCreatingPrnPage.createPRN()
   const message = await PrnCreatedPage.messageText()
-  expect(message).toContain('PRN created')
+  expect(message).toContain(`${prnWording} created`)
   expect(message).toContain('Awaiting authorisation')
   prnDetails.status = 'Awaiting authorisation'
   prnDetails.createdDate = todayddMMMMyyyy
@@ -103,10 +115,11 @@ export async function checkAwaitingRows(prnDetails, rowIndex, tableIndex = 1) {
   expect(awaitingRow.get('Status')).toEqual(prnDetails.status)
 }
 
-export async function checkIssuedRows(prnDetails, rowIndex) {
+export async function checkIssuedRows(prnDetails, rowIndex, isPern = false) {
+  const prnWording = isPern ? 'PERN' : 'PRN'
   const issuedRow = await PrnDashboardPage.getIssuedRow(rowIndex)
 
-  expect(issuedRow.get('PRN number')).toEqual(prnDetails.prnNumber)
+  expect(issuedRow.get(`${prnWording} number`)).toEqual(prnDetails.prnNumber)
   expect(issuedRow.get('Producer or compliance scheme')).toEqual(
     prnDetails.tradingName
   )
@@ -114,17 +127,23 @@ export async function checkIssuedRows(prnDetails, rowIndex) {
   expect(issuedRow.get('Status')).toEqual(prnDetails.status)
 }
 
-export async function issuePrnAndUpdateDetails(prnDetails) {
+export async function issuePrnAndUpdateDetails(
+  prnDetails,
+  prnPrefix = 'SR',
+  isPern = false
+) {
+  const prnWording = isPern ? 'PERN' : 'PRN'
   await PrnViewPage.issuePRNButton()
 
   const awaitingAcceptanceStatus = 'Awaiting acceptance'
   const prnIssuedText = await PrnIssuedPage.messageText()
 
-  expect(prnIssuedText).toContain('PRN issued to ' + prnDetails.tradingName)
-  expect(prnIssuedText).toContain('PRN number:')
-
+  expect(prnIssuedText).toContain(
+    `${prnWording} issued to ` + prnDetails.tradingName
+  )
+  expect(prnIssuedText).toContain(`${prnWording} number:`)
   const prnNumber = await PrnIssuedPage.prnNumberText()
-  const prnNoPattern = /SR\d{5,9}/
+  const prnNoPattern = new RegExp(`${prnPrefix}\\d{5,9}`)
   expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
   prnDetails.status = awaitingAcceptanceStatus
@@ -140,16 +159,23 @@ export async function checkIssuedPageLinks() {
   )
 }
 
-export async function cancelPRNAndReturnToPRNsDashboard() {
+export async function cancelPRNAndReturnToPRNsDashboard(isPern = false) {
+  const prnWording = isPern ? 'PERN' : 'PRN'
   await PrnViewPage.cancelPRNButton()
   const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
-  expect(confirmCancelHeading).toBe('Confirm cancellation of this PRN')
+  expect(confirmCancelHeading).toBe(
+    `Confirm cancellation of this ${prnWording}`
+  )
 
   await ConfirmCancelPrnPage.confirmCancelPrn()
   const cancelledMessageText = await PrnCancelledPage.messageText()
-  expect(cancelledMessageText).toContain('PRN cancelled')
+  expect(cancelledMessageText).toContain(`${prnWording} cancelled`)
 
   const prnStatus = await PrnCancelledPage.statusText()
   expect(prnStatus).toContain('Cancelled')
-  await PrnCancelledPage.prnsPage()
+  if (!isPern) {
+    await PrnCancelledPage.prnsPage()
+  } else {
+    await PrnCancelledPage.pernsPage()
+  }
 }

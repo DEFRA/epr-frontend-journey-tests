@@ -134,9 +134,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     // End of PRN Dashboard checks
     await PrnDashboardPage.selectAwaitingLink(1)
-
     await checkViewPrnDetails(prnDetails)
-
     await PrnViewPage.returnToPRNList()
 
     // Issue the created PRN
