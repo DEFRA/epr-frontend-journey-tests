@@ -8,15 +8,14 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import CreatePRNPage from 'page-objects/create.prn.page.js'
-import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import { thirdTradingName as tradingName } from '~/test/support/fixtures.js'
+import { PrnHelper } from '~/test/support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheckout', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -72,44 +71,21 @@ describe('Packing Recycling Notes (Sanity)', () => {
       )
 
       await DashboardPage.selectTableLink(2, i + 1)
-
       await WasteRecordsPage.createNewPRNLink()
-      const issuerNotes = 'Testing'
 
-      await CreatePRNPage.enterTonnage(tonnageWordingsOutput[i].integer)
-      await CreatePRNPage.enterValue(tradingName)
-      await CreatePRNPage.addIssuerNotes(issuerNotes)
-      await CreatePRNPage.continue()
+      const prnHelper = new PrnHelper()
+      const prnDetails = {
+        tonnageWordings: tonnageWordingsOutput[i],
+        tradingName,
+        issuerNotes: 'Testing',
+        organisationDetails,
+        regAddress: organisationDetails.regAddresses[orgAddressIndex],
+        materialDesc: MATERIALS[i].prnName,
+        accNumber,
+        process: MATERIALS[i].process
+      }
 
-      const headingText = await CheckBeforeCreatingPrnPage.headingText()
-      expect(headingText).toBe('Check before creating PRN')
-
-      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issuer']).toBe(
-        organisationDetails.organisation.companyName
-      )
-      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        tradingName
-      )
-      expect(prnDetails['Tonnage']).toBe(`${tonnageWordingsOutput[i].integer}`)
-      expect(prnDetails['Tonnage in words']).toBe(tonnageWordingsOutput[i].word)
-      expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-      const accreditationDetails =
-        await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
-      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-      expect(
-        accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-      ).toBe(organisationDetails.regAddresses[orgAddressIndex])
-
-      await CheckBeforeCreatingPrnPage.createPRN()
-
-      const message = await PrnCreatedPage.messageText()
-
-      expect(message).toContain('PRN created')
-      expect(message).toContain('Awaiting authorisation')
+      await prnHelper.createAndCheckPrnDetails(prnDetails)
 
       await PrnCreatedPage.returnToRegistrationPage()
 
