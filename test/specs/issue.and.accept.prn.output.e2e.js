@@ -90,6 +90,7 @@ describe('Issuing Packing Recycling Notes', () => {
       accNumber,
       prnNumber: '',
       issuedDate: '',
+      process: 'R3',
       createdDate: todayddMMMMyyyy
     }
 

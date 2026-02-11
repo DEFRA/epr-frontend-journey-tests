@@ -29,8 +29,10 @@ export class PrnHelper {
     expect(prnDetails['Tonnage in words']).toBe(
       expectedPrnDetails.tonnageWordings.word
     )
-    expect(prnDetails['Process to be used']).toBe('R3')
-    expect(prnDetails['Issuer notes']).toBe(expectedPrnDetails.issuerNotes)
+    expect(prnDetails['Process to be used']).toBe(expectedPrnDetails.process)
+    expect(prnDetails['Issuer notes']).toBe(
+      expectedPrnDetails.issuerNotesToCheck
+    )
 
     const accreditationDetails =
       await CheckBeforeCreatingPrnPage.accreditationDetails()
@@ -89,21 +91,30 @@ export class PrnHelper {
   }
 
   async createAndCheckPrnDetails(prnDetails) {
-    await CreatePRNPage.createPrn(
-      prnDetails.tonnageWordings.integer,
-      prnDetails.tradingName,
-      prnDetails.issuerNotes
-    )
-
-    const headingText = await CheckBeforeCreatingPrnPage.headingText()
-    expect(headingText).toBe(`Check before creating ${this.prnWording}`)
-    await this.checkPrnDetails(prnDetails)
+    await this.createAndCheckDraftPrn(prnDetails)
     await CheckBeforeCreatingPrnPage.createPRN()
     const message = await PrnCreatedPage.messageText()
     expect(message).toContain(`${this.prnWording} created`)
     expect(message).toContain('Awaiting authorisation')
     prnDetails.status = 'Awaiting authorisation'
     prnDetails.createdDate = todayddMMMMyyyy
+  }
+
+  async createAndCheckDraftPrn(prnDetails) {
+    await CreatePRNPage.createPrn(
+      prnDetails.tonnageWordings.integer,
+      prnDetails.tradingName,
+      prnDetails.issuerNotes
+    )
+
+    if (prnDetails.issuerNotes === '') {
+      prnDetails.issuerNotesToCheck = 'Not provided'
+    } else {
+      prnDetails.issuerNotesToCheck = prnDetails.issuerNotes
+    }
+    const headingText = await CheckBeforeCreatingPrnPage.headingText()
+    expect(headingText).toBe(`Check before creating ${this.prnWording}`)
+    await this.checkPrnDetails(prnDetails)
   }
 
   async checkAwaitingRows(prnDetails, rowIndex, tableIndex = 1) {

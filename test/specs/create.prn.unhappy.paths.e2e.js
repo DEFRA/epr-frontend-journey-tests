@@ -14,66 +14,10 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { thirdTradingName as tradingName } from '../support/fixtures.js'
-
-async function checkPrnDetails(
-  organisationDetails,
-  materialDesc,
-  producer,
-  tonnageWordings,
-  issuerNotes,
-  accNumber
-) {
-  const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-  expect(prnDetails['Issuer']).toBe(
-    organisationDetails.organisation.companyName
-  )
-  expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    producer
-  )
-  expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnDetails['Process to be used']).toBe('R3')
-  expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-  const accreditationDetails =
-    await CheckBeforeCreatingPrnPage.accreditationDetails()
-
-  expect(accreditationDetails['Material']).toBe(materialDesc)
-  expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-  expect(
-    accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(organisationDetails.regAddresses[0])
-  return { prnDetails }
-}
-
-async function createAndCheckPrnDetails(
-  tonnageWordings,
-  tradingName,
-  issuerNotes,
-  issuerNotesToCheck,
-  organisationDetails,
-  materialDesc,
-  accNumber
-) {
-  await CreatePRNPage.enterTonnage(tonnageWordings.integer)
-  await CreatePRNPage.enterValue(tradingName)
-  await CreatePRNPage.addIssuerNotes(issuerNotes)
-  await CreatePRNPage.continue()
-
-  const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PRN')
-  await checkPrnDetails(
-    organisationDetails,
-    materialDesc,
-    tradingName,
-    tonnageWordings,
-    issuerNotesToCheck,
-    accNumber
-  )
-}
+import { PrnHelper } from '~/test/support/prn.helper.js'
 
 describe('Creating Packing Recycling Notes', () => {
-  it('Should test various (Unhappy) paths for Create PRN @createprn', async () => {
+  it('Should test various (Unhappy) paths for Create PRN Reprocessor @createprn', async () => {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -112,34 +56,29 @@ describe('Creating Packing Recycling Notes', () => {
 
     await WasteRecordsPage.createNewPRNLink()
 
-    let issuerNotes = ''
+    const prnHelper = new PrnHelper()
 
-    // Empty issuer notes, PRN created should say "Not provided"
-    await createAndCheckPrnDetails(
+    const prnDetails = {
       tonnageWordings,
       tradingName,
-      issuerNotes,
-      'Not provided',
+      issuerNotes: '',
       organisationDetails,
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      process: 'R3'
+    }
+
+    // Empty issuer notes, PRN created should say "Not provided"
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
+
     // Discard the first attempt
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
     const discardHeading = await ConfirmDiscardPRNPage.headingText()
     expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
     await ConfirmDiscardPRNPage.discardAndStartAgain()
 
-    issuerNotes = 'Testing'
-    await createAndCheckPrnDetails(
-      tonnageWordings,
-      tradingName,
-      issuerNotes,
-      issuerNotes,
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
+    prnDetails.issuerNotes = 'Testing'
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
 
     // This time we go to the discard page, and check the back link works
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
@@ -161,15 +100,8 @@ describe('Creating Packing Recycling Notes', () => {
       'Enter a packaging waste producer or compliance scheme'
     ])
 
-    await createAndCheckPrnDetails(
-      tonnageWordings,
-      tradingName,
-      issuerNotes,
-      issuerNotes,
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
+
     await CheckBeforeCreatingPrnPage.createPRN()
 
     // Now we see an error message related to tonnage exceeding waste balance

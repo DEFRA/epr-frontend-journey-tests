@@ -94,6 +94,7 @@ describe('Issuing Packing Recycling Notes', () => {
       organisationDetails,
       status: '',
       materialDesc,
+      process: 'R3',
       accNumber,
       prnNumber: '',
       issuedDate: '',
@@ -164,6 +165,7 @@ describe('Issuing Packing Recycling Notes', () => {
       organisationDetails,
       status: '',
       materialDesc,
+      process: 'R3',
       accNumber,
       prnNumber: '',
       issuedDate: ''
@@ -229,6 +231,7 @@ describe('Issuing Packing Recycling Notes', () => {
       status: '',
       organisationDetails,
       materialDesc,
+      process: 'R3',
       accNumber,
       prnNumber: '',
       issuedDate: ''

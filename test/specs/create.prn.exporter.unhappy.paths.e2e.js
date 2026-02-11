@@ -14,60 +14,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { secondTradingName as tradingName } from '../support/fixtures.js'
-
-async function checkPernDetails(
-  organisationDetails,
-  materialDesc,
-  producer,
-  tonnageWordings,
-  issuerNotes,
-  accNumber
-) {
-  const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-  expect(prnDetails['Issuer']).toBe(
-    organisationDetails.organisation.companyName
-  )
-  expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    producer
-  )
-  expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnDetails['Process to be used']).toBe('R4')
-  expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-  const accreditationDetails =
-    await CheckBeforeCreatingPrnPage.accreditationDetails()
-
-  expect(accreditationDetails['Material']).toBe(materialDesc)
-  expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-  return { prnDetails }
-}
-
-async function createAndCheckPrnDetails(
-  tonnageWordings,
-  tradingName,
-  issuerNotes,
-  issuerNotesToCheck,
-  organisationDetails,
-  materialDesc,
-  accNumber
-) {
-  await CreatePRNPage.enterTonnage(tonnageWordings.integer)
-  await CreatePRNPage.enterValue(tradingName)
-  await CreatePRNPage.addIssuerNotes(issuerNotes)
-  await CreatePRNPage.continue()
-
-  const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PERN')
-  await checkPernDetails(
-    organisationDetails,
-    materialDesc,
-    tradingName,
-    tonnageWordings,
-    issuerNotesToCheck,
-    accNumber
-  )
-}
+import { PrnHelper } from '~/test/support/prn.helper.js'
 
 describe('Create Packing Recycling Notes (Exporter)', () => {
   it('Should test various (Unhappy) paths for Create PRN Exporter @prnexporter', async () => {
@@ -108,34 +55,29 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.createNewPERNLink()
 
-    let issuerNotes = ''
+    const prnHelper = new PrnHelper(true)
 
-    // Empty issuer notes, PERN created should say "Not provided"
-    await createAndCheckPrnDetails(
+    const prnDetails = {
       tonnageWordings,
       tradingName,
-      issuerNotes,
-      'Not provided',
+      issuerNotes: '',
       organisationDetails,
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      process: 'R4'
+    }
+
+    // Empty issuer notes, PERN created should say "Not provided"
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
+
     // Discard the first attempt
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
     const discardHeading = await ConfirmDiscardPRNPage.headingText()
     expect(discardHeading).toBe('Are you sure you want to discard this PERN?')
     await ConfirmDiscardPRNPage.discardAndStartAgain()
 
-    issuerNotes = 'Testing'
-    await createAndCheckPrnDetails(
-      tonnageWordings,
-      tradingName,
-      issuerNotes,
-      issuerNotes,
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
+    prnDetails.issuerNotes = 'Testing'
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
 
     // This time we go to the discard page, and check the back link works
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
@@ -157,15 +99,8 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       'Enter a packaging waste producer or compliance scheme'
     ])
 
-    await createAndCheckPrnDetails(
-      tonnageWordings,
-      tradingName,
-      issuerNotes,
-      issuerNotes,
-      organisationDetails,
-      materialDesc,
-      accNumber
-    )
+    await prnHelper.createAndCheckDraftPrn(prnDetails)
+
     await CheckBeforeCreatingPrnPage.createPRN()
 
     // Now we see an error message related to tonnage exceeding waste balance
