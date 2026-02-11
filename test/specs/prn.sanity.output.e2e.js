@@ -86,7 +86,6 @@ describe('Packing Recycling Notes (Sanity)', () => {
       }
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
-
       await PrnCreatedPage.returnToRegistrationPage()
 
       orgAddressIndex++
