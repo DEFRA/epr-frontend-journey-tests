@@ -129,7 +129,6 @@ services:
       MONGO_URI: mongodb://mongodb:27017/
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       AUDIT_ENABLED: false
-      FEATURE_FLAG_SUMMARY_LOGS: true
       FEATURE_FLAG_DEV_ENDPOINTS: true
       FEATURE_FLAG_SQS_COMMANDS: true
       COMMAND_QUEUE_SQS_ENDPOINT: http://localstack:4566
