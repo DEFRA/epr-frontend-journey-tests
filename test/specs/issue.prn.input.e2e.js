@@ -24,15 +24,7 @@ import {
 import { checkBodyText } from '../support/checks.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
-import {
-  cancelPRNAndReturnToPRNsDashboard,
-  checkAwaitingRows,
-  checkIssuedPageLinks,
-  checkIssuedRows,
-  checkViewPrnDetails,
-  createAndCheckPrnDetails,
-  issuePrnAndUpdateDetails
-} from '../support/prnchecks.js'
+import { PrnHelper } from '../support/prn.helper.js'
 import { todayddMMMMyyyy } from '../support/date.js'
 
 describe('Issuing Packing Recycling Notes', () => {
@@ -93,6 +85,8 @@ describe('Issuing Packing Recycling Notes', () => {
       `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
     )
 
+    const prnHelper = new PrnHelper()
+
     const prnDetails = {
       tonnageWordings,
       tradingName,
@@ -106,7 +100,7 @@ describe('Issuing Packing Recycling Notes', () => {
       createdDate: todayddMMMMyyyy
     }
 
-    await createAndCheckPrnDetails(prnDetails)
+    await prnHelper.createAndCheckPrnDetails(prnDetails)
 
     await checkBodyText('Your available waste balance has been updated.', 10)
     await checkBodyText(
@@ -130,20 +124,20 @@ describe('Issuing Packing Recycling Notes', () => {
     const selectPRNHeadingText = await PrnDashboardPage.selectPrnHeadingText()
     expect(selectPRNHeadingText).toBe('Select a PRN')
 
-    await checkAwaitingRows(prnDetails, 1)
+    await prnHelper.checkAwaitingRows(prnDetails, 1)
 
     // End of PRN Dashboard checks
     await PrnDashboardPage.selectAwaitingLink(1)
-    await checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
     await PrnViewPage.returnToPRNList()
 
     // Issue the created PRN
     await PrnDashboardPage.selectAwaitingLink(1)
-    await issuePrnAndUpdateDetails(prnDetails)
+    await prnHelper.issuePrnAndUpdateDetails(prnDetails)
 
     await PrnIssuedPage.viewPdfButton()
     await switchToNewTabAndClosePreviousTab()
-    await checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
     await PrnViewPage.returnToPRNList()
 
     const noPrnMessage = await PrnDashboardPage.getNoPrnMessage()
@@ -175,7 +169,7 @@ describe('Issuing Packing Recycling Notes', () => {
       issuedDate: ''
     }
 
-    await createAndCheckPrnDetails(newPrnDetails)
+    await prnHelper.createAndCheckPrnDetails(newPrnDetails)
     // End of new PRN creation
 
     await PrnCreatedPage.returnToRegistrationPage()
@@ -183,30 +177,30 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await WasteRecordsPage.managePRNsLink()
 
-    await checkAwaitingRows(newPrnDetails, 1)
+    await prnHelper.checkAwaitingRows(newPrnDetails, 1)
 
     await PrnDashboardPage.selectAwaitingLink(1)
 
-    await checkViewPrnDetails(newPrnDetails)
-    await issuePrnAndUpdateDetails(newPrnDetails)
+    await prnHelper.checkViewPrnDetails(newPrnDetails)
+    await prnHelper.issuePrnAndUpdateDetails(newPrnDetails)
 
     // Both Manage PRNs and Issue another PRN links should point to the same page
-    await checkIssuedPageLinks()
+    await prnHelper.checkIssuedPageLinks()
 
     await PrnIssuedPage.returnToHomePage()
     await WasteRecordsPage.managePRNsLink()
 
     // Check issued PRNs
     await PrnDashboardPage.selectIssuedTab()
-    await checkIssuedRows(prnDetails, 1)
-    await checkIssuedRows(newPrnDetails, 2)
+    await prnHelper.checkIssuedRows(prnDetails, 1)
+    await prnHelper.checkIssuedRows(newPrnDetails, 2)
 
     // Check first Issued PRN details
     await PrnDashboardPage.selectIssuedLink(1)
     await switchToNewTabAndClosePreviousTab()
 
     // Check Issued PRN details
-    await checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
 
     // Now RPD cancels the PRN
     await externalAPIcancelPrn(prnDetails)
@@ -216,7 +210,7 @@ describe('Issuing Packing Recycling Notes', () => {
     // See that on the PRN Dashboard page, only PRNs awaiting cancellation are shown
     const tableHeading = await PrnDashboardPage.getTableHeading()
     expect(tableHeading).toBe('PRNs awaiting cancellation')
-    await checkAwaitingRows(prnDetails, 1)
+    await prnHelper.checkAwaitingRows(prnDetails, 1)
 
     await PrnDashboardPage.selectBackLink()
 
@@ -240,7 +234,7 @@ describe('Issuing Packing Recycling Notes', () => {
       issuedDate: ''
     }
 
-    await createAndCheckPrnDetails(updatedPrnDetails)
+    await prnHelper.createAndCheckPrnDetails(updatedPrnDetails)
 
     // End of new PRN creation
     await PrnCreatedPage.prnsPageLink()
@@ -249,17 +243,17 @@ describe('Issuing Packing Recycling Notes', () => {
     const awaitingAuthHeading = await PrnDashboardPage.getTableHeading()
     expect(awaitingAuthHeading).toBe('PRNs awaiting authorisation')
 
-    await checkAwaitingRows(updatedPrnDetails, 1)
+    await prnHelper.checkAwaitingRows(updatedPrnDetails, 1)
 
     const awaitingCancellationHeading =
       await PrnDashboardPage.getTableHeading(2)
     expect(awaitingCancellationHeading).toBe('PRNs awaiting cancellation')
-    await checkAwaitingRows(prnDetails, 1, 2)
+    await prnHelper.checkAwaitingRows(prnDetails, 1, 2)
 
     // Select awaiting cancellation PRN
     await PrnDashboardPage.selectAwaitingLink(1, 2)
 
-    await checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
 
     // Test back link of cancellation page
     await PrnViewPage.cancelPRNButton()
@@ -269,7 +263,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await cancelPRNAndReturnToPRNsDashboard()
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
 
     await PrnDashboardPage.selectBackLink()
     await WasteRecordsPage.selectBackLink()
