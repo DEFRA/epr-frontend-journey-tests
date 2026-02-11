@@ -218,7 +218,7 @@ export async function updateMigratedOrganisation(
   for (let i = 0; i < updateDataRows.length; i++) {
     const orgUpdateData = updateDataRows[i]
     data.registrations[i].status = orgUpdateData.status
-    data.registrations[i].validFrom = '2025-01-01'
+    data.registrations[i].validFrom = '2026-01-01'
     data.registrations[i].validTo = `${currentYear + 1}-01-01`
     data.registrations[i].registrationNumber = orgUpdateData.regNumber
     if (orgUpdateData.validFrom?.trim()) {
@@ -240,7 +240,7 @@ export async function updateMigratedOrganisation(
       const j = accreditationIndex
       data.registrations[i].accreditationId = data.accreditations[j].id
       data.accreditations[j].status = orgUpdateData.status
-      data.accreditations[j].validFrom = '2025-01-01'
+      data.accreditations[j].validFrom = '2026-01-01'
       data.accreditations[j].validTo = `${currentYear + 1}-01-01`
       if (orgUpdateData.validFrom?.trim()) {
         data.accreditations[j].validFrom = orgUpdateData.validFrom
@@ -344,4 +344,18 @@ export async function externalAPIcancelPrn(prnDetails) {
     `POST /v1/packaging-recycling-notes/${prnDetails.prnNumber}/reject`
   )
   prnDetails.status = 'Awaiting cancellation'
+}
+
+export async function externalAPIacceptPrn(prnDetails) {
+  const eprBackend = new EprBackend()
+  const response = await eprBackend.post(
+    `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/accept`,
+    JSON.stringify({ acceptedAt: new Date().toISOString() })
+  )
+
+  await assertSuccessResponseWithoutBody(
+    response,
+    `POST /v1/packaging-recycling-notes/${prnDetails.prnNumber}/accept`
+  )
+  prnDetails.status = 'Accepted'
 }
