@@ -8,6 +8,14 @@ class PRNCreatedPage {
     return await bodyElement.getText()
   }
 
+  async pernsPageLink() {
+    await $('a*=PERNs page').click()
+  }
+
+  async prnsPageLink() {
+    await $('a*=PRNs page').click()
+  }
+
   async returnToRegistrationPage() {
     await $('a*=Return to home').click()
   }
