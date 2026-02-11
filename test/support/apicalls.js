@@ -188,10 +188,23 @@ export async function updateMigratedOrganisation(
   }
   await authClient.generateToken(payload, urlSuffix)
 
-  let response = await eprBackend.get(
-    `/v1/organisations/${orgId}`,
-    authClient.authHeader()
-  )
+  const timeout = 5000
+  const startTime = Date.now()
+
+  let response
+  // Poll for 5 seconds until organisation is available
+  while (Date.now() - startTime < timeout) {
+    response = await eprBackend.get(
+      `/v1/organisations/${orgId}`,
+      authClient.authHeader()
+    )
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    } else {
+      break
+    }
+  }
+
   const responseData = await assertSuccessResponse(
     response,
     `GET /v1/organisations/${orgId}`

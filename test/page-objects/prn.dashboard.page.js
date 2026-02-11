@@ -69,14 +69,6 @@ class PRNDashboardPage {
       return element.getText()
     })
 
-    // #awaiting-action > table > tbody > tr:nth-child(1) > td:nth-child(5) > a
-
-    // console.log(
-    //   `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) > tbody > tr:nth-child(` +
-    //     rowIndex +
-    //     ') td'
-    // )
-
     const tableData = await $$(
       `#awaiting-action table.govuk-table:nth-of-type(${tableIndex}) > tbody > tr:nth-child(` +
         rowIndex +
