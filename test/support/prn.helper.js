@@ -87,7 +87,10 @@ export class PrnHelper {
     )
     if (!this.isPern) {
       expect(
-        accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
+        accreditationViewDetails['Reprocessing site address'].replaceAll(
+          ', ',
+          ','
+        )
       ).toBe(expectedPrnDetails.regAddress)
     }
   }
