@@ -332,15 +332,16 @@ export async function linkDefraIdUser(organisationId, userId, email) {
 }
 
 //TODO: Add auth, and also factor in TEST environment
-export async function externalAPIcancelPrn(prnNumber) {
+export async function externalAPIcancelPrn(prnDetails) {
   const eprBackend = new EprBackend()
   const response = await eprBackend.post(
-    `/v1/packaging-recycling-notes/${prnNumber}/reject`,
+    `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/reject`,
     JSON.stringify({ rejectedAt: new Date().toISOString() })
   )
 
   await assertSuccessResponseWithoutBody(
     response,
-    `POST /v1/packaging-recycling-notes/${prnNumber}/reject`
+    `POST /v1/packaging-recycling-notes/${prnDetails.prnNumber}/reject`
   )
+  prnDetails.status = 'Awaiting cancellation'
 }
