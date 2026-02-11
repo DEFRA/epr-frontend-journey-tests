@@ -85,6 +85,7 @@ describe('Issuing Packing Recycling Notes', () => {
       tradingName,
       issuerNotes: 'Testing',
       organisationDetails,
+      regAddress: organisationDetails.regAddresses[0],
       status: '',
       materialDesc,
       accNumber,

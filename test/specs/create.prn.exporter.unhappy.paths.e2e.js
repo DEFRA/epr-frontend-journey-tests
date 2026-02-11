@@ -62,6 +62,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       tradingName,
       issuerNotes: '',
       organisationDetails,
+      regAddress: organisationDetails.regAddresses[0],
       materialDesc,
       accNumber,
       process: 'R4'

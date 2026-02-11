@@ -46,7 +46,7 @@ export class PrnHelper {
     if (!this.isPern) {
       expect(
         accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-      ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+      ).toBe(expectedPrnDetails.regAddress)
     }
   }
 
@@ -74,7 +74,9 @@ export class PrnHelper {
     expect(prnViewDetails['Tonnage in words']).toBe(
       expectedPrnDetails.tonnageWordings.word
     )
-    expect(prnViewDetails['Process to be used']).toBe('R3')
+    expect(prnViewDetails['Process to be used']).toBe(
+      expectedPrnDetails.process
+    )
 
     const accreditationViewDetails = await PrnViewPage.accreditationDetails()
     expect(accreditationViewDetails['Material']).toBe(
@@ -86,7 +88,7 @@ export class PrnHelper {
     if (!this.isPern) {
       expect(
         accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
-      ).toBe(expectedPrnDetails.organisationDetails.regAddresses[0])
+      ).toBe(expectedPrnDetails.regAddress)
     }
   }
 

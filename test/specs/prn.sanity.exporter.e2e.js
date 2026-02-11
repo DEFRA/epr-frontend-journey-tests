@@ -8,12 +8,11 @@ import {
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
 } from '../support/apicalls.js'
-import PRNPage from 'page-objects/create.prn.page.js'
-import CheckBeforeCreatingPrnPage from 'page-objects/check.before.creating.prn.page.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import { tradingName } from '../support/fixtures.js'
+import { PrnHelper } from '~/test/support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
@@ -70,42 +69,19 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       await WasteRecordsPage.createNewPERNLink()
 
-      const issuerNotes = 'Testing'
+      const prnHelper = new PrnHelper(true)
 
-      await PRNPage.enterTonnage(tonnageWordingsExporter[i].integer)
-      await PRNPage.enterValue(tradingName)
-      await PRNPage.addIssuerNotes(issuerNotes)
-      await PRNPage.continue()
+      const prnDetails = {
+        tonnageWordings: tonnageWordingsExporter[i],
+        tradingName,
+        issuerNotes: 'Testing',
+        organisationDetails,
+        materialDesc: MATERIALS[i].prnName,
+        accNumber,
+        process: MATERIALS[i].process
+      }
 
-      const headingText = await CheckBeforeCreatingPrnPage.headingText()
-      expect(headingText).toBe('Check before creating PERN')
-
-      const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-      expect(prnDetails['Issuer']).toBe(
-        organisationDetails.organisation.companyName
-      )
-      expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-        tradingName
-      )
-      expect(prnDetails['Tonnage']).toBe(
-        `${tonnageWordingsExporter[i].integer}`
-      )
-      expect(prnDetails['Tonnage in words']).toBe(
-        tonnageWordingsExporter[i].word
-      )
-      expect(prnDetails['Process to be used']).toBe(MATERIALS[i].process)
-      expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-      const accreditationDetails =
-        await CheckBeforeCreatingPrnPage.accreditationDetails()
-      expect(accreditationDetails['Material']).toBe(MATERIALS[i].prnName)
-      expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-
-      await CheckBeforeCreatingPrnPage.createPRN()
-
-      const message = await PrnCreatedPage.messageText()
-      expect(message).toContain('PERN created')
-      expect(message).toContain('Awaiting authorisation')
+      await prnHelper.createAndCheckPrnDetails(prnDetails)
 
       await PrnCreatedPage.returnToRegistrationPage()
     }
