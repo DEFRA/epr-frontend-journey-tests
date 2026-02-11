@@ -25,6 +25,7 @@ import {
 import { checkBodyText } from '../support/checks.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import PrnCancelledPage from 'page-objects/prn.cancelled.page.js'
+import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 async function checkPernDetails(
   organisationDetails,
@@ -257,25 +258,9 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     const pernNoPattern = /EX\d{5,9}/
     expect(pernNoPattern.test(prnNumber)).toEqual(true)
 
-    let originalWindow = await browser.getWindowHandle()
-
     await PrnIssuedPage.viewPdfButton()
 
-    await browser.waitUntil(
-      async () => (await browser.getWindowHandles()).length === 2,
-      { timeout: 5000, timeoutMsg: 'New tab did not open' }
-    )
-
-    let handles = await browser.getWindowHandles()
-    let newWindow = handles.find((handle) => handle !== originalWindow)
-    await browser.switchToWindow(newWindow)
-
-    // Now switch back to original tab to close it
-    await browser.switchToWindow(originalWindow)
-    await browser.closeWindow()
-
-    // Switch back to the new tab (now the only one)
-    await browser.switchToWindow(newWindow)
+    await switchToNewTabAndClosePreviousTab()
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     await checkViewPernDetails(
@@ -398,26 +383,10 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
 
-    originalWindow = await browser.getWindowHandle()
-
     // Check first Issued PRN details
     await PrnDashboardPage.selectIssuedLink(1)
 
-    await browser.waitUntil(
-      async () => (await browser.getWindowHandles()).length === 2,
-      { timeout: 5000, timeoutMsg: 'New tab did not open' }
-    )
-
-    handles = await browser.getWindowHandles()
-    newWindow = handles.find((handle) => handle !== originalWindow)
-    await browser.switchToWindow(newWindow)
-
-    // Now switch back to original tab to close it
-    await browser.switchToWindow(originalWindow)
-    await browser.closeWindow()
-
-    // Switch back to the new tab (now the only one)
-    await browser.switchToWindow(newWindow)
+    await switchToNewTabAndClosePreviousTab()
 
     // Check Issued PERN details
     await checkViewPernDetails(

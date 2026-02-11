@@ -25,97 +25,11 @@ import {
 import { checkBodyText } from '../support/checks.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import PrnCancelledPage from 'page-objects/prn.cancelled.page.js'
-
-async function checkPrnDetails(
-  organisationDetails,
-  materialDesc,
-  tradingName,
-  tonnageWordings,
-  issuerNotes,
-  accNumber
-) {
-  const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-  expect(prnDetails['Issuer']).toBe(
-    organisationDetails.organisation.companyName
-  )
-  expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
-    tradingName
-  )
-  expect(prnDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnDetails['Process to be used']).toBe('R3')
-  expect(prnDetails['Issuer notes']).toBe(issuerNotes)
-
-  const accreditationDetails =
-    await CheckBeforeCreatingPrnPage.accreditationDetails()
-
-  expect(accreditationDetails['Material']).toBe(materialDesc)
-  expect(accreditationDetails['Accreditation number']).toBe(accNumber)
-  expect(
-    accreditationDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(organisationDetails.regAddresses[0])
-  return { prnDetails }
-}
-
-async function checkViewPrnDetails(
-  organisationDetails,
-  issuer,
-  tonnageWordings,
-  issuerNotes,
-  status,
-  materialDesc,
-  accNumber,
-  prnNumber,
-  issuedDate = ''
-) {
-  const headingText = await PrnViewPage.headingText()
-  expect(headingText).toBe('Packaging Waste Recycling Note')
-  const prnViewDetails = await PrnViewPage.prnDetails()
-  expect(prnViewDetails['PRN number']).toBe(prnNumber)
-  expect(prnViewDetails['Packaging waste producer or compliance scheme']).toBe(
-    issuer
-  )
-  expect(prnViewDetails['Tonnage']).toBe(`${tonnageWordings.integer}`)
-  expect(prnViewDetails['Issuer notes']).toBe(issuerNotes)
-  expect(prnViewDetails['Issued date']).toBe(issuedDate)
-  expect(prnViewDetails['Status']).toBe(status)
-  expect(prnViewDetails['December waste']).toBe('No')
-  expect(prnViewDetails['Tonnage in words']).toBe(tonnageWordings.word)
-  expect(prnViewDetails['Process to be used']).toBe('R3')
-
-  const accreditationViewDetails = await PrnViewPage.accreditationDetails()
-  expect(accreditationViewDetails['Material']).toBe(materialDesc)
-  expect(accreditationViewDetails['Accreditation number']).toBe(accNumber)
-  expect(
-    accreditationViewDetails['Accreditation address'].replaceAll(', ', ',')
-  ).toBe(organisationDetails.regAddresses[0])
-}
-
-async function createAndCheckPrnDetails(
-  tonnageWordings,
-  tradingName,
-  issuerNotes,
-  issuerNotesToCheck,
-  organisationDetails,
-  materialDesc,
-  accNumber
-) {
-  await CreatePRNPage.createPrn(
-    tonnageWordings.integer,
-    tradingName,
-    issuerNotes
-  )
-  const headingText = await CheckBeforeCreatingPrnPage.headingText()
-  expect(headingText).toBe('Check before creating PRN')
-  await checkPrnDetails(
-    organisationDetails,
-    materialDesc,
-    tradingName,
-    tonnageWordings,
-    issuerNotesToCheck,
-    accNumber
-  )
-}
+import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
+import {
+  checkViewPrnDetails,
+  createAndCheckPrnDetails
+} from '../support/prnchecks.js'
 
 describe('Issuing Packing Recycling Notes', () => {
   it('Should be able to create and issue PRNs for Paper (Reprocessor Input) @issueprnrepro', async function () {
@@ -179,15 +93,19 @@ describe('Issuing Packing Recycling Notes', () => {
       `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
     )
 
-    await createAndCheckPrnDetails(
+    const prnDetails = {
       tonnageWordings,
       tradingName,
       issuerNotes,
-      issuerNotes,
       organisationDetails,
+      status: '',
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      prnNumber: '',
+      issuedDate: ''
+    }
+
+    await createAndCheckPrnDetails(prnDetails)
 
     await CheckBeforeCreatingPrnPage.createPRN()
 
@@ -237,16 +155,10 @@ describe('Issuing Packing Recycling Notes', () => {
     // End of PRN Dashboard checks
 
     await PrnDashboardPage.selectAwaitingLink(1)
-    await checkViewPrnDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAuthorisationStatus,
-      materialDesc,
-      accNumber,
-      ''
-    )
+
+    prnDetails.status = awaitingAuthorisationStatus
+
+    await checkViewPrnDetails(prnDetails)
 
     await PrnViewPage.returnToPRNList()
 
@@ -263,38 +175,17 @@ describe('Issuing Packing Recycling Notes', () => {
     const prnNoPattern = /SR\d{5,9}/
     expect(prnNoPattern.test(prnNumber)).toEqual(true)
 
-    let originalWindow = await browser.getWindowHandle()
-
     await PrnIssuedPage.viewPdfButton()
 
-    await browser.waitUntil(
-      async () => (await browser.getWindowHandles()).length === 2,
-      { timeout: 5000, timeoutMsg: 'New tab did not open' }
-    )
-
-    let handles = await browser.getWindowHandles()
-    let newWindow = handles.find((handle) => handle !== originalWindow)
-    await browser.switchToWindow(newWindow)
-
-    // Now switch back to original tab to close it
-    await browser.switchToWindow(originalWindow)
-    await browser.closeWindow()
-
-    // Switch back to the new tab (now the only one)
-    await browser.switchToWindow(newWindow)
+    await switchToNewTabAndClosePreviousTab()
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
-    await checkViewPrnDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAcceptanceStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+
+    prnDetails.status = awaitingAcceptanceStatus
+    prnDetails.issuedDate = expectedCreateDate
+    prnDetails.prnNumber = prnNumber
+
+    await checkViewPrnDetails(prnDetails)
 
     await PrnViewPage.returnToPRNList()
 
@@ -315,15 +206,19 @@ describe('Issuing Packing Recycling Notes', () => {
     }
     const newIssuerNotes = 'Testing another PRN'
 
-    await createAndCheckPrnDetails(
-      newTonnageWordings,
-      newTradingName,
-      newIssuerNotes,
-      newIssuerNotes,
+    const newPrnDetails = {
+      tonnageWordings: newTonnageWordings,
+      tradingName: newTradingName,
+      issuerNotes: newIssuerNotes,
       organisationDetails,
+      status: '',
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      prnNumber: '',
+      issuedDate: ''
+    }
+
+    await createAndCheckPrnDetails(newPrnDetails)
 
     await CheckBeforeCreatingPrnPage.createPRN()
 
@@ -352,16 +247,9 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await PrnDashboardPage.selectAwaitingLink(1)
 
-    await checkViewPrnDetails(
-      organisationDetails,
-      newTradingName,
-      newTonnageWordings,
-      newIssuerNotes,
-      awaitingAuthorisationStatus,
-      materialDesc,
-      accNumber,
-      ''
-    )
+    newPrnDetails.status = awaitingAuthorisationStatus
+
+    await checkViewPrnDetails(newPrnDetails)
 
     await PrnViewPage.issuePRNButton()
 
@@ -404,39 +292,13 @@ describe('Issuing Packing Recycling Notes', () => {
     expect(secondIssuedRow.get('Date issued')).toEqual(expectedCreateDate)
     expect(secondIssuedRow.get('Status')).toEqual(awaitingAcceptanceStatus)
 
-    originalWindow = await browser.getWindowHandle()
-
     // Check first Issued PRN details
     await PrnDashboardPage.selectIssuedLink(1)
 
-    await browser.waitUntil(
-      async () => (await browser.getWindowHandles()).length === 2,
-      { timeout: 5000, timeoutMsg: 'New tab did not open' }
-    )
-
-    handles = await browser.getWindowHandles()
-    newWindow = handles.find((handle) => handle !== originalWindow)
-    await browser.switchToWindow(newWindow)
-
-    // Now switch back to original tab to close it
-    await browser.switchToWindow(originalWindow)
-    await browser.closeWindow()
-
-    // Switch back to the new tab (now the only one)
-    await browser.switchToWindow(newWindow)
+    await switchToNewTabAndClosePreviousTab()
 
     // Check Issued PRN details
-    await checkViewPrnDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingAcceptanceStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+    await checkViewPrnDetails(prnDetails)
 
     // Now RPD cancels the PRN
     await externalAPIcancelPrn(prnNumber)
@@ -472,15 +334,19 @@ describe('Issuing Packing Recycling Notes', () => {
       word: 'Fifteen'
     }
 
-    await createAndCheckPrnDetails(
-      updatedTonnageWordings,
-      updatedTradingName,
-      newIssuerNotes,
-      newIssuerNotes,
+    const updatedPrnDetails = {
+      tonnageWordings: updatedTonnageWordings,
+      tradingName: updatedTradingName,
+      issuerNotes: newIssuerNotes,
+      status: '',
       organisationDetails,
       materialDesc,
-      accNumber
-    )
+      accNumber,
+      prnNumber: '',
+      issuedDate: ''
+    }
+
+    await createAndCheckPrnDetails(updatedPrnDetails)
 
     await CheckBeforeCreatingPrnPage.createPRN()
 
@@ -532,17 +398,9 @@ describe('Issuing Packing Recycling Notes', () => {
     // Select awaiting cancellation PRN
     await PrnDashboardPage.selectAwaitingLink(1, 2)
 
-    await checkViewPrnDetails(
-      organisationDetails,
-      tradingName,
-      tonnageWordings,
-      issuerNotes,
-      awaitingCancellationStatus,
-      materialDesc,
-      accNumber,
-      prnNumber,
-      expectedCreateDate
-    )
+    prnDetails.status = awaitingCancellationStatus
+
+    await checkViewPrnDetails(prnDetails)
 
     // Test back link of cancellation page
     await PrnViewPage.cancelPRNButton()
