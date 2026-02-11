@@ -107,7 +107,7 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     // Return to awaiting authorisation PERNs
     await PrnDashboardPage.selectAwaitingActionTab()
-    await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
+    await PrnDashboardPage.selectAwaitingLink(1)
 
     // Test the back link on Delete PERN confirmation page first
     await PrnViewPage.deletePRNButton()

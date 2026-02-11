@@ -3,7 +3,7 @@ import config from '../config/config.js'
 
 let baseUrl
 
-export class BaseAPI {
+export class EprBackend {
   constructor() {
     baseUrl = config.apiUri
     this.defaultHeaders = config.apiHeaders

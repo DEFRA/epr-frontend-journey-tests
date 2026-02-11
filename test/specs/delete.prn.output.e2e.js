@@ -108,7 +108,7 @@ describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
 
     // Return to awaiting authorisation PRNs
     await PrnDashboardPage.selectAwaitingActionTab()
-    await PrnDashboardPage.selectAwaitingAuthorisationLink(1)
+    await PrnDashboardPage.selectAwaitingLink(1)
 
     // Test the back link on Delete PRN confirmation page first
     await PrnViewPage.deletePRNButton()
