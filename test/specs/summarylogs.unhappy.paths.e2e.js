@@ -103,8 +103,6 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       expect.stringContaining('Summary log: upload')
     )
 
-    await browser.pause(1100)
-
     await UploadSummaryLogPage.uploadFile('resources/bad-marker.xlsx')
     await UploadSummaryLogPage.continue()
 

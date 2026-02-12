@@ -23,7 +23,9 @@ class UploadSummaryLogPage {
 
   async uploadFile(filePath) {
     const remoteFilePath = await browser.uploadFile(filePath)
-    await $('#summary-log-upload').setValue(remoteFilePath)
+    const summaryLogUploadElement = await $('#summary-log-upload')
+    await summaryLogUploadElement.waitForExist({ timeout: 5000 })
+    summaryLogUploadElement.setValue(remoteFilePath)
   }
 
   async continue() {
