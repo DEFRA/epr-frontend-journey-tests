@@ -41,25 +41,22 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await UploadSummaryLogPage.continue()
-    await expect(browser).toHaveTitle(
-      expect.stringContaining('Summary log: upload')
-    )
-
     await UploadSummaryLogPage.uploadFile('resources/empty.xlsx')
     await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+
     await checkUploadErrorText(
       '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
-      'The selected file is empty',
-      5
+      "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
+      30
     )
 
-    // Should not continue without uploading a file
     await UploadSummaryLogPage.continue()
     await checkUploadErrorText(
       '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
-      'The selected file is empty',
-      2
+      "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
+      30
     )
 
     await UploadSummaryLogPage.returnToSubmissionPage()
@@ -105,6 +102,8 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
+
+    await browser.pause(1100)
 
     await UploadSummaryLogPage.uploadFile('resources/bad-marker.xlsx')
     await UploadSummaryLogPage.continue()
