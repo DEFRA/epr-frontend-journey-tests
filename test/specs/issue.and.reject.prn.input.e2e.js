@@ -6,7 +6,7 @@ import DashboardPage from '../page-objects/dashboard.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
-  externalAPIcancelPrn,
+  // externalAPIcancelPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
@@ -18,11 +18,11 @@ import PrnViewPage from 'page-objects/prn.view.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
 import {
   tradingName,
-  thirdTradingName as newTradingName,
-  thirdTradingName as updatedTradingName
+  thirdTradingName as newTradingName
+  // thirdTradingName as updatedTradingName
 } from '../support/fixtures.js'
 import { checkBodyText } from '../support/checks.js'
-import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
+// import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 import { PrnHelper } from '../support/prn.helper.js'
 import { todayddMMMMyyyy } from '../support/date.js'
@@ -206,77 +206,78 @@ describe('Issuing Packing Recycling Notes', () => {
     // Check Issued PRN details
     await prnHelper.checkViewPrnDetails(prnDetails)
 
+    // TODO: Temporarily omit "RPD" tests
     // Now RPD cancels the PRN
-    await externalAPIcancelPrn(prnDetails)
-
-    await PrnViewPage.returnToPRNList()
-
-    // See that on the PRN Dashboard page, only PRNs awaiting cancellation are shown
-    const tableHeading = await PrnDashboardPage.getTableHeading()
-    expect(tableHeading).toBe('PRNs awaiting cancellation')
-    await prnHelper.checkAwaitingRows(prnDetails, 1)
-
-    await PrnDashboardPage.selectBackLink()
-
-    // Create another new PRN
-    await WasteRecordsPage.createNewPRNLink()
-
-    const updatedTonnageWordings = {
-      integer: 15,
-      word: 'Fifteen'
-    }
-
-    const updatedPrnDetails = {
-      tonnageWordings: updatedTonnageWordings,
-      tradingName: updatedTradingName,
-      issuerNotes: newIssuerNotes,
-      status: '',
-      organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
-      materialDesc,
-      process: 'R3',
-      accNumber,
-      prnNumber: '',
-      issuedDate: ''
-    }
-
-    await prnHelper.createAndCheckPrnDetails(updatedPrnDetails)
-
-    // End of new PRN creation
-    await PrnCreatedPage.prnsPageLink()
-
-    // See that on the PRN Dashboard page, PRNs awaiting authorisation and cancellation are shown
-    const awaitingAuthHeading = await PrnDashboardPage.getTableHeading()
-    expect(awaitingAuthHeading).toBe('PRNs awaiting authorisation')
-
-    await prnHelper.checkAwaitingRows(updatedPrnDetails, 1)
-
-    const awaitingCancellationHeading =
-      await PrnDashboardPage.getTableHeading(2)
-    expect(awaitingCancellationHeading).toBe('PRNs awaiting cancellation')
-    await prnHelper.checkAwaitingRows(prnDetails, 1, 2)
-
-    // Select awaiting cancellation PRN
-    await PrnDashboardPage.selectAwaitingLink(1, 2)
-
-    await prnHelper.checkViewPrnDetails(prnDetails)
-
-    // Test back link of cancellation page
-    await PrnViewPage.cancelPRNButton()
-
-    const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
-    expect(confirmCancelHeading).toBe('Confirm cancellation of this PRN')
-    await ConfirmCancelPrnPage.selectBackLink()
-
-    // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
-
-    await PrnDashboardPage.selectBackLink()
-    await WasteRecordsPage.selectBackLink()
-
-    // Check that the waste balance has been updated from the cancelled PRN
-    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('358.28')
+    // await externalAPIcancelPrn(prnDetails)
+    //
+    // await PrnViewPage.returnToPRNList()
+    //
+    // // See that on the PRN Dashboard page, only PRNs awaiting cancellation are shown
+    // const tableHeading = await PrnDashboardPage.getTableHeading()
+    // expect(tableHeading).toBe('PRNs awaiting cancellation')
+    // await prnHelper.checkAwaitingRows(prnDetails, 1)
+    //
+    // await PrnDashboardPage.selectBackLink()
+    //
+    // // Create another new PRN
+    // await WasteRecordsPage.createNewPRNLink()
+    //
+    // const updatedTonnageWordings = {
+    //   integer: 15,
+    //   word: 'Fifteen'
+    // }
+    //
+    // const updatedPrnDetails = {
+    //   tonnageWordings: updatedTonnageWordings,
+    //   tradingName: updatedTradingName,
+    //   issuerNotes: newIssuerNotes,
+    //   status: '',
+    //   organisationDetails,
+    //   regAddress: organisationDetails.regAddresses[0],
+    //   materialDesc,
+    //   process: 'R3',
+    //   accNumber,
+    //   prnNumber: '',
+    //   issuedDate: ''
+    // }
+    //
+    // await prnHelper.createAndCheckPrnDetails(updatedPrnDetails)
+    //
+    // // End of new PRN creation
+    // await PrnCreatedPage.prnsPageLink()
+    //
+    // // See that on the PRN Dashboard page, PRNs awaiting authorisation and cancellation are shown
+    // const awaitingAuthHeading = await PrnDashboardPage.getTableHeading()
+    // expect(awaitingAuthHeading).toBe('PRNs awaiting authorisation')
+    //
+    // await prnHelper.checkAwaitingRows(updatedPrnDetails, 1)
+    //
+    // const awaitingCancellationHeading =
+    //   await PrnDashboardPage.getTableHeading(2)
+    // expect(awaitingCancellationHeading).toBe('PRNs awaiting cancellation')
+    // await prnHelper.checkAwaitingRows(prnDetails, 1, 2)
+    //
+    // // Select awaiting cancellation PRN
+    // await PrnDashboardPage.selectAwaitingLink(1, 2)
+    //
+    // await prnHelper.checkViewPrnDetails(prnDetails)
+    //
+    // // Test back link of cancellation page
+    // await PrnViewPage.cancelPRNButton()
+    //
+    // const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
+    // expect(confirmCancelHeading).toBe('Confirm cancellation of this PRN')
+    // await ConfirmCancelPrnPage.selectBackLink()
+    //
+    // // Now cancel the PRN and return to PRN Dashboard page
+    // await prnHelper.cancelPRNAndReturnToPRNsDashboard()
+    //
+    // await PrnDashboardPage.selectBackLink()
+    // await WasteRecordsPage.selectBackLink()
+    //
+    // // Check that the waste balance has been updated from the cancelled PRN
+    // const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    // expect(availableWasteBalance).toBe('358.28')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

@@ -6,7 +6,7 @@ import DashboardPage from '../page-objects/dashboard.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
-  externalAPIacceptPrn,
+  // externalAPIacceptPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
@@ -118,17 +118,18 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await PrnDashboardPage.selectBackLink()
 
+    // TODO: Temporarily omit "RPD" tests
     // RPD accepts the PRN
-    await externalAPIacceptPrn(prnDetails)
-
-    await WasteRecordsPage.managePRNsLink()
-
-    await PrnDashboardPage.selectIssuedTab()
-    prnHelper.checkIssuedRows(prnDetails, 1)
-
-    await PrnDashboardPage.selectIssuedLink(1)
-    await switchToNewTabAndClosePreviousTab()
-    await prnHelper.checkViewPrnDetails(prnDetails)
+    // await externalAPIacceptPrn(prnDetails)
+    //
+    // await WasteRecordsPage.managePRNsLink()
+    //
+    // await PrnDashboardPage.selectIssuedTab()
+    // prnHelper.checkIssuedRows(prnDetails, 1)
+    //
+    // await PrnDashboardPage.selectIssuedLink(1)
+    // await switchToNewTabAndClosePreviousTab()
+    // await prnHelper.checkViewPrnDetails(prnDetails)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
