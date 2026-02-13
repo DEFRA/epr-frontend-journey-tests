@@ -153,7 +153,7 @@ describe('Registration Only', () => {
     await DefraIdStubPage.loginViaEmail(userEmail)
 
     let material = await DashboardPage.getMaterial(1, 1)
-    expect(material).toBe('Fibre')
+    expect(material).toBe('Fibre-based composite')
 
     let numberOfRows = await DashboardPage.getNumberOfRows(1)
     expect(numberOfRows).toBe(1)
