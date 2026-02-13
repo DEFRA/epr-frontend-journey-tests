@@ -47,7 +47,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       console.log('Exporter -- Creating PRN for material: ' + MATERIALS[i].name)
 
       await DashboardPage.selectExportingTab()
-      await DashboardPage.selectTableLink(i + 1, 1)
+      await DashboardPage.selectTableLink(1, i + 1)
 
       const regNumber = `E25SR500020912${MATERIALS[i].suffix}`
       const accNumber = `E-ACC12245${MATERIALS[i].suffix}`
@@ -65,7 +65,7 @@ describe('Packing Recycling Notes (Sanity)', () => {
       )
 
       await DashboardPage.selectExportingTab()
-      await DashboardPage.selectTableLink(i + 1, 1)
+      await DashboardPage.selectTableLink(1, i + 1)
 
       await WasteRecordsPage.createNewPERNLink()
 
