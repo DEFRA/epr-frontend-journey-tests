@@ -34,7 +34,7 @@ describe('All materials and all waste processing types @allMaterials', () => {
 
     // Sanity check Exporter materials
     for (let i = 0; i < MATERIALS.length; i++) {
-      const material = await DashboardPage.getMaterial(i + 1, 1)
+      const material = await DashboardPage.getMaterial(1, i + 1)
       expect(material).toBe(MATERIALS[i].name)
     }
   })
