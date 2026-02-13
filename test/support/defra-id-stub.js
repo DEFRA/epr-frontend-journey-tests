@@ -1,11 +1,12 @@
 import config from '../config/config.js'
 import { request } from 'undici'
 
-export class DefraIdStub {
+class DefraIdStub {
   constructor(baseUrl = config.defraIdUri) {
     this.baseUrl = baseUrl
     this.defaultHeaders = config.apiHeaders
     this.accessTokens = new Map()
+    this.userIds = []
   }
 
   async register(payload) {
@@ -78,4 +79,22 @@ export class DefraIdStub {
       return {}
     }
   }
+
+  async expireAllUsers() {
+    const instanceHeaders = { ...this.defaultHeaders }
+    for (const userId of this.userIds) {
+      const response = await request(
+        `${this.baseUrl}/cdp-defra-id-stub/API/register/${userId}/expire`,
+        {
+          method: 'POST',
+          headers: instanceHeaders,
+          body: ''
+        }
+      )
+
+      console.log(`Expired user ${userId}:` + response.statusCode)
+    }
+  }
 }
+
+export const defraIdStub = new DefraIdStub()
