@@ -83,7 +83,7 @@ class DefraIdStub {
   async expireAllUsers() {
     const instanceHeaders = { ...this.defaultHeaders }
     for (const userId of this.userIds) {
-      const response = await request(
+      await request(
         `${this.baseUrl}/cdp-defra-id-stub/API/register/${userId}/expire`,
         {
           method: 'POST',
@@ -91,8 +91,6 @@ class DefraIdStub {
           body: ''
         }
       )
-
-      console.log(`Expired user ${userId}:` + response.statusCode)
     }
   }
 }
