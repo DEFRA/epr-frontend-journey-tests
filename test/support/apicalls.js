@@ -9,7 +9,7 @@ import { expect } from '@wdio/globals'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
 import { fakerEN_GB } from '@faker-js/faker'
-import { DefraIdStub } from './defra-id-stub.js'
+import { defraIdStub } from './defra-id-stub.js'
 import Users from './users.js'
 import { FormData } from 'undici'
 import { MATERIALS } from './materials.js'
@@ -293,10 +293,10 @@ export async function createAndRegisterDefraIdUser(
   email,
   numberOfRelationships = 1
 ) {
-  const defraIdStub = new DefraIdStub()
   const users = new Users()
   const user = await users.userPayload(email)
   await defraIdStub.register(JSON.stringify(user))
+  defraIdStub.userIds.push(user.userId)
 
   for (let i = 0; i < numberOfRelationships; i++) {
     const params = await users.userParams(user.userId)
@@ -312,7 +312,6 @@ export async function createAndRegisterDefraIdUser(
 
 export async function linkDefraIdUser(organisationId, userId, email) {
   const eprBackend = new EprBackend()
-  const defraIdStub = new DefraIdStub()
   const users = new Users()
 
   const payload = await users.authorisationPayload(email)

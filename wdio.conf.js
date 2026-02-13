@@ -2,6 +2,8 @@ import fs from 'node:fs'
 
 const oneMinute = 60 * 1000
 
+import { defraIdStub } from './test/support/defra-id-stub.js'
+
 export const config = {
   //
   // ====================
@@ -217,7 +219,9 @@ export const config = {
    * @param {Array.<Object>} capabilities list of capabilities details
    * @param {Array.<String>} specs List of spec file paths that ran
    */
-  // after: function (result, capabilities, specs) {},
+  after: async function (result, capabilities, specs) {
+    await defraIdStub.expireAllUsers()
+  },
   /**
    * Gets executed right after terminating the webdriver session.
    * @param {object} config wdio configuration object
