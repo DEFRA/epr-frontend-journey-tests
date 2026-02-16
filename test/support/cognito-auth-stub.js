@@ -1,8 +1,9 @@
 import { request } from 'undici'
+import config from '../config/config.js'
 
-class CognitoAuthStub {
+class CognitoStub {
   constructor(config = {}) {
-    this.cognitoUrl = config.cognitoUrl
+    this.url = config.url
     this.clientId = config.clientId
     this.username = config.username
     this.password = config.password
@@ -10,7 +11,7 @@ class CognitoAuthStub {
   }
 
   async generateToken() {
-    const { statusCode, body } = await request(this.cognitoUrl, {
+    const { statusCode, body } = await request(this.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-amz-json-1.1',
@@ -28,9 +29,6 @@ class CognitoAuthStub {
 
     const data = await body.json()
 
-    // FIXME to remove
-    console.log('statusCode :>> ', statusCode)
-
     if (statusCode !== 200) {
       throw new Error(
         `Cognito InitiateAuth failed (${statusCode}): ${JSON.stringify(data)}`
@@ -41,11 +39,8 @@ class CognitoAuthStub {
   }
 
   authHeader() {
-    // FIXME to remove
-    console.log('this.accessToken :>> ', this.accessToken)
-
     return { Authorization: `Bearer ${this.accessToken}` }
   }
 }
 
-export const cognitoAuthStub = new CognitoAuthStub()
+export const cognitoStub = new CognitoStub(config.cognitoAuth)
