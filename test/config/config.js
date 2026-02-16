@@ -60,6 +60,13 @@ const defraId = {
   env: `https://cdp-defra-id-stub.${environment}.cdp-int.defra.cloud`
 }
 
+const cognitoAuth = {
+  url: withProxy ? 'http://cognito-stub:9229' : 'http://localhost:9229',
+  clientId: '5357lgchj0h0fuomqyas5r87u',
+  username: 'hello@example.com',
+  password: 'testPassword'
+}
+
 let globalUndiciAgent = agent
 if (environment) {
   globalUndiciAgent = proxy
@@ -84,10 +91,11 @@ if (!environment) {
 }
 
 export default {
+  apiHeaders: api.headers,
   apiUri,
-  authUri,
-  defraIdUri,
   auth,
-  undiciAgent: globalUndiciAgent,
-  apiHeaders: api.headers
+  authUri,
+  cognitoAuth,
+  defraIdUri,
+  undiciAgent: globalUndiciAgent
 }

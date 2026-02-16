@@ -1,0 +1,51 @@
+import { request } from 'undici'
+
+class CognitoAuthStub {
+  constructor(config = {}) {
+    this.cognitoUrl = config.cognitoUrl
+    this.clientId = config.clientId
+    this.username = config.username
+    this.password = config.password
+    this.accessToken = null
+  }
+
+  async generateToken() {
+    const { statusCode, body } = await request(this.cognitoUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-amz-json-1.1',
+        'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth'
+      },
+      body: JSON.stringify({
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: this.clientId,
+        AuthParameters: {
+          USERNAME: this.username,
+          PASSWORD: this.password
+        }
+      })
+    })
+
+    const data = await body.json()
+
+    // FIXME to remove
+    console.log('statusCode :>> ', statusCode)
+
+    if (statusCode !== 200) {
+      throw new Error(
+        `Cognito InitiateAuth failed (${statusCode}): ${JSON.stringify(data)}`
+      )
+    }
+
+    this.accessToken = data.AuthenticationResult.AccessToken
+  }
+
+  authHeader() {
+    // FIXME to remove
+    console.log('this.accessToken :>> ', this.accessToken)
+
+    return { Authorization: `Bearer ${this.accessToken}` }
+  }
+}
+
+export const cognitoAuthStub = new CognitoAuthStub()
