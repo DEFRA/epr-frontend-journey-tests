@@ -113,7 +113,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await PrnIssuedPage.viewPdfButton()
     await switchToNewTabAndClosePreviousTab()
-    // await prnHelper.checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
     await PrnViewPage.returnToPRNList()
 
     await PrnDashboardPage.selectBackLink()
@@ -124,7 +124,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await WasteRecordsPage.managePRNsLink()
 
     await PrnDashboardPage.selectIssuedTab()
-    prnHelper.checkIssuedRows(prnDetails, 1)
+    await prnHelper.checkIssuedRows(prnDetails, 1)
 
     await PrnDashboardPage.selectIssuedLink(1)
     await switchToNewTabAndClosePreviousTab()
