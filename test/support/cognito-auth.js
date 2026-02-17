@@ -1,5 +1,5 @@
 import { request } from 'undici'
-import config from '~/test/config/config.js'
+import config from '../config/config.js'
 class CognitoAuth {
   constructor(config = {}) {
     this.cognitoUrl = config.cognitoUrl
