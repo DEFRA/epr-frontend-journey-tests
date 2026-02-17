@@ -1,4 +1,15 @@
 import { Agent, ProxyAgent } from 'undici'
+import { CognitoAuth } from '../support/cognito-auth.js'
+import { CognitoStub } from '../support/cognito-stub.js'
+
+/**
+ * @typedef {{
+ *   url: string,
+ *   clientId: string,
+ *   username: string,
+ *   password: string
+ * }} CognitoAuthConfig
+ */
 
 const environment = process.env.ENVIRONMENT
 const withProxy = process.env.WITH_PROXY
@@ -60,6 +71,24 @@ const defraId = {
   env: `https://cdp-defra-id-stub.${environment}.cdp-int.defra.cloud`
 }
 
+/** @type CognitoAuthConfig */
+const cognitoAuthParams = {
+  url: 'http://localhost:9229',
+  envUrl: process.env.COGNITO_URL,
+  clientId:
+    environment === 'test'
+      ? process.env.COGNITO_CLIENT_ID
+      : '5357lgchj0h0fuomqyas5r87u',
+  username: 'hello@example.com',
+  password:
+    environment === 'test' ? process.env.COGNITO_CLIENT_SECRET : 'testPassword'
+}
+
+const cognito = {
+  local: new CognitoStub(cognitoAuthParams),
+  env: new CognitoAuth(cognitoAuthParams)
+}
+
 let globalUndiciAgent = agent
 if (environment) {
   globalUndiciAgent = proxy
@@ -68,26 +97,30 @@ if (environment) {
 let apiUri
 let authUri
 let defraIdUri
+let cognitoAuth
 
 if (!environment) {
   apiUri = api.local
   authUri = auth.local
   defraIdUri = defraId.local
-} else if (xApiKey) {
-  apiUri = api.envFromLocal
-  authUri = auth.env
-  defraIdUri = defraId.env
+  cognitoAuth = cognito.local
 } else {
   apiUri = api.env
   authUri = auth.env
   defraIdUri = defraId.env
+  cognitoAuth = cognito.env
+}
+
+if (xApiKey) {
+  apiUri = api.envFromLocal
 }
 
 export default {
+  apiHeaders: api.headers,
   apiUri,
-  authUri,
-  defraIdUri,
   auth,
-  undiciAgent: globalUndiciAgent,
-  apiHeaders: api.headers
+  authUri,
+  cognitoAuth,
+  defraIdUri,
+  undiciAgent: globalUndiciAgent
 }

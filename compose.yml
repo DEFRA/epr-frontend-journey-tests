@@ -20,10 +20,9 @@
 name: epr-frontend-journey-tests
 
 services:
-
-################################################################################
-# Headless browser, used by the test suite to actually run the tests against the
-# containers.
+  ################################################################################
+  # Headless browser, used by the test suite to actually run the tests against the
+  # containers.
   selenium-chrome:
     image: selenium/standalone-chrome:123.0
     ports:
@@ -32,7 +31,19 @@ services:
       SE_NODE_MAX_SESSIONS: 5
     network_mode: host
 
-################################################################################
+  ################################################################################
+
+  mongodb:
+    image: mongo:7.0.28
+    restart: always
+    ports:
+      - '27017:27017'
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      start_period: 5s
+      retries: 3
+
   localstack:
     image: localstack/localstack:3.2.0
     ports:
@@ -51,14 +62,13 @@ services:
       start_period: 5s
       retries: 10
 
-################################################################################
   redis:
     image: redis:7.2.11-alpine3.21
     ports:
       - '6379:6379'
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "PING"]
+      test: ['CMD', 'redis-cli', 'PING']
       interval: 5s
       start_period: 2s
       retries: 5
@@ -67,11 +77,10 @@ services:
     image: defradigital/cdp-uploader:${CDP_UPLOADER_VERSION:-latest}
     ports:
       - '7337:7337'
-    links:
-      - 'localstack:localstack'
-      - 'redis:redis'
     depends_on:
       localstack:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     env_file:
       - 'compose/aws.env'
@@ -89,31 +98,81 @@ services:
       S3_ENDPOINT: http://localstack:4566
       CONSUMER_BUCKETS: re-ex-summary-logs
 
-################################################################################
-#
-# Add the services you want to test below.
-#
-################################################################################
-  mongodb:
-    image: mongo:7.0.28
-    restart: always
+  # Copies cognito seed files into a volume so cognito-stub has its own copies
+  cognito-stub-init:
+    image: alpine:3.23.3
+    volumes:
+      - ./compose/cognito-local/clients.json:/seed/clients.json:ro
+      - ./compose/cognito-local/local_4D8shcYm.json:/seed/local_4D8shcYm.json:ro
+      - cognito-db:/target
+    command: sh -c "cp /seed/clients.json /seed/local_4D8shcYm.json /target/"
+
+  cognito-stub:
+    image: jagregory/cognito-local:5.1.0
     ports:
-      - '27017:27017'
+      - '9229:9229'
+    volumes:
+      - cognito-db:/app/.cognito/db
+    depends_on:
+      cognito-stub-init:
+        condition: service_completed_successfully
+
+  defra-id-stub:
+    image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
+    ports:
+      - '3200:3200'
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      APP_BASE_URL: http://defra-id-stub:3200
+      NODE_ENV: development
+      OIDC_BASE_PATH: /cdp-defra-id-stub
+      OIDC_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
+      OIDC_CLIENT_SECRET: test_value
+      OIDC_SHOW_LOGIN: true
+      PORT: 3200
+      REDIS_HOST: redis
+      SESSION_CACHE_ENGINE: redis
+      USE_SINGLE_INSTANCE_CACHE: true
+
+  epr-re-ex-entra-stub:
+    image: defradigital/epr-re-ex-entra-stub:latest
+    ports:
+      - 3010:3010
+    environment:
+      STUB_INTERNAL_URL: http://epr-re-ex-entra-stub:3010
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      start_period: 5s
+      test: ['CMD', 'curl', 'http://localhost:3010/health']
+      interval: 3s
+      start_period: 2s
       retries: 3
+
+  waste-organisations-mock-api:
+    build:
+      context: .
+      dockerfile: docker/mock/Dockerfile
+    ports:
+      - '3020:3020'
+    environment:
+      NODE_ENV: development
+
+  ################################################################################
 
   epr-backend:
     image: defradigital/epr-backend:${EPR_BACKEND:-latest}
+    build:
+      context: ../epr-backend
+      target: development
     ports:
       - '3001:3001'
-    links:
-      - 'localstack:localstack'
-      - 'mongodb:mongodb'
-      - 'cdp-uploader:cdp-uploader'
     depends_on:
+      cognito-stub:
+        condition: service_started
+      defra-id-stub:
+        condition: service_started
+      epr-re-ex-entra-stub:
+        condition: service_healthy
       localstack:
         condition: service_healthy
       mongodb:
@@ -123,26 +182,28 @@ services:
     env_file:
       - ./docker/config/defaults.env
     environment:
-      PORT: 3001
-      NODE_ENV: development
-      LOCALSTACK_ENDPOINT: http://localstack:4566
-      MONGO_URI: mongodb://mongodb:27017/
-      GOVUK_NOTIFY_API_KEY: fake-key-for-testing
+      ADMIN_UI_ENTRA_CLIENT_ID: clientId
+      APP_BASE_URL: http://epr-backend:3001
       AUDIT_ENABLED: false
-      FEATURE_FLAG_DEV_ENDPOINTS: true
-      FEATURE_FLAG_SQS_COMMANDS: true
-      SQS_ENDPOINT: http://localstack:4566
-      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
-      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES_EXTERNAL_API: true
+      CDP_UPLOADER_URL: http://cdp-uploader:7337
       DEFRA_ID_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
       DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       ENTRA_OIDC_WELL_KNOWN_CONFIGURATION_URL: http://epr-re-ex-entra-stub:3010/.well-known/openid-configuration
-      ADMIN_UI_ENTRA_CLIENT_ID: clientId
+      FEATURE_FLAG_DEV_ENDPOINTS: true
+      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES_EXTERNAL_API: true
+      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
+      FEATURE_FLAG_SQS_COMMANDS: true
+      GOVUK_NOTIFY_API_KEY: fake-key-for-testing
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      MONGO_URI: mongodb://mongodb:27017/
+      NODE_ENV: development
+      PACKAGING_RECYCLING_NOTES_EXTERNAL_API_CLIENT_ID: 5357lgchj0h0fuomqyas5r87u
+      PACKAGING_RECYCLING_NOTES_EXTERNAL_API_JWKS_URL: http://cognito-stub:9229/local_4D8shcYm/.well-known/jwks.json
+      PORT: 3001
       SERVICE_MAINTAINER_EMAILS: '["ea@test.gov.uk"]'
-      CDP_UPLOADER_URL: http://cdp-uploader:7337
-      APP_BASE_URL: http://epr-backend:3001
+      SQS_ENDPOINT: http://localstack:4566
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
       interval: 5s
       start_period: 10s
       retries: 5
@@ -182,42 +243,5 @@ services:
       cdp-uploader:
         condition: service_started
 
-  epr-re-ex-entra-stub:
-    image: defradigital/epr-re-ex-entra-stub:latest
-    ports:
-      - 3010:3010
-    environment:
-      STUB_INTERNAL_URL: http://epr-re-ex-entra-stub:3010
-    healthcheck:
-      test: ['CMD', 'curl', 'http://localhost:3010/health']
-      interval: 3s
-      start_period: 2s
-      retries: 3
-
-  defra-id-stub:
-    image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
-    ports:
-      - '3200:3200'
-    depends_on:
-      redis:
-        condition: service_started
-    environment:
-      APP_BASE_URL: http://defra-id-stub:3200
-      NODE_ENV: development
-      OIDC_BASE_PATH: /cdp-defra-id-stub
-      OIDC_CLIENT_ID: 63983fc2-cfff-45bb-8ec2-959e21062b9a
-      OIDC_CLIENT_SECRET: test_value
-      OIDC_SHOW_LOGIN: true
-      PORT: 3200
-      REDIS_HOST: redis
-      SESSION_CACHE_ENGINE: redis
-      USE_SINGLE_INSTANCE_CACHE: true
-
-  waste-organisations-mock-api:
-    build:
-      context: .
-      dockerfile: docker/mock/Dockerfile
-    ports:
-      - "3020:3020"
-    environment:
-       NODE_ENV: development
+volumes:
+  cognito-db:

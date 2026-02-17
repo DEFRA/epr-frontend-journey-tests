@@ -4,15 +4,15 @@ import {
   Registration
 } from '../support/generator.js'
 
-import { EprBackend } from '../apis/epr-backend.js'
+import { fakerEN_GB } from '@faker-js/faker'
 import { expect } from '@wdio/globals'
+import { FormData } from 'undici'
+import { EprBackend } from '../apis/epr-backend.js'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
-import { fakerEN_GB } from '@faker-js/faker'
 import { defraIdStub } from './defra-id-stub.js'
-import Users from './users.js'
-import { FormData } from 'undici'
 import { MATERIALS } from './materials.js'
+import Users from './users.js'
 
 async function assertSuccessResponse(response, context) {
   const body = await response.body.json()
@@ -332,10 +332,13 @@ export async function linkDefraIdUser(organisationId, userId, email) {
 
 //TODO: Add auth, and also factor in TEST environment
 export async function externalAPIcancelPrn(prnDetails) {
+  await config.cognitoAuth.generateToken()
+
   const eprBackend = new EprBackend()
   const response = await eprBackend.post(
     `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/reject`,
-    JSON.stringify({ rejectedAt: new Date().toISOString() })
+    JSON.stringify({ rejectedAt: new Date().toISOString() }),
+    config.cognitoAuth.authHeader()
   )
 
   await assertSuccessResponseWithoutBody(
@@ -346,10 +349,13 @@ export async function externalAPIcancelPrn(prnDetails) {
 }
 
 export async function externalAPIacceptPrn(prnDetails) {
+  await config.cognitoAuth.generateToken()
+
   const eprBackend = new EprBackend()
   const response = await eprBackend.post(
     `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/accept`,
-    JSON.stringify({ acceptedAt: new Date().toISOString() })
+    JSON.stringify({ acceptedAt: new Date().toISOString() }),
+    config.cognitoAuth.authHeader()
   )
 
   await assertSuccessResponseWithoutBody(

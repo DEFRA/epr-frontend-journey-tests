@@ -1,26 +1,26 @@
 import { browser, expect } from '@wdio/globals'
+import CreatePRNPage from 'page-objects/create.prn.page.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import WasteRecordsPage from '../page-objects/waste.records.page.js'
+import PrnCreatedPage from 'page-objects/prn.created.page.js'
+import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
+import PrnIssuedPage from 'page-objects/prn.issued.page.js'
+import PrnViewPage from 'page-objects/prn.view.page.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
-  // externalAPIacceptPrn,
+  externalAPIacceptPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import CreatePRNPage from 'page-objects/create.prn.page.js'
-import PrnCreatedPage from 'page-objects/prn.created.page.js'
-import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
-import PrnViewPage from 'page-objects/prn.view.page.js'
-import PrnIssuedPage from 'page-objects/prn.issued.page.js'
-import { tradingName } from '../support/fixtures.js'
 import { checkBodyText } from '../support/checks.js'
-import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
-import { PrnHelper } from '../support/prn.helper.js'
 import { todayddMMMMyyyy } from '../support/date.js'
+import { tradingName } from '../support/fixtures.js'
+import { PrnHelper } from '../support/prn.helper.js'
+import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 describe('Issuing Packing Recycling Notes', () => {
   it('Should be able to create, issue and accept PRNs for Plastic (Reprocessor Output) @issueprnoutput', async function () {
@@ -113,23 +113,22 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await PrnIssuedPage.viewPdfButton()
     await switchToNewTabAndClosePreviousTab()
-    // await prnHelper.checkViewPrnDetails(prnDetails)
+    await prnHelper.checkViewPrnDetails(prnDetails)
     await PrnViewPage.returnToPRNList()
 
     await PrnDashboardPage.selectBackLink()
 
-    // TODO: Temporarily omit "RPD" tests
     // RPD accepts the PRN
-    // await externalAPIacceptPrn(prnDetails)
-    //
-    // await WasteRecordsPage.managePRNsLink()
-    //
-    // await PrnDashboardPage.selectIssuedTab()
-    // prnHelper.checkIssuedRows(prnDetails, 1)
-    //
-    // await PrnDashboardPage.selectIssuedLink(1)
-    // await switchToNewTabAndClosePreviousTab()
-    // await prnHelper.checkViewPrnDetails(prnDetails)
+    await externalAPIacceptPrn(prnDetails)
+
+    await WasteRecordsPage.managePRNsLink()
+
+    await PrnDashboardPage.selectIssuedTab()
+    await prnHelper.checkIssuedRows(prnDetails, 1)
+
+    await PrnDashboardPage.selectIssuedLink(1)
+    await switchToNewTabAndClosePreviousTab()
+    await prnHelper.checkViewPrnDetails(prnDetails)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
