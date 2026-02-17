@@ -1,5 +1,14 @@
 import { Agent, ProxyAgent } from 'undici'
 
+/**
+ * @typedef {{
+ *   url: string,
+ *   clientId: string,
+ *   username: string,
+ *   password: string
+ * }} CognitoAuthConfig
+ */
+
 const environment = process.env.ENVIRONMENT
 const withProxy = process.env.WITH_PROXY
 const xApiKey = process.env.X_API_KEY
@@ -60,6 +69,7 @@ const defraId = {
   env: `https://cdp-defra-id-stub.${environment}.cdp-int.defra.cloud`
 }
 
+/** @type CognitoAuthConfig */
 const cognitoAuth = {
   url: withProxy ? 'http://cognito-stub:9229' : 'http://localhost:9229',
   clientId: '5357lgchj0h0fuomqyas5r87u',
