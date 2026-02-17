@@ -98,7 +98,7 @@ describe('Creating Packing Recycling Notes', () => {
     let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
       'Enter PRN tonnage as a whole number',
-      'Enter a packaging waste producer or compliance scheme'
+      'Enter a packaging producer or compliance scheme'
     ])
 
     await prnHelper.createAndCheckDraftPrn(prnDetails)
