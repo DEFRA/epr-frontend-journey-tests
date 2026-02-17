@@ -20,7 +20,7 @@ export class PrnHelper {
     expect(prnDetails['Issuer']).toBe(
       expectedPrnDetails.organisationDetails.organisation.companyName
     )
-    expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
+    expect(prnDetails['Packaging producer or compliance scheme']).toBe(
       expectedPrnDetails.tradingName
     )
     expect(prnDetails['Tonnage']).toBe(
@@ -61,9 +61,9 @@ export class PrnHelper {
     expect(prnViewDetails[`${this.prnWording} number`]).toBe(
       expectedPrnDetails.prnNumber
     )
-    expect(
-      prnViewDetails['Packaging waste producer or compliance scheme']
-    ).toBe(expectedPrnDetails.tradingName)
+    expect(prnViewDetails['Packaging producer or compliance scheme']).toBe(
+      expectedPrnDetails.tradingName
+    )
     expect(prnViewDetails['Tonnage']).toBe(
       `${expectedPrnDetails.tonnageWordings.integer}`
     )
