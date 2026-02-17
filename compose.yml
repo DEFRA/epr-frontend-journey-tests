@@ -30,7 +30,8 @@ services:
       - 4444:4444
     environment:
       SE_NODE_MAX_SESSIONS: 5
-    network_mode: host
+    networks:
+      - cdp-tenant
 
 ################################################################################
   localstack:
@@ -50,6 +51,8 @@ services:
       interval: 5s
       start_period: 5s
       retries: 10
+    networks:
+      - cdp-tenant
 
 ################################################################################
   redis:
@@ -62,6 +65,8 @@ services:
       interval: 5s
       start_period: 2s
       retries: 5
+    networks:
+      - cdp-tenant
 
   cdp-uploader:
     image: defradigital/cdp-uploader:${CDP_UPLOADER_VERSION:-latest}
@@ -88,6 +93,8 @@ services:
       SQS_ENDPOINT: http://localstack:4566
       S3_ENDPOINT: http://localstack:4566
       CONSUMER_BUCKETS: re-ex-summary-logs
+    networks:
+      - cdp-tenant
 
 ################################################################################
 #
@@ -104,6 +111,8 @@ services:
       interval: 5s
       start_period: 5s
       retries: 3
+    networks:
+      - cdp-tenant
 
   epr-backend:
     image: defradigital/epr-backend:${EPR_BACKEND:-latest}
@@ -146,6 +155,8 @@ services:
       interval: 5s
       start_period: 10s
       retries: 5
+    networks:
+      - cdp-tenant
 
   epr-frontend:
     image: defradigital/epr-frontend:${EPR_FRONTEND:-latest}
@@ -181,6 +192,8 @@ services:
         condition: service_healthy
       cdp-uploader:
         condition: service_started
+    networks:
+      - cdp-tenant
 
   epr-re-ex-entra-stub:
     image: defradigital/epr-re-ex-entra-stub:latest
@@ -193,6 +206,8 @@ services:
       interval: 3s
       start_period: 2s
       retries: 3
+    networks:
+      - cdp-tenant
 
   defra-id-stub:
     image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
@@ -212,6 +227,8 @@ services:
       REDIS_HOST: redis
       SESSION_CACHE_ENGINE: redis
       USE_SINGLE_INSTANCE_CACHE: true
+    networks:
+      - cdp-tenant
 
   waste-organisations-mock-api:
     build:
@@ -221,3 +238,10 @@ services:
       - "3020:3020"
     environment:
        NODE_ENV: development
+    networks:
+      - cdp-tenant
+
+networks:
+  cdp-tenant:
+    driver: bridge
+    name: cdp-tenant
