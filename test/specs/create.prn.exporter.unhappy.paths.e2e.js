@@ -14,7 +14,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { secondTradingName as tradingName } from '../support/fixtures.js'
-import { PrnHelper } from '~/test/support/prn.helper.js'
+import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Create Packing Recycling Notes (Exporter)', () => {
   it('Should test various (Unhappy) paths for Create PRN Exporter @prnexporter', async () => {

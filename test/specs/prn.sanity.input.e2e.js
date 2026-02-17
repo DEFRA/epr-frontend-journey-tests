@@ -14,7 +14,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import { secondTradingName as tradingName } from '../support/fixtures.js'
-import { PrnHelper } from '~/test/support/prn.helper.js'
+import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Reprocessor Input @sanitycheck', async () => {
