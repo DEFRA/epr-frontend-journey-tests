@@ -129,7 +129,7 @@ export class PrnHelper {
     )
     expect(awaitingRow.get('Date created')).toEqual(prnDetails.createdDate)
     expect(awaitingRow.get('Tonnage')).toEqual(
-      `${prnDetails.tonnageWordings.integer}`
+      `${prnDetails.tonnageWordings.integer}.00`
     )
     expect(awaitingRow.get('Status')).toEqual(prnDetails.status)
   }
@@ -144,6 +144,9 @@ export class PrnHelper {
       prnDetails.tradingName
     )
     expect(issuedRow.get('Date issued')).toEqual(prnDetails.issuedDate)
+    expect(issuedRow.get('Tonnage')).toEqual(
+      `${prnDetails.tonnageWordings.integer}.00`
+    )
     expect(issuedRow.get('Status')).toEqual(prnDetails.status)
   }
 
