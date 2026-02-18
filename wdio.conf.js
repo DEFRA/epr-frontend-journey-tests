@@ -26,7 +26,7 @@ export const config = {
   specs: ['./test/specs/**/*.js'],
   // Tests to exclude
   exclude: [],
-  maxInstances: 2,
+  maxInstances: 1,
 
   capabilities: [
     {
@@ -37,7 +37,6 @@ export const config = {
           sslProxy: new URL(process.env.HTTP_PROXY).host
         }
       }),
-      maxInstances: 2,
       browserName: 'chrome',
       'goog:chromeOptions': {
         args: [
