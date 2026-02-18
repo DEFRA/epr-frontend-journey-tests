@@ -12,7 +12,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
-  externalAPIacceptPrn,
+  externalAPIAcceptPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
@@ -119,7 +119,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await PrnDashboardPage.selectBackLink()
 
     // RPD accepts the PRN
-    await externalAPIacceptPrn(prnDetails)
+    await externalAPIAcceptPrn(prnDetails)
 
     await WasteRecordsPage.managePRNsLink()
 
