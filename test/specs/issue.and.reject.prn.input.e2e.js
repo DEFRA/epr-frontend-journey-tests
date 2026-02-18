@@ -13,7 +13,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
-  externalAPIcancelPrn,
+  externalAPICancelPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
@@ -207,7 +207,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await prnHelper.checkViewPrnDetails(prnDetails)
 
     // Now RPD cancels the PRN
-    await externalAPIcancelPrn(prnDetails)
+    await externalAPICancelPrn(prnDetails)
 
     await PrnViewPage.returnToPRNList()
 

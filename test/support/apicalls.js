@@ -330,8 +330,7 @@ export async function linkDefraIdUser(organisationId, userId, email) {
   expect(linkResponse.statusCode).toBe(200)
 }
 
-//TODO: Add auth, and also factor in TEST environment
-export async function externalAPIcancelPrn(prnDetails) {
+export async function externalAPICancelPrn(prnDetails) {
   await config.cognitoAuth.generateToken()
 
   const eprBackend = new EprBackend()
@@ -348,7 +347,7 @@ export async function externalAPIcancelPrn(prnDetails) {
   prnDetails.status = 'Awaiting cancellation'
 }
 
-export async function externalAPIacceptPrn(prnDetails) {
+export async function externalAPIAcceptPrn(prnDetails) {
   await config.cognitoAuth.generateToken()
 
   const eprBackend = new EprBackend()
