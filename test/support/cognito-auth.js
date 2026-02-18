@@ -4,7 +4,7 @@ class CognitoAuth {
   constructor(config = {}) {
     this.cognitoUrl = config.envUrl
     this.clientId = config.clientId
-    this.clientSecret = config.clientSecret
+    this.clientSecret = config.password
     this.accessToken = null
   }
 
