@@ -37,6 +37,7 @@ export const config = {
           sslProxy: new URL(process.env.HTTP_PROXY).host
         }
       }),
+      maxInstances: 2,
       browserName: 'chrome',
       'goog:chromeOptions': {
         args: [
