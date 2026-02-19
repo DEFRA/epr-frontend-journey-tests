@@ -13,7 +13,10 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import { secondTradingName as tradingName } from '../support/fixtures.js'
+import {
+  createPrnDetails,
+  secondTradingName as tradingName
+} from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Create Packing Recycling Notes (Exporter)', () => {
@@ -46,19 +49,13 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
-
     await DashboardPage.selectTableLink(1, 1)
 
     await WasteRecordsPage.createNewPERNLink()
 
     const prnHelper = new PrnHelper(true)
 
-    const prnDetails = {
-      tonnageWordings,
+    const prnDetails = createPrnDetails({
       tradingName,
       issuerNotes: '',
       organisationDetails,
@@ -66,7 +63,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       materialDesc,
       accNumber,
       process: 'R4'
-    }
+    })
 
     // Empty issuer notes, PERN created should say "Not provided"
     await prnHelper.createAndCheckDraftPrn(prnDetails)

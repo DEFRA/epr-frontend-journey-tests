@@ -17,8 +17,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
-import { todayddMMMMyyyy } from '../support/date.js'
-import { tradingName } from '../support/fixtures.js'
+import { createPrnDetails } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
@@ -26,8 +25,6 @@ describe('Issuing Packing Recycling Notes', () => {
   it('Should be able to create, issue and accept PRNs for Plastic (Reprocessor Output) @issueprnoutput', async function () {
     const regNumber = 'R25SR500010912PL'
     const accNumber = 'R-ACC12145PL'
-
-    const materialDesc = 'Plastic'
 
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Plastic (R3)', wasteProcessingType: 'Reprocessor' }
@@ -54,11 +51,6 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
-
     // Tonnage value expected from Summary Log files upload
     // Plastic 8,088.62
     await DashboardPage.selectTableLink(1, 1)
@@ -80,20 +72,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const prnHelper = new PrnHelper()
 
-    const prnDetails = {
-      tonnageWordings,
-      tradingName,
-      issuerNotes: 'Testing',
-      organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
-      status: '',
-      materialDesc,
-      accNumber,
-      prnNumber: '',
-      issuedDate: '',
-      process: 'R3',
-      createdDate: todayddMMMMyyyy
-    }
+    const prnDetails = createPrnDetails({ accNumber, organisationDetails })
 
     await prnHelper.createAndCheckPrnDetails(prnDetails)
 

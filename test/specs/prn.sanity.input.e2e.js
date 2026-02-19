@@ -13,7 +13,10 @@ import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
-import { secondTradingName as tradingName } from '../support/fixtures.js'
+import {
+  createPrnDetails,
+  secondTradingName as tradingName
+} from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
@@ -93,18 +96,15 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await WasteRecordsPage.createNewPRNLink()
       const prnHelper = new PrnHelper()
 
-      const prnDetails = {
+      const prnDetails = createPrnDetails({
         tonnageWordings: tonnageWordings[i],
         tradingName,
-        issuerNotes: 'Testing',
         organisationDetails,
         regAddress: organisationDetails.regAddresses[orgAddressIndex],
         materialDesc: MATERIALS[i].prnName,
         accNumber,
-        process: MATERIALS[i].process,
-        prnNumber: '',
-        issuedDate: ''
-      }
+        process: MATERIALS[i].process
+      })
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
 

@@ -16,7 +16,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import ConfirmDeletePRNPage from 'page-objects/confirm.delete.prn.page.js'
-import { tradingName } from '../support/fixtures.js'
+import { tonnageWordings, tradingName } from '../support/fixtures.js'
 
 describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
   it('Should be able to create and delete PRN for Plastic (Reprocessor Output) @delprnoutput', async () => {
@@ -49,11 +49,6 @@ describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
     await HomePage.clickStartNow()
 
     await DefraIdStubPage.loginViaEmail(userEmail)
-
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
 
     await DashboardPage.selectTableLink(1, 1)
 

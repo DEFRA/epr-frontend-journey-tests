@@ -17,9 +17,7 @@ export class PrnHelper {
 
   async checkPrnDetails(expectedPrnDetails) {
     const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-    expect(prnDetails['Issuer']).toBe(
-      expectedPrnDetails.organisationDetails.organisation.companyName
-    )
+    expect(prnDetails['Issuer']).toBe(expectedPrnDetails.companyName)
     expect(prnDetails['Packaging producer or compliance scheme']).toBe(
       expectedPrnDetails.tradingName
     )
