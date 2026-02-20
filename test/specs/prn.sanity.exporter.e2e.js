@@ -11,7 +11,7 @@ import {
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { tradingName } from '../support/fixtures.js'
+import { createPrnDetails } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
@@ -71,15 +71,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const prnHelper = new PrnHelper(true)
 
-      const prnDetails = {
+      const prnDetails = createPrnDetails({
         tonnageWordings: tonnageWordingsExporter[i],
-        tradingName,
-        issuerNotes: 'Testing',
         organisationDetails,
         materialDesc: MATERIALS[i].prnName,
         accNumber,
         process: MATERIALS[i].process
-      }
+      })
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
 

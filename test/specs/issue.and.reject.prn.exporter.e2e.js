@@ -18,11 +18,10 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
-import { todayddMMMMyyyy } from '../support/date.js'
 import {
   secondTradingName as newTradingName,
-  tradingName,
-  thirdTradingName as updatedTradingName
+  thirdTradingName as updatedTradingName,
+  createPrnDetails
 } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
@@ -57,11 +56,6 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
-
     // Tonnage value expected from Summary Log files upload
     // Wood
     const expectedWasteBalance = '371,647.05'
@@ -85,19 +79,11 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     const prnHelper = new PrnHelper(true)
 
-    const pernDetails = {
-      tonnageWordings,
-      tradingName,
-      issuerNotes: 'Testing',
-      organisationDetails,
-      status: '',
+    const pernDetails = createPrnDetails({
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: '',
-      createdDate: todayddMMMMyyyy
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(pernDetails)
 
@@ -158,18 +144,14 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     }
     const newIssuerNotes = 'Testing another PERN'
 
-    const newPernDetails = {
+    const newPernDetails = createPrnDetails({
       tonnageWordings: newTonnageWordings,
       tradingName: newTradingName,
       issuerNotes: newIssuerNotes,
-      organisationDetails,
-      status: '',
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: ''
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(newPernDetails)
     // End of new PERN creation
@@ -223,18 +205,14 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       word: 'Fifteen'
     }
 
-    const updatedPernDetails = {
+    const updatedPernDetails = createPrnDetails({
       tonnageWordings: updatedTonnageWordings,
       tradingName: updatedTradingName,
       issuerNotes: newIssuerNotes,
-      status: '',
-      organisationDetails,
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: ''
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(updatedPernDetails)
     // End of new PERN creation

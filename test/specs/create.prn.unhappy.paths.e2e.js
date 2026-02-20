@@ -13,7 +13,10 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import { thirdTradingName as tradingName } from '../support/fixtures.js'
+import {
+  createPrnDetails,
+  thirdTradingName as tradingName
+} from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Creating Packing Recycling Notes', () => {
@@ -47,27 +50,19 @@ describe('Creating Packing Recycling Notes', () => {
 
     await DefraIdStubPage.loginViaEmail(userEmail)
 
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
-
     await DashboardPage.selectTableLink(1, 1)
 
     await WasteRecordsPage.createNewPRNLink()
 
     const prnHelper = new PrnHelper()
 
-    const prnDetails = {
-      tonnageWordings,
+    const prnDetails = createPrnDetails({
       tradingName,
       issuerNotes: '',
       organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
       materialDesc,
-      accNumber,
-      process: 'R3'
-    }
+      accNumber
+    })
 
     // Empty issuer notes, PRN created should say "Not provided"
     await prnHelper.createAndCheckDraftPrn(prnDetails)
