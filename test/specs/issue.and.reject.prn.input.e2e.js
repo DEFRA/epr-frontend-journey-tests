@@ -37,7 +37,7 @@ describe('Issuing Packing Recycling Notes', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -50,13 +50,17 @@ describe('Issuing Packing Recycling Notes', () => {
       'sepa'
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
     // Paper and board	392.28
@@ -244,7 +248,15 @@ describe('Issuing Packing Recycling Notes', () => {
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard(prnDetails)
+
+    await PrnDashboardPage.selectCancelledTab()
+    await prnHelper.checkCancelledRows(prnDetails, 1)
+    await PrnDashboardPage.selectCancelledLink(1)
+    await switchToNewTabAndClosePreviousTab()
+
+    await prnHelper.checkViewPrnDetails(prnDetails)
+    await PrnViewPage.returnToPRNList()
 
     await PrnDashboardPage.selectBackLink()
     await WasteRecordsPage.selectBackLink()

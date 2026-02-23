@@ -11,7 +11,6 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-// import CreatePRNPage from 'page-objects/create.prn.page.js'
 
 describe('Summary Logs Exporter', () => {
   it('Should be able to submit a Exporter Summary Log spreadsheet @exporter', async () => {
@@ -21,7 +20,7 @@ describe('Summary Logs Exporter', () => {
     ])
 
     // We adjust validFrom date to test filtering of rows from the Summary Log upload
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -38,14 +37,18 @@ describe('Summary Logs Exporter', () => {
         }
       ]
     )
-    const user = await createAndRegisterDefraIdUser(userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)

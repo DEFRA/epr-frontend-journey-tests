@@ -37,7 +37,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       { material: 'Wood (R3)', wasteProcessingType: 'Exporter' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -48,13 +48,17 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
     // Wood
@@ -243,8 +247,15 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard(pernDetails)
 
+    await PrnDashboardPage.selectCancelledTab()
+    await prnHelper.checkCancelledRows(pernDetails, 1)
+    await PrnDashboardPage.selectCancelledLink(1)
+    await switchToNewTabAndClosePreviousTab()
+
+    await prnHelper.checkViewPrnDetails(pernDetails)
+    await PrnViewPage.returnToPERNList()
     // End of PERN cancellation test
 
     await PrnDashboardPage.selectBackLink()

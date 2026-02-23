@@ -23,8 +23,20 @@ class PRNDashboardPage {
     await linkElement.click()
   }
 
+  async selectCancelledLink(index) {
+    const linkElement = await $(
+      '#cancelled table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
+    )
+    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.click()
+  }
+
   async selectIssuedTab() {
     await $('//a[normalize-space()="Issued"]').click()
+  }
+
+  async selectCancelledTab() {
+    await $('//a[normalize-space()="Cancelled"]').click()
   }
 
   // Index changes depending on whether PRN cancellation / PRN awaiting authorisation exists
@@ -34,15 +46,21 @@ class PRNDashboardPage {
     ).getText()
   }
 
-  async getIssuedRow(rowIndex) {
-    const issuedRow = new Map()
-    const tableHeaders = await $$('#issued table.govuk-table > thead > tr th')
+  async getCancelledRow(rowIndex) {
+    return await this.getTableRow('#cancelled', rowIndex)
+  }
+
+  async getTableRow(tableId, rowIndex) {
+    const tableRow = new Map()
+    const tableHeaders = await $$(
+      `${tableId} table.govuk-table > thead > tr th`
+    )
     const headerText = await tableHeaders.map((element) => {
       return element.getText()
     })
 
     const tableData = await $$(
-      '#issued table.govuk-table > tbody > tr:nth-child(' + rowIndex + ') td'
+      `${tableId} table.govuk-table > tbody > tr:nth-child(${rowIndex}) td`
     )
 
     const rowText = await tableData.map((element) => {
@@ -50,9 +68,13 @@ class PRNDashboardPage {
     })
 
     for (let i = 0; i < headerText.length; i++) {
-      issuedRow.set(headerText[i], rowText[i])
+      tableRow.set(headerText[i], rowText[i])
     }
-    return issuedRow
+    return tableRow
+  }
+
+  async getIssuedRow(rowIndex) {
+    return await this.getTableRow('#issued', rowIndex)
   }
 
   async selectAwaitingActionTab() {

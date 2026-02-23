@@ -32,7 +32,7 @@ describe('Summary Logs (Glass Material)', () => {
       }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -55,14 +55,18 @@ describe('Summary Logs (Glass Material)', () => {
         }
       ]
     )
-    const user = await createAndRegisterDefraIdUser(userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     const firstGlassMaterial = await DashboardPage.getMaterial(1, 1)
     expect(firstGlassMaterial).toBe('Glass remelt')
