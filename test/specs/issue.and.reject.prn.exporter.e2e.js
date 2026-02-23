@@ -243,8 +243,15 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard(pernDetails)
 
+    await PrnDashboardPage.selectCancelledTab()
+    await prnHelper.checkCancelledRows(pernDetails, 1)
+    await PrnDashboardPage.selectCancelledLink(1)
+    await switchToNewTabAndClosePreviousTab()
+
+    await prnHelper.checkViewPrnDetails(pernDetails)
+    await PrnViewPage.returnToPERNList()
     // End of PERN cancellation test
 
     await PrnDashboardPage.selectBackLink()
