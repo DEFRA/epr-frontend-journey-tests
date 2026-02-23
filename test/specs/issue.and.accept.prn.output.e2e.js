@@ -30,7 +30,7 @@ describe('Issuing Packing Recycling Notes', () => {
       { material: 'Plastic (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -43,13 +43,17 @@ describe('Issuing Packing Recycling Notes', () => {
       'nrw'
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
     // Plastic 8,088.62

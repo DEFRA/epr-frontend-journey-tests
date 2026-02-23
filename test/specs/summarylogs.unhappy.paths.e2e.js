@@ -22,7 +22,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -34,13 +34,17 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
@@ -79,7 +83,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -91,13 +95,17 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.open()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
@@ -129,7 +137,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -140,13 +148,17 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.open()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()

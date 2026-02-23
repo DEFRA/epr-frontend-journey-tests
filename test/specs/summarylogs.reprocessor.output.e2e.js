@@ -18,7 +18,7 @@ describe('Summary Logs Reprocessor Output', () => {
       { material: 'Steel (R4)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -31,13 +31,17 @@ describe('Summary Logs Reprocessor Output', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.open()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     const dashboardHeaderText = await DashboardPage.dashboardHeaderText()
 

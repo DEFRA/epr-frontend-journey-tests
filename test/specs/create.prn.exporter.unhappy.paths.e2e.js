@@ -30,7 +30,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       { material: 'Aluminium (R4)', wasteProcessingType: 'Exporter' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -41,13 +41,17 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectTableLink(1, 1)
 

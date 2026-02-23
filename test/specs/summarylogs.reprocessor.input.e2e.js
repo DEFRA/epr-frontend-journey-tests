@@ -17,7 +17,7 @@ describe('Summary Logs Reprocessor Input', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -29,7 +29,7 @@ describe('Summary Logs Reprocessor Input', () => {
       ]
     )
 
-    await createAndRegisterDefraIdUser(userEmail, 2)
+    await createAndRegisterDefraIdUser(migrationResponse.email, 2)
 
     await HomePage.openStart()
 
@@ -54,7 +54,7 @@ describe('Summary Logs Reprocessor Input', () => {
 
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
     await DefraIdStubPage.selectOrganisation(1)
 
     // Tests the linking of an organisation
