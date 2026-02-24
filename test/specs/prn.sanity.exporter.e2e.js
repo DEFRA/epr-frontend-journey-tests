@@ -33,14 +33,14 @@ describe('Packing Recycling Notes (Sanity)', () => {
       { integer: 219, word: 'Two hundred and nineteen' },
       { integer: 3, word: 'Three' },
       {
-        integer: 487203,
-        word: 'Four hundred and eighty seven thousand two hundred and three'
+        integer: 487,
+        word: 'Four hundred and eighty seven'
       },
       {
-        integer: 929999,
-        word: 'Nine hundred and twenty nine thousand nine hundred and ninety nine'
+        integer: 929,
+        word: 'Nine hundred and twenty nine'
       },
-      { integer: 68000, word: 'Sixty eight thousand' }
+      { integer: 680, word: 'Six hundred and eighty' }
     ]
 
     for (let i = 0; i < MATERIALS.length; i++) {
