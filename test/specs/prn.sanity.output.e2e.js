@@ -18,7 +18,7 @@ import {
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @outsanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
