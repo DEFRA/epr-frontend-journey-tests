@@ -51,23 +51,23 @@ describe('Packing Recycling Notes (Sanity)', () => {
     ]
 
     // Tonnage values expected from Summary Log files upload
-    // Aluminium        345.78
-    // Fibre	         	313.44
-    // Glass remelt	  	403.83
-    // Glass other	    1,022.20
-    // Paper and board	392.28
-    // Plastic	      	420.18
-    // Steel	         	275.10
-    // Wood	           	203.38
+    // Aluminium        42,026.48
+    // Fibre	         	39,206.32
+    // Glass remelt	  	36,907.78
+    // Glass other	    37,628.18
+    // Paper and board	40,608.74
+    // Plastic	      	41,768.47
+    // Steel	         	33,321.77
+    // Wood	           	38,546.55
     const expectedWasteBalances = [
-      '338.78',
-      '56.44',
-      '384.83',
-      '716.20',
-      '189.28',
-      '264.18',
-      '176.10',
-      '135.38'
+      '42,019.48',
+      '38,949.32',
+      '36,888.78',
+      '37,322.18',
+      '40,405.74',
+      '41,612.47',
+      '33,222.77',
+      '38,478.55'
     ]
 
     // Sanity check Reprocessor Input materials

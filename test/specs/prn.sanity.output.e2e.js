@@ -18,7 +18,7 @@ import {
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Reprocessor Output @outsanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
     const user = await createAndRegisterDefraIdUser(userEmail)
@@ -39,14 +39,14 @@ describe('Packing Recycling Notes (Sanity)', () => {
       },
       { integer: 5, word: 'Five' },
       {
-        integer: 57482,
-        word: 'Fifty seven thousand four hundred and eighty two'
+        integer: 27482,
+        word: 'Twenty seven thousand four hundred and eighty two'
       },
       { integer: 9307, word: 'Nine thousand three hundred and seven' },
       { integer: 42, word: 'Forty two' },
       {
-        integer: 83516,
-        word: 'Eighty three thousand five hundred and sixteen'
+        integer: 43516,
+        word: 'Forty three thousand five hundred and sixteen'
       },
       { integer: 156, word: 'One hundred and fifty six' }
     ]

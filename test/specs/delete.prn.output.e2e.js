@@ -63,7 +63,7 @@ describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const expectedWasteBalance = '8,088.62 tonnes'
+    const expectedWasteBalance = '56,455.66 tonnes'
     // Check waste balance amount from upload
     let wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedWasteBalance)
@@ -93,7 +93,7 @@ describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
 
-    const expectedDeductedWasteBalance = '7,885.62 tonnes'
+    const expectedDeductedWasteBalance = '56,252.66 tonnes'
     // Check waste balance amount is deducted from creation
     wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedDeductedWasteBalance)
