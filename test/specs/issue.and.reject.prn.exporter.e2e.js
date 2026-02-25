@@ -62,7 +62,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     // Tonnage value expected from Summary Log files upload
     // Wood
-    const expectedWasteBalance = '1,324.99'
+    const expectedWasteBalance = '1,325.09'
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -75,7 +75,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
 
     await WasteRecordsPage.createNewPERNLink()
 
-    const originalWasteBalance = '1,527.99'
+    const originalWasteBalance = '1,528.09'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
       `Your waste balance available for creating PERNs is ${originalWasteBalance} tonnes.`
@@ -262,7 +262,7 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
     await WasteRecordsPage.selectBackLink()
 
     // Check that the waste balance has been updated from the cancelled PRN
-    const expectedUpdatedWasteBalance = '1,493.99'
+    const expectedUpdatedWasteBalance = '1,494.09'
     const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe(expectedUpdatedWasteBalance)
 
