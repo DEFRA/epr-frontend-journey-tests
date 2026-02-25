@@ -12,7 +12,7 @@ import {
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import { checkBodyText } from '../support/checks.js'
 
-describe('Summary Logs (Glass Material)', () => {
+describe('Summary Logs (Glass Material) @smoketest', () => {
   it('Should be able to distinguish between Glass Re-Melt and Glass Other @glassMaterial', async () => {
     const organisationDetails = await createLinkedOrganisation([
       {

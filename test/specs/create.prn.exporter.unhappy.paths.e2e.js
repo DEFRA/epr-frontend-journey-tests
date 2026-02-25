@@ -19,7 +19,7 @@ import {
 } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
-describe('Create Packing Recycling Notes (Exporter)', () => {
+describe('Create Packing Recycling Notes (Exporter) @smoketest', () => {
   it('Should test various (Unhappy) paths for Create PRN Exporter @prnexporter', async () => {
     const regNumber = 'E25SR500020912AL'
     const accNumber = 'E-ACC12245AL'

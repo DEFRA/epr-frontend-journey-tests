@@ -27,7 +27,7 @@ import { PrnHelper } from '../support/prn.helper.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 describe('Issuing Packing Recycling Notes', () => {
-  it('Should be able to create, issue and reject PRNs for Paper (Reprocessor Input) @issueprnrepro', async function () {
+  it('Should be able to create, issue and reject PRNs for Paper (Reprocessor Input) @issueprnrepro @smoketest', async function () {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
