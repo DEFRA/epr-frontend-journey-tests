@@ -27,7 +27,7 @@ import { PrnHelper } from '../support/prn.helper.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 describe('Issuing Packing Recycling Notes (Exporter)', () => {
-  it('Should be able to create, issue and reject PRNs for Wood (Exporter) @issueprnexp', async function () {
+  it('Should be able to create, issue and reject PRNs for Wood (Exporter) @issueprnexp @smoketest', async function () {
     const regNumber = 'E25SR500020912WO'
     const accNumber = 'E-ACC12245WO'
 

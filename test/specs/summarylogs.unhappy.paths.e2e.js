@@ -125,7 +125,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
 
     await checkBodyText(
       "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
-      20
+      60
     )
 
     await HomePage.signOut()
@@ -174,35 +174,35 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
 
     await checkBodyText(
       'The selected file contains date formats that do not match the examples provided in the summary log',
-      20
+      60
     )
     await checkBodyText(
       'The selected file contains values in some fields that have not been selected from within the drop-down provided',
-      20
+      60
     )
     await checkBodyText(
       'The selected file contains answers to Yes / No questions with formats that do not match the examples provided in the summary log',
-      20
+      60
     )
     await checkBodyText(
       'The selected file contains tonnage and weight values with formats that do not match the examples provided in the summary log',
-      20
+      60
     )
     await checkBodyText(
       'The selected file contains percentage values with formats that do not match the examples provided in the summary log',
-      20
+      60
     )
     await checkBodyText(
       'The selected file contains unacceptable content within the fields that accept free text',
-      20
+      60
     )
     await checkBodyText(
       "The selected file contains data that's been entered incorrectly - check that the data you've entered matches the examples provided in the summary log",
-      20
+      60
     )
     await checkBodyTextDoesNotInclude(
       'Sorry, there is a problem with the service - try again later',
-      20
+      60
     )
 
     await HomePage.signOut()

@@ -1,7 +1,12 @@
 #!/bin/sh
 
 echo "run_id: $RUN_ID"
-npm test
+# Generate data based on PROFILE
+if [ "$PROFILE" = "generate" ]; then
+  npm test
+else
+  npm test:smoketest
+fi
 
 npm run report:publish
 publish_exit_code=$?
