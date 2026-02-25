@@ -5,7 +5,7 @@ echo "run_id: $RUN_ID"
 if [ "$PROFILE" = "all" ]; then
   npm test
 else
-  npm test:smoketest
+  npm run test:smoketest
 fi
 
 npm run report:publish
