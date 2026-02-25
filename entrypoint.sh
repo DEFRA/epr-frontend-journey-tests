@@ -1,8 +1,8 @@
 #!/bin/sh
 
 echo "run_id: $RUN_ID"
-# Generate data based on PROFILE
-if [ "$PROFILE" = "generate" ]; then
+# Run tests based on PROFILE (if all, then all tests are run)
+if [ "$PROFILE" = "all" ]; then
   npm test
 else
   npm test:smoketest
