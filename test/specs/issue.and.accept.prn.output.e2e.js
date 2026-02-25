@@ -56,7 +56,7 @@ describe('Issuing Packing Recycling Notes', () => {
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
-    // Plastic 56,455.66
+    // Plastic 56,455.67
     await DashboardPage.selectTableLink(1, 1)
 
     await WasteRecordsPage.submitSummaryLogLink()
@@ -68,7 +68,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await WasteRecordsPage.createNewPRNLink()
 
-    const originalWasteBalance = '56,455.66'
+    const originalWasteBalance = '56,455.67'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
       `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
