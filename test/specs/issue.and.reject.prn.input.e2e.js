@@ -63,8 +63,8 @@ describe('Issuing Packing Recycling Notes', () => {
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
-    // Paper and board	40,608.74
-    const expectedWasteBalance = '40,405.74'
+    // Paper and board	40,608.86
+    const expectedWasteBalance = '40,405.86'
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -77,7 +77,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await WasteRecordsPage.createNewPRNLink()
 
-    const originalWasteBalance = '40,608.74'
+    const originalWasteBalance = '40,608.86'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
       `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
@@ -263,7 +263,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     // Check that the waste balance has been updated from the cancelled PRN
     const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('40,574.74')
+    expect(availableWasteBalance).toBe('40,574.86')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
