@@ -192,7 +192,6 @@ services:
       FEATURE_FLAG_DEV_ENDPOINTS: true
       FEATURE_FLAG_PACKAGING_RECYCLING_NOTES_EXTERNAL_API: true
       FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
-      FEATURE_FLAG_SQS_COMMANDS: true
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       LOCALSTACK_ENDPOINT: http://localstack:4566
       MONGO_URI: mongodb://mongodb:27017/
