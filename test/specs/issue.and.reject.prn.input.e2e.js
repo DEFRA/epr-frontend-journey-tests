@@ -18,17 +18,16 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
-import { todayddMMMMyyyy } from '../support/date.js'
 import {
   thirdTradingName as newTradingName,
-  tradingName,
-  thirdTradingName as updatedTradingName
+  thirdTradingName as updatedTradingName,
+  createPrnDetails
 } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 describe('Issuing Packing Recycling Notes', () => {
-  it('Should be able to create, issue and reject PRNs for Paper (Reprocessor Input) @issueprnrepro', async function () {
+  it('Should be able to create, issue and reject PRNs for Paper (Reprocessor Input) @issueprnrepro @smoketest', async function () {
     const regNumber = 'R25SR500000912PA'
     const accNumber = 'R-ACC12045PA'
 
@@ -38,7 +37,7 @@ describe('Issuing Packing Recycling Notes', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -51,22 +50,21 @@ describe('Issuing Packing Recycling Notes', () => {
       'sepa'
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
-
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     // Tonnage value expected from Summary Log files upload
-    // Paper and board	392.28
-    const expectedWasteBalance = '189.28'
+    // Paper and board	40,608.86
+    const expectedWasteBalance = '40,405.86'
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -79,7 +77,7 @@ describe('Issuing Packing Recycling Notes', () => {
 
     await WasteRecordsPage.createNewPRNLink()
 
-    const originalWasteBalance = '392.28'
+    const originalWasteBalance = '40,608.86'
     const wasteBalanceHint = await CreatePRNPage.wasteBalanceHint()
     expect(wasteBalanceHint).toBe(
       `Your waste balance available for creating PRNs is ${originalWasteBalance} tonnes.`
@@ -87,20 +85,11 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const prnHelper = new PrnHelper()
 
-    const prnDetails = {
-      tonnageWordings,
-      tradingName,
-      issuerNotes: 'Testing',
-      organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
-      status: '',
+    const prnDetails = createPrnDetails({
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: '',
-      createdDate: todayddMMMMyyyy
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(prnDetails)
 
@@ -159,19 +148,14 @@ describe('Issuing Packing Recycling Notes', () => {
     }
     const newIssuerNotes = 'Testing another PRN'
 
-    const newPrnDetails = {
+    const newPrnDetails = createPrnDetails({
       tonnageWordings: newTonnageWordings,
       tradingName: newTradingName,
       issuerNotes: newIssuerNotes,
-      organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
-      status: '',
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: ''
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(newPrnDetails)
     // End of new PRN creation
@@ -226,19 +210,14 @@ describe('Issuing Packing Recycling Notes', () => {
       word: 'Fifteen'
     }
 
-    const updatedPrnDetails = {
+    const updatedPrnDetails = createPrnDetails({
       tonnageWordings: updatedTonnageWordings,
       tradingName: updatedTradingName,
       issuerNotes: newIssuerNotes,
-      status: '',
-      organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
       materialDesc,
-      process: 'R3',
       accNumber,
-      prnNumber: '',
-      issuedDate: ''
-    }
+      organisationDetails
+    })
 
     await prnHelper.createAndCheckPrnDetails(updatedPrnDetails)
 
@@ -269,14 +248,22 @@ describe('Issuing Packing Recycling Notes', () => {
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard()
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard(prnDetails)
+
+    await PrnDashboardPage.selectCancelledTab()
+    await prnHelper.checkCancelledRows(prnDetails, 1)
+    await PrnDashboardPage.selectCancelledLink(1)
+    await switchToNewTabAndClosePreviousTab()
+
+    await prnHelper.checkViewPrnDetails(prnDetails)
+    await PrnViewPage.returnToPRNList()
 
     await PrnDashboardPage.selectBackLink()
     await WasteRecordsPage.selectBackLink()
 
     // Check that the waste balance has been updated from the cancelled PRN
     const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('358.28')
+    expect(availableWasteBalance).toBe('40,574.86')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

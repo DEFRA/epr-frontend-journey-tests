@@ -9,7 +9,7 @@ import DashboardPage from 'page-objects/dashboard.page.js'
 import { expect } from '@wdio/globals'
 import { MATERIALS } from '../support/materials.js'
 
-describe('All materials and all waste processing types @allMaterials', () => {
+describe('All materials and all waste processing types @allMaterials @smoketest', () => {
   it('Should be able to see all waste processing types and all materials on the User Interface', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()

@@ -17,9 +17,7 @@ export class PrnHelper {
 
   async checkPrnDetails(expectedPrnDetails) {
     const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-    expect(prnDetails['Issuer']).toBe(
-      expectedPrnDetails.organisationDetails.organisation.companyName
-    )
+    expect(prnDetails['Issuer']).toBe(expectedPrnDetails.companyName)
     expect(prnDetails['Packaging producer or compliance scheme']).toBe(
       expectedPrnDetails.tradingName
     )
@@ -134,20 +132,28 @@ export class PrnHelper {
     expect(awaitingRow.get('Status')).toEqual(prnDetails.status)
   }
 
-  async checkIssuedRows(prnDetails, rowIndex) {
-    const issuedRow = await PrnDashboardPage.getIssuedRow(rowIndex)
-
-    expect(issuedRow.get(`${this.prnWording} number`)).toEqual(
+  async checkTableRows(tableRow, prnDetails) {
+    expect(tableRow.get(`${this.prnWording} number`)).toEqual(
       prnDetails.prnNumber
     )
-    expect(issuedRow.get('Producer or compliance scheme')).toEqual(
+    expect(tableRow.get('Producer or compliance scheme')).toEqual(
       prnDetails.tradingName
     )
-    expect(issuedRow.get('Date issued')).toEqual(prnDetails.issuedDate)
-    expect(issuedRow.get('Tonnage')).toEqual(
+    expect(tableRow.get('Date issued')).toEqual(prnDetails.issuedDate)
+    expect(tableRow.get('Tonnage')).toEqual(
       `${prnDetails.tonnageWordings.integer}`
     )
-    expect(issuedRow.get('Status')).toEqual(prnDetails.status)
+    expect(tableRow.get('Status')).toEqual(prnDetails.status)
+  }
+
+  async checkCancelledRows(prnDetails, rowIndex) {
+    const cancelledRow = await PrnDashboardPage.getCancelledRow(rowIndex)
+    await this.checkTableRows(cancelledRow, prnDetails)
+  }
+
+  async checkIssuedRows(prnDetails, rowIndex) {
+    const issuedRow = await PrnDashboardPage.getIssuedRow(rowIndex)
+    await this.checkTableRows(issuedRow, prnDetails)
   }
 
   async issuePrnAndUpdateDetails(prnDetails, prnPrefix = 'SR') {
@@ -177,7 +183,7 @@ export class PrnHelper {
     )
   }
 
-  async cancelPRNAndReturnToPRNsDashboard() {
+  async cancelPRNAndReturnToPRNsDashboard(prnDetails) {
     await PrnViewPage.cancelPRNButton()
     const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
     expect(confirmCancelHeading).toBe(
@@ -190,6 +196,7 @@ export class PrnHelper {
 
     const prnStatus = await PrnCancelledPage.statusText()
     expect(prnStatus).toContain('Cancelled')
+    prnDetails.status = 'Cancelled'
     if (!this.isPern) {
       await PrnCancelledPage.prnsPage()
     } else {

@@ -97,6 +97,10 @@ You can check the progress of the build under the actions section of this reposi
 
 The results of the test run are made available in the portal.
 
+### Running tests with Profile
+
+By default in the CDP-Portal only tests tagged with @smoketest are run. If you wish to run all the tests, pass in `all` in the profile section of the CDP Portal UI.
+
 ## Requirements of CDP Environment Tests
 
 1. Your service builds as a docker container using the `.github/workflows/publish.yml`

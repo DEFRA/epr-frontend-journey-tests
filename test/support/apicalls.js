@@ -81,10 +81,12 @@ export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
 
   updateDataRows[0].email = `sanity_${fakerEN_GB.internet.email()}`
 
-  const userEmail = await updateMigratedOrganisation(
+  const migratedOrganisation = await updateMigratedOrganisation(
     organisationDetails.refNo,
     updateDataRows
   )
+
+  const userEmail = migratedOrganisation.email
   return { organisationDetails, userEmail }
 }
 
@@ -215,6 +217,9 @@ export async function updateMigratedOrganisation(
   let data = responseData
   let accreditationIndex = 0
 
+  const accreditationIds = []
+  const registrationIds = []
+
   for (let i = 0; i < updateDataRows.length; i++) {
     const orgUpdateData = updateDataRows[i]
     data.registrations[i].status = orgUpdateData.status
@@ -235,6 +240,8 @@ export async function updateMigratedOrganisation(
     if (submittedToRegulator) {
       data.registrations[i].submittedToRegulator = submittedToRegulator
     }
+
+    registrationIds.push(data.registrations[i].id)
 
     if (!orgUpdateData.withoutAccreditation) {
       const j = accreditationIndex
@@ -257,6 +264,7 @@ export async function updateMigratedOrganisation(
       if (submittedToRegulator) {
         data.accreditations[j].submittedToRegulator = submittedToRegulator
       }
+      accreditationIds.push(data.accreditations[j].id)
       accreditationIndex++
     }
   }
@@ -286,7 +294,7 @@ export async function updateMigratedOrganisation(
   )
   expect(response.statusCode).toBe(200)
 
-  return email
+  return { email, registrationIds, accreditationIds }
 }
 
 export async function createAndRegisterDefraIdUser(

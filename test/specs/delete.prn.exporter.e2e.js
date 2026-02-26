@@ -16,7 +16,7 @@ import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
 import ConfirmDeletePRNPage from 'page-objects/confirm.delete.prn.page.js'
-import { tradingName } from '../support/fixtures.js'
+import { tonnageWordings, tradingName } from '../support/fixtures.js'
 
 describe('Deleting Packing Recycling Notes (Exporter)', () => {
   it('Should be able to create and delete PRN for Fibre (Exporter) @delprnexp', async () => {
@@ -30,7 +30,7 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
       }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -41,18 +41,17 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
-
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -63,7 +62,7 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
 
     await DashboardPage.selectTableLink(1, 1)
 
-    const expectedWasteBalance = '1,532.99 tonnes'
+    const expectedWasteBalance = '1,580.71 tonnes'
     // Check waste balance amount from upload
     let wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedWasteBalance)
@@ -93,7 +92,7 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
     await PrnCreatedPage.returnToRegistrationPage()
     await DashboardPage.selectTableLink(1, 1)
 
-    const expectedDeductedWasteBalance = '1,329.99 tonnes'
+    const expectedDeductedWasteBalance = '1,377.71 tonnes'
     // Check waste balance amount is deducted from creation
     wasteBalanceAmount = await WasteRecordsPage.wasteBalanceAmount()
     expect(wasteBalanceAmount).toBe(expectedDeductedWasteBalance)

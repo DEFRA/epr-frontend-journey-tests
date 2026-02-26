@@ -1,7 +1,12 @@
 #!/bin/sh
 
 echo "run_id: $RUN_ID"
-npm test
+# Run tests based on PROFILE (if all, then all tests are run)
+if [ "$PROFILE" = "all" ]; then
+  npm test
+else
+  npm run test:smoketest
+fi
 
 npm run report:publish
 publish_exit_code=$?

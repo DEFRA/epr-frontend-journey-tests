@@ -13,7 +13,10 @@ import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnViewPage from 'page-objects/prn.view.page.js'
-import { secondTradingName as tradingName } from '../support/fixtures.js'
+import {
+  createPrnDetails,
+  secondTradingName as tradingName
+} from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
@@ -48,23 +51,23 @@ describe('Packing Recycling Notes (Sanity)', () => {
     ]
 
     // Tonnage values expected from Summary Log files upload
-    // Aluminium        345.78
-    // Fibre	         	313.44
-    // Glass remelt	  	403.83
-    // Glass other	    1,022.20
-    // Paper and board	392.28
-    // Plastic	      	420.18
-    // Steel	         	275.10
-    // Wood	           	203.38
+    // Aluminium        42,026.48
+    // Fibre	         	39,206.34
+    // Glass remelt	  	36,907.80
+    // Glass other	    37,628.03
+    // Paper and board	40,608.86
+    // Plastic	      	41,768.17
+    // Steel	         	33,321.55
+    // Wood	           	38,546.55
     const expectedWasteBalances = [
-      '338.78',
-      '56.44',
-      '384.83',
-      '716.20',
-      '189.28',
-      '264.18',
-      '176.10',
-      '135.38'
+      '42,019.55',
+      '38,949.34',
+      '36,888.80',
+      '37,322.03',
+      '40,405.86',
+      '41,612.17',
+      '33,222.55',
+      '38,478.46'
     ]
 
     // Sanity check Reprocessor Input materials
@@ -93,18 +96,15 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await WasteRecordsPage.createNewPRNLink()
       const prnHelper = new PrnHelper()
 
-      const prnDetails = {
+      const prnDetails = createPrnDetails({
         tonnageWordings: tonnageWordings[i],
         tradingName,
-        issuerNotes: 'Testing',
         organisationDetails,
         regAddress: organisationDetails.regAddresses[orgAddressIndex],
         materialDesc: MATERIALS[i].prnName,
         accNumber,
-        process: MATERIALS[i].process,
-        prnNumber: '',
-        issuedDate: ''
-      }
+        process: MATERIALS[i].process
+      })
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
 

@@ -9,6 +9,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import DashboardPage from 'page-objects/dashboard.page.js'
+import WasteRecordsPage from 'page-objects/waste.records.page.js'
 
 describe('Registration Only', () => {
   it('Should not display Registration that do not have Accreditation associated @registration', async () => {
@@ -30,7 +31,7 @@ describe('Registration Only', () => {
       }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -55,16 +56,26 @@ describe('Registration Only', () => {
         }
       ]
     )
-    const user = await createAndRegisterDefraIdUser(userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await checkBodyText('No sites found.', 10)
+
+    await WasteRecordsPage.open(
+      organisationDetails.refNo,
+      migrationResponse.registrationIds[0]
+    )
+    await checkBodyText('Page not found', 10)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -101,7 +112,7 @@ describe('Registration Only', () => {
       }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -143,14 +154,18 @@ describe('Registration Only', () => {
         }
       ]
     )
-    const user = await createAndRegisterDefraIdUser(userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     let material = await DashboardPage.getMaterial(1, 1)
     expect(material).toBe('Fibre-based composite')
