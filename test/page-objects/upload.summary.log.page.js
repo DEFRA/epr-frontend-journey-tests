@@ -1,5 +1,8 @@
 import { browser, $ } from '@wdio/globals'
-import { checkBodyText } from '../support/checks.js'
+import {
+  checkBodyText,
+  checkBodyTextDoesNotInclude
+} from '../support/checks.js'
 
 class UploadSummaryLogPage {
   open(orgId, regId) {
@@ -17,6 +20,7 @@ class UploadSummaryLogPage {
     await this.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyTextDoesNotInclude('Declaration', 10)
     await checkBodyText('Summary log uploaded', 30)
     await this.clickOnReturnToHomePage()
   }
