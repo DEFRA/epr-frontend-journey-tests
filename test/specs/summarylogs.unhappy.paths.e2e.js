@@ -208,4 +208,76 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
+
+  it('Should get cover sheet validation error messages @coverValidationErrors', async () => {
+    const organisationDetails = await createLinkedOrganisation([
+      { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          regNumber: 'E25SR500020912PP',
+          accNumber: 'E-ACC12245PP',
+          status: 'approved'
+        }
+      ]
+    )
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.open()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    await DashboardPage.selectLink(1)
+
+    const regNo = await $('//a[normalize-space()="E25SR500020912PP"]')
+    expect(regNo).toExist()
+
+    const accNo = await $('//a[normalize-space()="E-ACC12245PP"]')
+    expect(accNo).toExist()
+
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+
+    const uploadInput = await $('#summary-log-upload')
+    await uploadInput.waitForExist({ timeout: 10000 })
+
+    await UploadSummaryLogPage.uploadFile('resources/cover-invalid.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+
+    await checkBodyText(
+      "Material on summary log's 'Cover' tab is missing or incorrect",
+      60
+    )
+    await checkBodyText(
+      "Registration number on summary log's 'Cover' tab is missing or incorrect",
+      60
+    )
+    await checkBodyText(
+      "Accreditation number on summary log's 'Cover' tab is missing or incorrect",
+      60
+    )
+
+    await checkBodyTextDoesNotInclude(
+      'Sorry, there is a problem with the service - try again later',
+      60
+    )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
 })
