@@ -190,8 +190,6 @@ services:
       DEFRA_ID_OIDC_WELL_KNOWN_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       ENTRA_OIDC_WELL_KNOWN_CONFIGURATION_URL: http://epr-re-ex-entra-stub:3010/.well-known/openid-configuration
       FEATURE_FLAG_DEV_ENDPOINTS: true
-      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES_EXTERNAL_API: true
-      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       LOCALSTACK_ENDPOINT: http://localstack:4566
       MONGO_URI: mongodb://mongodb:27017/
@@ -220,7 +218,6 @@ services:
       DEFRA_ID_OIDC_CONFIGURATION_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
-      FEATURE_FLAG_PACKAGING_RECYCLING_NOTES: true
       LOCALSTACK_ENDPOINT: http://localstack:4566
       NODE_ENV: development
       PORT: 3000
