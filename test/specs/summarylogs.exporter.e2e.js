@@ -94,9 +94,9 @@ describe('Summary Logs Exporter', () => {
 
     await checkBodyText('Your file is being checked', 30)
     await checkBodyText('Check before confirming upload', 30)
-    await checkBodyText('1 new load will be added to your waste balance', 10)
+    await checkBodyText('3 new loads will be added to your waste balance', 10)
     await checkBodyText(
-      '1 adjusted load will be reflected in your waste balance',
+      '2 adjusted loads will be reflected in your waste balance',
       10
     )
 
@@ -106,14 +106,14 @@ describe('Summary Logs Exporter', () => {
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyText('Your updated waste balance', 10)
-    await checkBodyText('89.00 tonnes', 10)
+    await checkBodyText('139.00 tonnes', 10)
 
     await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
 
     availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('89.00')
+    expect(availableWasteBalance).toBe('139.00')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
