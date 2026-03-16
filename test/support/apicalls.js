@@ -288,7 +288,7 @@ export async function updateMigratedOrganisation(
 
   data = { organisation: data }
 
-  response = await eprBackend.patch(
+  response = await eprBackend.put(
     `/v1/dev/organisations/${orgId}`,
     JSON.stringify(data)
   )
