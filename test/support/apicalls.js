@@ -226,6 +226,13 @@ export async function updateMigratedOrganisation(
     data.registrations[i].validFrom = '2026-01-01'
     data.registrations[i].validTo = `${currentYear + 1}-01-01`
     data.registrations[i].registrationNumber = orgUpdateData.regNumber
+    data.registrations[i].statusHistory = [
+      ...(data.registrations[i].statusHistory || []),
+      {
+        status: orgUpdateData.status,
+        updatedAt: data.registrations[i].validFrom
+      }
+    ]
     if (orgUpdateData.validFrom?.trim()) {
       data.registrations[i].validFrom = orgUpdateData.validFrom
     }
@@ -249,6 +256,13 @@ export async function updateMigratedOrganisation(
       data.accreditations[j].status = orgUpdateData.status
       data.accreditations[j].validFrom = '2026-01-01'
       data.accreditations[j].validTo = `${currentYear + 1}-01-01`
+      data.accreditations[j].statusHistory = [
+        ...(data.accreditations[j].statusHistory || []),
+        {
+          status: orgUpdateData.status,
+          updatedAt: data.accreditations[j].validFrom
+        }
+      ]
       if (orgUpdateData.validFrom?.trim()) {
         data.accreditations[j].validFrom = orgUpdateData.validFrom
       }
@@ -285,7 +299,13 @@ export async function updateMigratedOrganisation(
   data.submitterContactDetails.email = email
 
   data.status = updateDataRows[0].status
-
+  data.statusHistory = [
+    ...(data.statusHistory || []),
+    {
+      status: updateDataRows[0].status,
+      updatedAt: data.registrations[0].validFrom
+    }
+  ]
   data = { organisation: data }
 
   response = await eprBackend.put(
