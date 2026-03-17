@@ -1,93 +1,19 @@
-import { browser, expect } from '@wdio/globals'
+import { expect } from '@wdio/globals'
+import DashboardPage from 'page-objects/dashboard.page.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import { checkBodyText } from '../support/checks.js'
+import WasteRecordsPage from 'page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import DashboardPage from 'page-objects/dashboard.page.js'
-import WasteRecordsPage from 'page-objects/waste.records.page.js'
+import { checkBodyText } from '../support/checks.js'
 
-describe('Registration Only', () => {
-  it('Should not display Registration that do not have Accreditation associated @registration', async () => {
+describe('@registered-only', () => {
+  it('should display registered-only operators alongside accredited ones', async () => {
     const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      },
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      },
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Exporter',
-        withoutAccreditation: true
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber: 'R25SR5111050912PA',
-          accNumber: 'ACC123456',
-          status: 'approved',
-          withoutAccreditation: true
-        },
-        {
-          reprocessingType: 'input',
-          regNumber: 'RI25SR5111050912PA',
-          accNumber: 'ACCI123456',
-          status: 'approved',
-          withoutAccreditation: true
-        },
-        {
-          regNumber: 'E25SR500030913PA',
-          accNumber: 'ACC234567',
-          status: 'approved',
-          withoutAccreditation: true
-        }
-      ]
-    )
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    await checkBodyText('No sites found.', 10)
-
-    await WasteRecordsPage.open(
-      organisationDetails.refNo,
-      migrationResponse.registrationIds[0]
-    )
-    await checkBodyText('Page not found', 10)
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('Should display Registrations that have Accreditation associated @registrationOnly', async () => {
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      },
       {
         material: 'Paper or board (R3)',
         wasteProcessingType: 'Reprocessor',
@@ -105,10 +31,6 @@ describe('Registration Only', () => {
       {
         material: 'Plastic (R3)',
         wasteProcessingType: 'Reprocessor'
-      },
-      {
-        material: 'Wood (R3)',
-        wasteProcessingType: 'Exporter'
       }
     ])
 
@@ -119,13 +41,6 @@ describe('Registration Only', () => {
           reprocessingType: 'output',
           regNumber: 'R25SR5111050912PA',
           accNumber: 'ACC123456',
-          status: 'approved',
-          withoutAccreditation: true
-        },
-        {
-          reprocessingType: 'input',
-          regNumber: 'RI25SR5111050912PA',
-          accNumber: 'ACCI123456',
           status: 'approved',
           withoutAccreditation: true
         },
@@ -146,11 +61,6 @@ describe('Registration Only', () => {
           regNumber: 'RI25SR51110509124PL',
           accNumber: 'ACCI1234567',
           status: 'approved'
-        },
-        {
-          regNumber: 'E25SR5000309132WO',
-          accNumber: 'ACC2345678',
-          status: 'approved'
         }
       ]
     )
@@ -167,24 +77,25 @@ describe('Registration Only', () => {
 
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
-    let material = await DashboardPage.getMaterial(1, 1)
+    const row = await DashboardPage.getTableRow(1, 1)
+    expect(row.get('Accreditation')).toBe('Not accredited')
+    expect(row.get('Available waste balance (tonnes)')).toBe('N/A')
+
+    let material = await DashboardPage.getMaterial(2, 1)
     expect(material).toBe('Fibre-based composite')
 
-    let numberOfRows = await DashboardPage.getNumberOfRows(1)
-    expect(numberOfRows).toBe(1)
-
-    material = await DashboardPage.getMaterial(2, 1)
+    material = await DashboardPage.getMaterial(3, 1)
     expect(material).toBe('Plastic')
-    numberOfRows = await DashboardPage.getNumberOfRows(2)
-    expect(numberOfRows).toBe(1)
 
     await DashboardPage.selectExportingTab()
-    material = await DashboardPage.getMaterial(1, 1)
-    expect(material).toBe('Wood')
-    numberOfRows = await DashboardPage.getNumberOfRows(1)
-    expect(numberOfRows).toBe(1)
+    const exportRow = await DashboardPage.getTableRow(1, 1)
+    expect(exportRow.get('Accreditation')).toBe('Not accredited')
+    expect(exportRow.get('Available waste balance (tonnes)')).toBe('N/A')
 
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+    await WasteRecordsPage.open(
+      organisationDetails.refNo,
+      migrationResponse.registrationIds[0]
+    )
+    await checkBodyText('Page not found', 10)
   })
 })
