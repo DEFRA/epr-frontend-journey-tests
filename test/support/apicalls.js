@@ -233,6 +233,17 @@ export async function updateMigratedOrganisation(
         updatedAt: data.registrations[i].validFrom
       }
     ]
+    data.registrations[i].statusHistory = (
+      data.registrations[i].statusHistory || []
+    ).map((entry) => {
+      if (entry.status === 'created') {
+        return {
+          ...entry,
+          updatedAt: '2025-12-31'
+        }
+      }
+      return entry
+    })
     if (orgUpdateData.validFrom?.trim()) {
       data.registrations[i].validFrom = orgUpdateData.validFrom
     }
@@ -263,6 +274,17 @@ export async function updateMigratedOrganisation(
           updatedAt: data.accreditations[j].validFrom
         }
       ]
+      data.accreditations[j].statusHistory = (
+        data.accreditations[j].statusHistory || []
+      ).map((entry) => {
+        if (entry.status === 'created') {
+          return {
+            ...entry,
+            updatedAt: '2025-12-31'
+          }
+        }
+        return entry
+      })
       if (orgUpdateData.validFrom?.trim()) {
         data.accreditations[j].validFrom = orgUpdateData.validFrom
       }
