@@ -96,7 +96,7 @@ services:
       MOCK_VIRUS_RESULT_DELAY: 3
       SQS_ENDPOINT: http://localstack:4566
       S3_ENDPOINT: http://localstack:4566
-      CONSUMER_BUCKETS: re-ex-summary-logs
+      CONSUMER_BUCKETS: re-ex-summary-logs,re-ex-overseas-sites
 
   # Copies cognito seed files into a volume so cognito-stub has its own copies
   cognito-stub-init:
