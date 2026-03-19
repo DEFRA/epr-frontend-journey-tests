@@ -9,7 +9,10 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import { checkBodyText } from '../support/checks.js'
+import {
+  checkBodyText,
+  checkBodyTextDoesNotInclude
+} from '../support/checks.js'
 
 describe('@registered-only', () => {
   it('should display registered-only operators alongside accredited ones', async () => {
@@ -87,15 +90,19 @@ describe('@registered-only', () => {
     material = await DashboardPage.getMaterial(3, 1)
     expect(material).toBe('Plastic')
 
+    await DashboardPage.selectTableLink(1, 1)
+
+    await checkBodyText('R25SR5111050912PA', 10)
+    await checkBodyText('Upload your summary log', 10)
+    await checkBodyTextDoesNotInclude('Available waste balance', 5)
+    await checkBodyTextDoesNotInclude('Accreditation number', 5)
+    await checkBodyTextDoesNotInclude('PRNs', 5)
+
+    await WasteRecordsPage.selectBackLink()
+
     await DashboardPage.selectExportingTab()
     const exportRow = await DashboardPage.getTableRow(1, 1)
     expect(exportRow.get('Accreditation')).toBe('Not accredited')
     expect(exportRow.get('Available waste balance (tonnes)')).toBe('N/A')
-
-    await WasteRecordsPage.open(
-      organisationDetails.refNo,
-      migrationResponse.registrationIds[0]
-    )
-    await checkBodyText('Page not found', 10)
   })
 })
