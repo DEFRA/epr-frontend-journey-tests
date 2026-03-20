@@ -112,7 +112,7 @@ runs:
         docker compose up --wait-timeout 300 -d --quiet-pull
 
     - name: Start docker compose
-      if : steps.service-branch.outputs.exists != 'true'
+      if: steps.service-branch.outputs.exists != 'true'
       shell: bash
       run: |
         EPR_FRONTEND=${{ inputs.epr-frontend }} \
@@ -140,14 +140,14 @@ runs:
 
     - name: Upload allure report
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: allure-report
         path: ./allure-report
 
     - name: Upload docker compose logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: docker-compose-logs
         path: ./logs.txt
