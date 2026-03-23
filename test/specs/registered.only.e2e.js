@@ -82,7 +82,7 @@ describe('@registered-only', () => {
 
     const row = await DashboardPage.getTableRow(1, 1)
     expect(row.get('Accreditation')).toBe('Not accredited')
-    expect(row.get('Available waste balance (tonnes)')).toBe('N/A')
+    expect(row.get('Available waste balance (tonnes)')).toBe('Not applicable')
 
     let material = await DashboardPage.getMaterial(2, 1)
     expect(material).toBe('Fibre-based composite')
@@ -103,6 +103,8 @@ describe('@registered-only', () => {
     await DashboardPage.selectExportingTab()
     const exportRow = await DashboardPage.getTableRow(1, 1)
     expect(exportRow.get('Accreditation')).toBe('Not accredited')
-    expect(exportRow.get('Available waste balance (tonnes)')).toBe('N/A')
+    expect(exportRow.get('Available waste balance (tonnes)')).toBe(
+      'Not applicable'
+    )
   })
 })
