@@ -82,6 +82,13 @@ Running tests with a specific tag locally
 GREP='@delprnexp' npm run test:local:grep
 ```
 
+If for whatever reason [the stable version of Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/#stable)
+is not working for you, then you can specify the Chrome version when running locally
+
+```sh
+WDIO_CHROME_VERSION=146.0.7680.154 npm run test:local:grep
+```
+
 ### Debugging local tests
 
 ```bash
