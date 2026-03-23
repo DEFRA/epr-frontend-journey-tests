@@ -10,6 +10,8 @@ if (debug) {
   execArgv.push('--inspect')
 }
 
+const browserVersion = process.env.WDIO_CHROME_VERSION ?? 'stable'
+
 export const config = {
   //
   // ====================
@@ -63,12 +65,12 @@ export const config = {
   //
 
   capabilities: debug
-    ? [{ browserName: 'chrome', browserVersion: 'stable' }]
+    ? [{ browserName: 'chrome', browserVersion }]
     : [
         {
           maxInstances: 1,
           browserName: 'chrome',
-          browserVersion: 'stable',
+          browserVersion,
           'goog:chromeOptions': {
             args: [
               '--no-sandbox',
