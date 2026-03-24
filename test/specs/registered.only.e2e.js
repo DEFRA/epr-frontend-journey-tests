@@ -1,4 +1,4 @@
-import { expect } from '@wdio/globals'
+import { browser, expect } from '@wdio/globals'
 import DashboardPage from 'page-objects/dashboard.page.js'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
@@ -13,6 +13,7 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 
 describe('@registered-only', () => {
   it('should display registered-only operators alongside accredited ones', async () => {
@@ -43,13 +44,11 @@ describe('@registered-only', () => {
         {
           reprocessingType: 'output',
           regNumber: 'R25SR5111050912PA',
-          accNumber: 'ACC123456',
           status: 'approved',
           withoutAccreditation: true
         },
         {
           regNumber: 'E25SR500030913PA',
-          accNumber: 'ACC234567',
           status: 'approved',
           withoutAccreditation: true
         },
@@ -98,7 +97,24 @@ describe('@registered-only', () => {
     await checkBodyTextDoesNotInclude('Accreditation number', 5)
     await checkBodyTextDoesNotInclude('PRNs', 5)
 
-    await WasteRecordsPage.selectBackLink()
+    await WasteRecordsPage.submitSummaryLogLink()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+    await UploadSummaryLogPage.uploadFile(
+      'resources/reprocessor-output-regonly.xlsx'
+    )
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+
+    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('8 new loads will be added to your waste balance', 30)
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Summary log uploaded', 30)
+    await checkBodyTextDoesNotInclude('Your updated waste balance', 10)
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
     const exportRow = await DashboardPage.getTableRow(1, 1)
