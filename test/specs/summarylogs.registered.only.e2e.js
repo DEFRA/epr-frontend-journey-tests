@@ -16,7 +16,7 @@ import {
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 
 describe('@registered-only', () => {
-  it('should display registered-only operators alongside accredited ones', async () => {
+  it('should be able to upload Registered Only Reprocessor Summary Logs for registered-only operators and display unaccredited registrations alongside accredited ones @regOnlyReprocessor', async () => {
     const organisationDetails = await createLinkedOrganisation([
       {
         material: 'Paper or board (R3)',
@@ -122,5 +122,65 @@ describe('@registered-only', () => {
     expect(exportRow.get('Available waste balance (tonnes)')).toBe(
       'Not applicable'
     )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('should be able to upload Registered Only Exporter Summary Logs for registered-only operator and display unaccredited registrations alongside accredited ones @regOnlyExporter', async () => {
+    const organisationDetails = await createLinkedOrganisation([
+      {
+        material: 'Paper or board (R3)',
+        wasteProcessingType: 'Exporter',
+        withoutAccreditation: true
+      }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          regNumber: 'E25SR500030913PA',
+          status: 'approved',
+          withoutAccreditation: true
+        }
+      ]
+    )
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    await DashboardPage.selectTableLink(1, 1)
+    await checkBodyText('E25SR500030913PA', 10)
+
+    await WasteRecordsPage.submitSummaryLogLink()
+    await expect(browser).toHaveTitle(
+      expect.stringContaining('Summary log: upload')
+    )
+
+    await UploadSummaryLogPage.uploadFile('resources/exporter-regonly.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+
+    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('12 new loads will be added to your waste balance', 30)
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Summary log uploaded', 30)
+    await checkBodyTextDoesNotInclude('Your updated waste balance', 10)
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 })
