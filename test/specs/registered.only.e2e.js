@@ -44,13 +44,11 @@ describe('@registered-only', () => {
         {
           reprocessingType: 'output',
           regNumber: 'R25SR5111050912PA',
-          accNumber: 'ACC123456',
           status: 'approved',
           withoutAccreditation: true
         },
         {
           regNumber: 'E25SR500030913PA',
-          accNumber: 'ACC234567',
           status: 'approved',
           withoutAccreditation: true
         },
