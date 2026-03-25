@@ -109,7 +109,13 @@ describe('@registered-only', () => {
     await checkBodyText('Your file is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 30)
-    await checkBodyText('8 new loads will be added to your waste balance', 30)
+    await checkBodyText(
+      'Check the following before confirming the upload.',
+      30
+    )
+    await checkBodyText('Loads received', 30)
+    await checkBodyText('Loads sent on', 30)
+    await checkBodyText('new loads have been added', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Summary log uploaded', 30)
@@ -173,7 +179,14 @@ describe('@registered-only', () => {
     await checkBodyText('Your file is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 30)
-    await checkBodyText('12 new loads will be added to your waste balance', 30)
+    await checkBodyText(
+      'Check the following before confirming the upload.',
+      30
+    )
+    await checkBodyText('Loads received', 30)
+    await checkBodyText('Loads exported', 30)
+    await checkBodyText('Loads sent on', 30)
+    await checkBodyText('new loads have been added', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Summary log uploaded', 30)
