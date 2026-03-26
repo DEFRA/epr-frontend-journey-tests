@@ -75,8 +75,8 @@ describe('Deleting an in-progress report', () => {
     let deleteHeading = await ConfirmDeleteReportPage.headingText()
     expect(deleteHeading).toBe('Confirm deletion of this report')
 
-    const bodyText = await ConfirmDeleteReportPage.bodyText()
-    expect(bodyText).toContain('This action cannot be undone')
+    const warningText = await ConfirmDeleteReportPage.warningText()
+    expect(warningText).toContain('This action cannot be undone')
 
     // Test back link
     await ConfirmDeleteReportPage.selectBackLink()
@@ -110,9 +110,20 @@ describe('Deleting an in-progress report', () => {
     expect(checkHeading).toBe('Check your answers before creating draft report')
     await ReportCheckAnswersPage.deleteAndStartAgainLink()
 
-    // Confirm deletion
+    // Confirm deletion page — test back link goes to supporting information
     deleteHeading = await ConfirmDeleteReportPage.headingText()
     expect(deleteHeading).toBe('Confirm deletion of this report')
+
+    await ConfirmDeleteReportPage.selectBackLink()
+    const backToSupportingInfo =
+      await ReportSupportingInformationPage.headingText()
+    expect(backToSupportingInfo).toBe(
+      'Add supporting information for your regulator (optional)'
+    )
+
+    // Navigate back to check answers and delete
+    await ReportSupportingInformationPage.continue()
+    await ReportCheckAnswersPage.deleteAndStartAgainLink()
     await ConfirmDeleteReportPage.confirmDeletion()
 
     // Should be back on reports list with status reverted to Due

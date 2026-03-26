@@ -7,10 +7,8 @@ class ConfirmDeleteReportPage {
     return await element.getText()
   }
 
-  async bodyText() {
-    const element = await $(
-      '#main-content .govuk-grid-column-two-thirds > p.govuk-body'
-    )
+  async warningText() {
+    const element = await $('p*=cannot be undone')
     await element.waitForExist({ timeout: 5000 })
     return await element.getText()
   }
