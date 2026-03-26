@@ -2,7 +2,7 @@ import { $ } from '@wdio/globals'
 
 class ReportsPage {
   async headingText() {
-    const element = await $('h1.govuk-heading-xl')
+    const element = await $('h1.govuk-heading-l')
     await element.waitForExist({ timeout: 5000 })
     return await element.getText()
   }

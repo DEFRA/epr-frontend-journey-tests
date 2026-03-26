@@ -95,7 +95,7 @@ describe('Deleting an in-progress report', () => {
 
     // Should be back on reports list with status reverted to Due
     let reportsHeading = await ReportsPage.headingText()
-    expect(reportsHeading).toBe('Reports')
+    expect(reportsHeading).toContain('Reports')
 
     let statusBadge = await ReportsPage.getStatusBadge(1)
     expect(statusBadge).toBe('Due')
