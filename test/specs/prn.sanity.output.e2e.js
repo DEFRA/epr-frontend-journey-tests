@@ -11,8 +11,11 @@ import {
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { thirdTradingName as tradingName } from '~/test/support/fixtures.js'
-import { PrnHelper } from '~/test/support/prn.helper.js'
+import {
+  createPrnDetails,
+  thirdTradingName as tradingName
+} from '../support/fixtures.js'
+import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Reprocessor Output @sanitycheck', async () => {
@@ -36,14 +39,14 @@ describe('Packing Recycling Notes (Sanity)', () => {
       },
       { integer: 5, word: 'Five' },
       {
-        integer: 571482,
-        word: 'Five hundred and seventy one thousand four hundred and eighty two'
+        integer: 27482,
+        word: 'Twenty seven thousand four hundred and eighty two'
       },
       { integer: 9307, word: 'Nine thousand three hundred and seven' },
       { integer: 42, word: 'Forty two' },
       {
-        integer: 83516,
-        word: 'Eighty three thousand five hundred and sixteen'
+        integer: 43516,
+        word: 'Forty three thousand five hundred and sixteen'
       },
       { integer: 156, word: 'One hundred and fifty six' }
     ]
@@ -74,16 +77,15 @@ describe('Packing Recycling Notes (Sanity)', () => {
       await WasteRecordsPage.createNewPRNLink()
 
       const prnHelper = new PrnHelper()
-      const prnDetails = {
+      const prnDetails = createPrnDetails({
         tonnageWordings: tonnageWordingsOutput[i],
         tradingName,
-        issuerNotes: 'Testing',
         organisationDetails,
         regAddress: organisationDetails.regAddresses[orgAddressIndex],
         materialDesc: MATERIALS[i].prnName,
         accNumber,
         process: MATERIALS[i].process
-      }
+      })
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
       await PrnCreatedPage.returnToRegistrationPage()

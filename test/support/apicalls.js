@@ -4,15 +4,15 @@ import {
   Registration
 } from '../support/generator.js'
 
-import { EprBackend } from '../apis/epr-backend.js'
+import { fakerEN_GB } from '@faker-js/faker'
 import { expect } from '@wdio/globals'
+import { FormData } from 'undici'
+import { EprBackend } from '../apis/epr-backend.js'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
-import { fakerEN_GB } from '@faker-js/faker'
 import { defraIdStub } from './defra-id-stub.js'
-import Users from './users.js'
-import { FormData } from 'undici'
 import { MATERIALS } from './materials.js'
+import Users from './users.js'
 
 async function assertSuccessResponse(response, context) {
   const body = await response.body.json()
@@ -81,10 +81,12 @@ export async function createOrgWithAllWasteProcessingTypeAllMaterials() {
 
   updateDataRows[0].email = `sanity_${fakerEN_GB.internet.email()}`
 
-  const userEmail = await updateMigratedOrganisation(
+  const migratedOrganisation = await updateMigratedOrganisation(
     organisationDetails.refNo,
     updateDataRows
   )
+
+  const userEmail = migratedOrganisation.email
   return { organisationDetails, userEmail }
 }
 
@@ -215,12 +217,33 @@ export async function updateMigratedOrganisation(
   let data = responseData
   let accreditationIndex = 0
 
+  const accreditationIds = []
+  const registrationIds = []
+
   for (let i = 0; i < updateDataRows.length; i++) {
     const orgUpdateData = updateDataRows[i]
     data.registrations[i].status = orgUpdateData.status
     data.registrations[i].validFrom = '2026-01-01'
     data.registrations[i].validTo = `${currentYear + 1}-01-01`
     data.registrations[i].registrationNumber = orgUpdateData.regNumber
+    data.registrations[i].statusHistory = [
+      ...(data.registrations[i].statusHistory || []),
+      {
+        status: orgUpdateData.status,
+        updatedAt: data.registrations[i].validFrom
+      }
+    ]
+    data.registrations[i].statusHistory = (
+      data.registrations[i].statusHistory || []
+    ).map((entry) => {
+      if (entry.status === 'created') {
+        return {
+          ...entry,
+          updatedAt: '2025-12-31'
+        }
+      }
+      return entry
+    })
     if (orgUpdateData.validFrom?.trim()) {
       data.registrations[i].validFrom = orgUpdateData.validFrom
     }
@@ -236,12 +259,32 @@ export async function updateMigratedOrganisation(
       data.registrations[i].submittedToRegulator = submittedToRegulator
     }
 
+    registrationIds.push(data.registrations[i].id)
+
     if (!orgUpdateData.withoutAccreditation) {
       const j = accreditationIndex
       data.registrations[i].accreditationId = data.accreditations[j].id
       data.accreditations[j].status = orgUpdateData.status
       data.accreditations[j].validFrom = '2026-01-01'
       data.accreditations[j].validTo = `${currentYear + 1}-01-01`
+      data.accreditations[j].statusHistory = [
+        ...(data.accreditations[j].statusHistory || []),
+        {
+          status: orgUpdateData.status,
+          updatedAt: data.accreditations[j].validFrom
+        }
+      ]
+      data.accreditations[j].statusHistory = (
+        data.accreditations[j].statusHistory || []
+      ).map((entry) => {
+        if (entry.status === 'created') {
+          return {
+            ...entry,
+            updatedAt: '2025-12-31'
+          }
+        }
+        return entry
+      })
       if (orgUpdateData.validFrom?.trim()) {
         data.accreditations[j].validFrom = orgUpdateData.validFrom
       }
@@ -257,6 +300,7 @@ export async function updateMigratedOrganisation(
       if (submittedToRegulator) {
         data.accreditations[j].submittedToRegulator = submittedToRegulator
       }
+      accreditationIds.push(data.accreditations[j].id)
       accreditationIndex++
     }
   }
@@ -277,16 +321,22 @@ export async function updateMigratedOrganisation(
   data.submitterContactDetails.email = email
 
   data.status = updateDataRows[0].status
-
+  data.statusHistory = [
+    ...(data.statusHistory || []),
+    {
+      status: updateDataRows[0].status,
+      updatedAt: data.registrations[0].validFrom
+    }
+  ]
   data = { organisation: data }
 
-  response = await eprBackend.patch(
+  response = await eprBackend.put(
     `/v1/dev/organisations/${orgId}`,
     JSON.stringify(data)
   )
   expect(response.statusCode).toBe(200)
 
-  return email
+  return { email, registrationIds, accreditationIds }
 }
 
 export async function createAndRegisterDefraIdUser(
@@ -330,12 +380,14 @@ export async function linkDefraIdUser(organisationId, userId, email) {
   expect(linkResponse.statusCode).toBe(200)
 }
 
-//TODO: Add auth, and also factor in TEST environment
-export async function externalAPIcancelPrn(prnDetails) {
+export async function externalAPICancelPrn(prnDetails) {
+  await config.cognitoAuth.generateToken()
+
   const eprBackend = new EprBackend()
   const response = await eprBackend.post(
     `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/reject`,
-    JSON.stringify({ rejectedAt: new Date().toISOString() })
+    JSON.stringify({ rejectedAt: new Date().toISOString() }),
+    config.cognitoAuth.authHeader()
   )
 
   await assertSuccessResponseWithoutBody(
@@ -345,11 +397,14 @@ export async function externalAPIcancelPrn(prnDetails) {
   prnDetails.status = 'Awaiting cancellation'
 }
 
-export async function externalAPIacceptPrn(prnDetails) {
+export async function externalAPIAcceptPrn(prnDetails) {
+  await config.cognitoAuth.generateToken()
+
   const eprBackend = new EprBackend()
   const response = await eprBackend.post(
     `/v1/packaging-recycling-notes/${prnDetails.prnNumber}/accept`,
-    JSON.stringify({ acceptedAt: new Date().toISOString() })
+    JSON.stringify({ acceptedAt: new Date().toISOString() }),
+    config.cognitoAuth.authHeader()
   )
 
   await assertSuccessResponseWithoutBody(

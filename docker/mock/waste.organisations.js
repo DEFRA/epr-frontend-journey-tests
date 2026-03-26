@@ -135,7 +135,34 @@ app.get('/waste-organisations/organisations', checkAuth, (req, res) => {
               "registrationYear": 2026
             }
           ]
-        }
+        },
+        {
+          "id": "d5fff1c9-2717-4d49-982b-5f87a8db5e4a",
+          "name": "Ball Corporation",
+          "tradingName": "test10",
+          "businessCountry": "GB-ENG",
+          "companiesHouseNumber": null,
+          "address": {
+            "addressLine1": "Test street1",
+            "addressLine2": null,
+            "town": null,
+            "county": null,
+            "postcode": "Essex",
+            "country": "CB113AA"
+          },
+          "registrations": [
+            {
+              "status": "REGISTERED",
+              "type": "LARGE_PRODUCER",
+              "registrationYear": 2025
+            },
+            {
+              "status": "REGISTERED",
+              "type": "LARGE_PRODUCER",
+              "registrationYear": 2026
+            }
+          ]
+        },
       ]
     })
 })

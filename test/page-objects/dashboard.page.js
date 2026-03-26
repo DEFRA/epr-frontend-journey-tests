@@ -61,6 +61,21 @@ class DashboardPage {
     )
     return rows.length
   }
+
+  async getTableRow(tableIndex, rowIndex) {
+    const tableRow = new Map()
+    const selector = `#main-content table.govuk-table:nth-of-type(${tableIndex})`
+    const tableHeaders = await $$(`${selector} > thead > tr th`)
+    const headerText = await tableHeaders.map((el) => el.getText())
+    const tableData = await $$(
+      `${selector} > tbody > tr:nth-child(${rowIndex}) td`
+    )
+    const rowText = await tableData.map((el) => el.getText())
+    for (let i = 0; i < headerText.length; i++) {
+      tableRow.set(headerText[i], rowText[i])
+    }
+    return tableRow
+  }
 }
 
 export default new DashboardPage()

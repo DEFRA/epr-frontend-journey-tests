@@ -4,7 +4,7 @@ import PrnViewPage from 'page-objects/prn.view.page.js'
 import CreatePRNPage from 'page-objects/create.prn.page.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import PrnIssuedPage from 'page-objects/prn.issued.page.js'
-import { todayddMMMMyyyy } from '~/test/support/date.js'
+import { todayddMMMMyyyy } from './date.js'
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import ConfirmCancelPrnPage from 'page-objects/confirm.cancel.prn.page.js'
 import PrnCancelledPage from 'page-objects/prn.cancelled.page.js'
@@ -17,10 +17,8 @@ export class PrnHelper {
 
   async checkPrnDetails(expectedPrnDetails) {
     const prnDetails = await CheckBeforeCreatingPrnPage.prnDetails()
-    expect(prnDetails['Issuer']).toBe(
-      expectedPrnDetails.organisationDetails.organisation.companyName
-    )
-    expect(prnDetails['Packaging waste producer or compliance scheme']).toBe(
+    expect(prnDetails['Issuer']).toBe(expectedPrnDetails.companyName)
+    expect(prnDetails['Packaging producer or compliance scheme']).toBe(
       expectedPrnDetails.tradingName
     )
     expect(prnDetails['Tonnage']).toBe(
@@ -61,9 +59,9 @@ export class PrnHelper {
     expect(prnViewDetails[`${this.prnWording} number`]).toBe(
       expectedPrnDetails.prnNumber
     )
-    expect(
-      prnViewDetails['Packaging waste producer or compliance scheme']
-    ).toBe(expectedPrnDetails.tradingName)
+    expect(prnViewDetails['Packaging producer or compliance scheme']).toBe(
+      expectedPrnDetails.tradingName
+    )
     expect(prnViewDetails['Tonnage']).toBe(
       `${expectedPrnDetails.tonnageWordings.integer}`
     )
@@ -134,17 +132,28 @@ export class PrnHelper {
     expect(awaitingRow.get('Status')).toEqual(prnDetails.status)
   }
 
-  async checkIssuedRows(prnDetails, rowIndex) {
-    const issuedRow = await PrnDashboardPage.getIssuedRow(rowIndex)
-
-    expect(issuedRow.get(`${this.prnWording} number`)).toEqual(
+  async checkTableRows(tableRow, prnDetails) {
+    expect(tableRow.get(`${this.prnWording} number`)).toEqual(
       prnDetails.prnNumber
     )
-    expect(issuedRow.get('Producer or compliance scheme')).toEqual(
+    expect(tableRow.get('Producer or compliance scheme')).toEqual(
       prnDetails.tradingName
     )
-    expect(issuedRow.get('Date issued')).toEqual(prnDetails.issuedDate)
-    expect(issuedRow.get('Status')).toEqual(prnDetails.status)
+    expect(tableRow.get('Date issued')).toEqual(prnDetails.issuedDate)
+    expect(tableRow.get('Tonnage')).toEqual(
+      `${prnDetails.tonnageWordings.integer}`
+    )
+    expect(tableRow.get('Status')).toEqual(prnDetails.status)
+  }
+
+  async checkCancelledRows(prnDetails, rowIndex) {
+    const cancelledRow = await PrnDashboardPage.getCancelledRow(rowIndex)
+    await this.checkTableRows(cancelledRow, prnDetails)
+  }
+
+  async checkIssuedRows(prnDetails, rowIndex) {
+    const issuedRow = await PrnDashboardPage.getIssuedRow(rowIndex)
+    await this.checkTableRows(issuedRow, prnDetails)
   }
 
   async issuePrnAndUpdateDetails(prnDetails, prnPrefix = 'SR') {
@@ -174,7 +183,7 @@ export class PrnHelper {
     )
   }
 
-  async cancelPRNAndReturnToPRNsDashboard() {
+  async cancelPRNAndReturnToPRNsDashboard(prnDetails) {
     await PrnViewPage.cancelPRNButton()
     const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
     expect(confirmCancelHeading).toBe(
@@ -187,6 +196,7 @@ export class PrnHelper {
 
     const prnStatus = await PrnCancelledPage.statusText()
     expect(prnStatus).toContain('Cancelled')
+    prnDetails.status = 'Cancelled'
     if (!this.isPern) {
       await PrnCancelledPage.prnsPage()
     } else {

@@ -13,10 +13,13 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import { secondTradingName as tradingName } from '../support/fixtures.js'
-import { PrnHelper } from '~/test/support/prn.helper.js'
+import {
+  createPrnDetails,
+  secondTradingName as tradingName
+} from '../support/fixtures.js'
+import { PrnHelper } from '../support/prn.helper.js'
 
-describe('Create Packing Recycling Notes (Exporter)', () => {
+describe('Create Packing Recycling Notes (Exporter) @smoketest', () => {
   it('Should test various (Unhappy) paths for Create PRN Exporter @prnexporter', async () => {
     const regNumber = 'E25SR500020912AL'
     const accNumber = 'E-ACC12245AL'
@@ -27,7 +30,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       { material: 'Aluminium (R4)', wasteProcessingType: 'Exporter' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -38,18 +41,17 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
-
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -57,8 +59,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
 
     const prnHelper = new PrnHelper(true)
 
-    const prnDetails = {
-      tonnageWordings,
+    const prnDetails = createPrnDetails({
       tradingName,
       issuerNotes: '',
       organisationDetails,
@@ -66,7 +67,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
       materialDesc,
       accNumber,
       process: 'R4'
-    }
+    })
 
     // Empty issuer notes, PERN created should say "Not provided"
     await prnHelper.createAndCheckDraftPrn(prnDetails)
@@ -97,7 +98,7 @@ describe('Create Packing Recycling Notes (Exporter)', () => {
     let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
       'Enter PERN tonnage as a whole number',
-      'Enter a packaging waste producer or compliance scheme'
+      'Enter a packaging producer or compliance scheme'
     ])
 
     await prnHelper.createAndCheckDraftPrn(prnDetails)

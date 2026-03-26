@@ -13,7 +13,10 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-import { thirdTradingName as tradingName } from '../support/fixtures.js'
+import {
+  createPrnDetails,
+  thirdTradingName as tradingName
+} from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Creating Packing Recycling Notes', () => {
@@ -27,7 +30,7 @@ describe('Creating Packing Recycling Notes', () => {
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
     ])
 
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -39,18 +42,17 @@ describe('Creating Packing Recycling Notes', () => {
       ]
     )
 
-    const user = await createAndRegisterDefraIdUser(userEmail)
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
-
-    const tonnageWordings = {
-      integer: 203,
-      word: 'Two hundred and three'
-    }
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectTableLink(1, 1)
 
@@ -58,16 +60,13 @@ describe('Creating Packing Recycling Notes', () => {
 
     const prnHelper = new PrnHelper()
 
-    const prnDetails = {
-      tonnageWordings,
+    const prnDetails = createPrnDetails({
       tradingName,
       issuerNotes: '',
       organisationDetails,
-      regAddress: organisationDetails.regAddresses[0],
       materialDesc,
-      accNumber,
-      process: 'R3'
-    }
+      accNumber
+    })
 
     // Empty issuer notes, PRN created should say "Not provided"
     await prnHelper.createAndCheckDraftPrn(prnDetails)
@@ -98,7 +97,7 @@ describe('Creating Packing Recycling Notes', () => {
     let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
       'Enter PRN tonnage as a whole number',
-      'Enter a packaging waste producer or compliance scheme'
+      'Enter a packaging producer or compliance scheme'
     ])
 
     await prnHelper.createAndCheckDraftPrn(prnDetails)

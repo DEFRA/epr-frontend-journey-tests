@@ -11,7 +11,6 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
-// import CreatePRNPage from 'page-objects/create.prn.page.js'
 
 describe('Summary Logs Exporter', () => {
   it('Should be able to submit a Exporter Summary Log spreadsheet @exporter', async () => {
@@ -21,7 +20,7 @@ describe('Summary Logs Exporter', () => {
     ])
 
     // We adjust validFrom date to test filtering of rows from the Summary Log upload
-    const userEmail = await updateMigratedOrganisation(
+    const migrationResponse = await updateMigratedOrganisation(
       organisationDetails.refNo,
       [
         {
@@ -38,14 +37,18 @@ describe('Summary Logs Exporter', () => {
         }
       ]
     )
-    const user = await createAndRegisterDefraIdUser(userEmail)
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
-    await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
 
     await HomePage.openStart()
     await HomePage.clickStartNow()
 
-    await DefraIdStubPage.loginViaEmail(userEmail)
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)
@@ -63,7 +66,7 @@ describe('Summary Logs Exporter', () => {
 
     await checkBodyText('Your file is being checked', 30)
     await checkBodyText('Check before confirming upload', 30)
-    await checkBodyText('3 new loads will be added to your waste balance', 10)
+    await checkBodyText('2 new loads will be added to your waste balance', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)
@@ -91,9 +94,9 @@ describe('Summary Logs Exporter', () => {
 
     await checkBodyText('Your file is being checked', 30)
     await checkBodyText('Check before confirming upload', 30)
-    await checkBodyText('2 new loads will be added to your waste balance', 10)
+    await checkBodyText('3 new loads will be added to your waste balance', 10)
     await checkBodyText(
-      '1 adjusted load will be reflected in your waste balance',
+      '2 adjusted loads will be reflected in your waste balance',
       10
     )
 
@@ -103,14 +106,14 @@ describe('Summary Logs Exporter', () => {
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyText('Your updated waste balance', 10)
-    await checkBodyText('89.00 tonnes', 10)
+    await checkBodyText('139.00 tonnes', 10)
 
     await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
 
     availableWasteBalance = await DashboardPage.availableWasteBalance(1)
-    expect(availableWasteBalance).toBe('89.00')
+    expect(availableWasteBalance).toBe('139.00')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

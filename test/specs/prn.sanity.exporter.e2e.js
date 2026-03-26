@@ -11,8 +11,8 @@ import {
 import PrnCreatedPage from 'page-objects/prn.created.page.js'
 import { MATERIALS } from '../support/materials.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import { tradingName } from '../support/fixtures.js'
-import { PrnHelper } from '~/test/support/prn.helper.js'
+import { createPrnDetails } from '../support/fixtures.js'
+import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
@@ -33,14 +33,14 @@ describe('Packing Recycling Notes (Sanity)', () => {
       { integer: 219, word: 'Two hundred and nineteen' },
       { integer: 3, word: 'Three' },
       {
-        integer: 487203,
-        word: 'Four hundred and eighty seven thousand two hundred and three'
+        integer: 487,
+        word: 'Four hundred and eighty seven'
       },
       {
-        integer: 929999,
-        word: 'Nine hundred and twenty nine thousand nine hundred and ninety nine'
+        integer: 929,
+        word: 'Nine hundred and twenty nine'
       },
-      { integer: 68000, word: 'Sixty eight thousand' }
+      { integer: 680, word: 'Six hundred and eighty' }
     ]
 
     for (let i = 0; i < MATERIALS.length; i++) {
@@ -71,15 +71,13 @@ describe('Packing Recycling Notes (Sanity)', () => {
 
       const prnHelper = new PrnHelper(true)
 
-      const prnDetails = {
+      const prnDetails = createPrnDetails({
         tonnageWordings: tonnageWordingsExporter[i],
-        tradingName,
-        issuerNotes: 'Testing',
         organisationDetails,
         materialDesc: MATERIALS[i].prnName,
         accNumber,
         process: MATERIALS[i].process
-      }
+      })
 
       await prnHelper.createAndCheckPrnDetails(prnDetails)
 

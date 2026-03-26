@@ -5,6 +5,8 @@ The template to create a service that runs WDIO tests against an environment.
 - [Local](#local)
   - [Requirements](#requirements)
     - [Node.js](#nodejs)
+    - [Gitleaks](#gitleaks)
+    - [Mise](#mise)
   - [Setup](#setup)
   - [Running local tests](#running-local-tests)
   - [Debugging local tests](#debugging-local-tests)
@@ -27,6 +29,28 @@ To use the correct version of Node.js for this application, via nvm:
 ```bash
 nvm use
 ```
+
+#### Gitleaks
+
+[Gitleaks](https://github.com/gitleaks/gitleaks) is required for pre-commit secret scanning and must be available on your PATH.
+
+The simplest install on macOS/Linux is via [mise](#mise)
+
+```bash
+mise trust && mise install
+```
+
+Alternatively, install directly:
+
+- macOS: `brew install gitleaks`
+- Linux/Windows: see the [gitleaks releases page](https://github.com/gitleaks/gitleaks/releases)
+
+#### Mise
+
+[mise](https://mise.jdx.dev/) - a polyglot version manager that reads `mise.toml` in this repo to install the correct pinned versions
+
+1. [Install](https://mise.jdx.dev/getting-started.html#installing-mise-cli)
+2. [Activate](https://mise.jdx.dev/getting-started.html#activate-mise) in your shell
 
 ### Setup
 
@@ -58,6 +82,13 @@ Running tests with a specific tag locally
 GREP='@delprnexp' npm run test:local:grep
 ```
 
+If for whatever reason [the stable version of Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/#stable)
+is not working for you, then you can specify the Chrome version when running locally
+
+```sh
+WDIO_CHROME_VERSION=146.0.7680.154 npm run test:local:grep
+```
+
 ### Debugging local tests
 
 ```bash
@@ -72,6 +103,10 @@ Tests are run from the CDP-Portal under the Test Suites section. Before any chan
 You can check the progress of the build under the actions section of this repository. Builds typically take around 1-2 minutes.
 
 The results of the test run are made available in the portal.
+
+### Running tests with Profile
+
+By default in the CDP-Portal only tests tagged with @smoketest are run. If you wish to run all the tests, pass in `all` in the profile section of the CDP Portal UI.
 
 ## Requirements of CDP Environment Tests
 
