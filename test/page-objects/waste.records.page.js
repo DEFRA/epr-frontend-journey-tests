@@ -29,6 +29,10 @@ class WasteRecordsPage {
     await $('a*=Create new PERN').click()
   }
 
+  async manageReportsLink() {
+    await $('a*=Manage reports').click()
+  }
+
   async selectBackLink() {
     await $('a*=Back').click()
   }
