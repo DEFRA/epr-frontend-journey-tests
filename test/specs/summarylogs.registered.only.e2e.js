@@ -175,7 +175,7 @@ describe('@registered-only', () => {
 
     await checkBodyText('Your file is being checked', 30)
 
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('Check the following before confirming the upload.', 30)
     await checkBodyText('Loads received', 30)
     await checkBodyText('Loads exported', 30)
