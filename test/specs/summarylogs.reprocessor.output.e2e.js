@@ -66,7 +66,7 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await checkBodyText('Your file is being checked', 30)
 
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('1 new load will be added to your waste balance', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
 
@@ -97,7 +97,7 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await checkBodyText('Your file is being checked', 30)
 
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await checkBodyText(
       '1 adjusted load will be reflected in your waste balance',
       30

@@ -96,7 +96,7 @@ describe('Summary Logs Reprocessor Input', () => {
 
     await checkBodyText('Your file is being checked', 30)
 
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)

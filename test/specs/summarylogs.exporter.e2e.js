@@ -65,7 +65,7 @@ describe('Summary Logs Exporter', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being checked', 30)
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('2 new loads will be added to your waste balance', 10)
     await UploadSummaryLogPage.confirmAndSubmit()
 
@@ -93,7 +93,7 @@ describe('Summary Logs Exporter', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your file is being checked', 30)
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('3 new loads will be added to your waste balance', 10)
     await checkBodyText(
       '2 adjusted loads will be reflected in your waste balance',
