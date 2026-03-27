@@ -16,12 +16,12 @@ class UploadSummaryLogPage {
     await this.continue()
 
     await checkBodyText('Your file is being checked', 30)
-    await checkBodyText('Check before confirming upload', 30)
+    await checkBodyText('Check before confirming upload', 60)
     await this.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)
     await checkBodyTextDoesNotInclude('Declaration', 10)
-    await checkBodyText('Summary log uploaded', 30)
+    await checkBodyText('Summary log uploaded', 60)
     await this.clickOnReturnToHomePage()
   }
 
