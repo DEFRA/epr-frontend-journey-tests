@@ -21,8 +21,8 @@ import { checkBodyText } from '../support/checks.js'
 
 describe('Accredited exporter report flow @accreditedExporter', () => {
   it('should complete the full accredited exporter report flow through to confirmation @accreditedExporterFullFlow', async () => {
-    const regNumber = 'E25SR500010912PA'
-    const accNumber = 'E-ACC12145PA'
+    const regNumber = 'E25SR500020912PA'
+    const accNumber = 'E-ACC12245PA'
 
     const organisationDetails = await createLinkedOrganisation([
       {
@@ -112,7 +112,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
   it('should save and come back later from PRN summary and free PERNs pages @accreditedExporterSave', async () => {
     const regNumber = 'E25SR500020912PA'
-    const accNumber = 'E-ACC22145PA'
+    const accNumber = 'E-ACC12245PA'
 
     const organisationDetails = await createLinkedOrganisation([
       {
@@ -191,8 +191,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
   })
 
   it('should navigate to delete confirmation from PRN summary and free PERNs pages @accreditedExporterDelete', async () => {
-    const regNumber = 'E25SR500030912PA'
-    const accNumber = 'E-ACC32145PA'
+    const regNumber = 'E25SR500020912PA'
+    const accNumber = 'E-ACC12245PA'
 
     const organisationDetails = await createLinkedOrganisation([
       {
@@ -283,8 +283,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
   })
 
   it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
-    const regNumber = 'E25SR500040912PA'
-    const accNumber = 'E-ACC42145PA'
+    const regNumber = 'E25SR500020912PA'
+    const accNumber = 'E-ACC12245PA'
 
     const organisationDetails = await createLinkedOrganisation([
       {
