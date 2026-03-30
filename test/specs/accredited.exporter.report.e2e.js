@@ -103,7 +103,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await ReportCheckAnswersPage.createReport()
 
     // Verify confirmation page
-    await checkBodyText('Report created', 30)
+    await checkBodyText('report created', 30)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -477,7 +477,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     // Submit
     await ReportCheckAnswersPage.createReport()
 
-    await checkBodyText('Report created', 30)
+    await checkBodyText('report created', 30)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
