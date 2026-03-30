@@ -413,7 +413,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
   })
 
   it('should allow registered-only exporter to skip PRN pages and go directly to supporting information @registeredOnlyExporterRegression', async () => {
-    const regNumber = 'E25SR500060912PA'
+    const regNumber = 'E25SR500030913PA'
 
     const organisationDetails = await createLinkedOrganisation([
       {
