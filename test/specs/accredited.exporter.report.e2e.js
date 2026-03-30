@@ -412,7 +412,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should allow registered-only exporter to skip PRN pages and go directly to supporting information @registeredOnlyExporterRegression', async () => {
+  it('should return 404 when registered-only exporter tries to access PRN pages @registeredOnlyExporterRegression', async () => {
     const regNumber = 'E25SR500030913PA'
 
     const organisationDetails = await createLinkedOrganisation([
@@ -445,37 +445,17 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await HomePage.clickStartNow()
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-      'resources/exporter-regonly.xlsx'
+    // Try to access prn-summary directly — should get 404
+    await browser.url(
+      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/prn-summary`
     )
+    await checkBodyText('Page not found', 10)
 
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-
-    // Should go directly to supporting information (skipping PRN pages)
-    const supportingInfoHeading =
-      await ReportSupportingInformationPage.headingText()
-    expect(supportingInfoHeading).toBe(
-      'Add supporting information for your regulator (optional)'
+    // Try to access free-perns directly — should get 404
+    await browser.url(
+      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/free-perns`
     )
-
-    // Continue to CYA
-    await ReportSupportingInformationPage.continue()
-
-    const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
-
-    // Submit
-    await ReportCheckAnswersPage.createReport()
-
-    await checkBodyText('report created', 30)
+    await checkBodyText('Page not found', 10)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
