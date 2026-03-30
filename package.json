@@ -50,13 +50,7 @@
     "undici": "7.24.5"
   },
   "overrides": {
-    "@isaacs/brace-expansion": "5.0.1",
-    "flatted": "^3.4.2",
-    "minimatch@3": "3.1.5",
-    "minimatch@5": "5.1.9",
-    "minimatch@>=9.0.0": "10.2.4",
-    "serialize-javascript": "^7.0.3",
-    "yauzl": "^3.2.1"
+    "serialize-javascript": "^7.0.5"
   },
   "devDependencies": {
     "eslint": "9.39.4",
