@@ -163,9 +163,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     const reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    // Resume the report — should go back to prn-summary
+    // Resume the report — Continue goes directly to prn-summary for accredited exporters
     await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
 
     // Continue past prn-summary to free-perns
     await PrnSummaryPage.enterRevenue('500')
@@ -179,9 +178,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     const reportsHeadingAfterSave = await ReportsPage.headingText()
     expect(reportsHeadingAfterSave).toContain('Reports')
 
-    // Clean up — delete the report
+    // Clean up — delete the report (Continue goes directly to prn-summary)
     await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
     await PrnSummaryPage.deleteReportLink()
     await ConfirmDeleteReportPage.confirmDeletion()
 
