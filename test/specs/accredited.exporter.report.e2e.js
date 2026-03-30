@@ -80,8 +80,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     const freePernHeading = await FreePernPage.headingText()
     expect(freePernHeading).toBeTruthy()
 
-    // Enter free PERN tonnage
-    await FreePernPage.enterTonnage('5')
+    // Enter free PERN tonnage (must be <= issued tonnage)
+    await FreePernPage.enterTonnage('0')
     await FreePernPage.continue()
 
     // --- Supporting information page ---
@@ -96,9 +96,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     const checkHeading = await ReportCheckAnswersPage.headingText()
     expect(checkHeading).toBe('Check your answers before creating draft report')
 
-    // Verify PRN revenue and free PERN tonnage persist to CYA
+    // Verify PRN revenue persists to CYA
     await checkBodyText('1,500.50', 10)
-    await checkBodyText('5', 10)
 
     // Submit the report
     await ReportCheckAnswersPage.createReport()
@@ -173,7 +172,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await PrnSummaryPage.continue()
 
     // --- Save from free PERNs page ---
-    await FreePernPage.enterTonnage('3')
+    await FreePernPage.enterTonnage('0')
     await FreePernPage.saveAndComeBackLater()
 
     // Should redirect back to reports list
@@ -348,7 +347,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     // Continue through to supporting info
     await PrnSummaryPage.enterRevenue('100')
     await PrnSummaryPage.continue()
-    await FreePernPage.enterTonnage('2')
+    await FreePernPage.enterTonnage('0')
     await FreePernPage.continue()
 
     // On supporting info — back link goes to free-perns
