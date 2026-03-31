@@ -21,51 +21,59 @@ import {
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
 
+const REG_NUMBER = 'R25SR500010912PA'
+const ACC_NUMBER = 'R-ACC12145PA'
+
+async function setupAccreditedReprocessor() {
+  const organisationDetails = await createLinkedOrganisation([
+    {
+      material: 'Paper or board (R3)',
+      wasteProcessingType: 'Reprocessor'
+    }
+  ])
+
+  const migrationResponse = await updateMigratedOrganisation(
+    organisationDetails.refNo,
+    [
+      {
+        reprocessingType: 'output',
+        regNumber: REG_NUMBER,
+        accNumber: ACC_NUMBER,
+        status: 'approved'
+      }
+    ]
+  )
+
+  const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+  await linkDefraIdUser(
+    organisationDetails.refNo,
+    user.userId,
+    migrationResponse.email
+  )
+
+  await HomePage.openStart()
+  await HomePage.clickStartNow()
+  await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+  return { organisationDetails, migrationResponse }
+}
+
+async function uploadAndNavigateToReports() {
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.submitSummaryLogLink()
+
+  const filePath = `resources/sanity/reprocessorOutput_${ACC_NUMBER}_${REG_NUMBER}.xlsx`
+  await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
+
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.manageReportsLink()
+}
+
 describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   it('should complete the full accredited reprocessor report flow through to confirmation @accreditedReprocessorFullFlow', async () => {
-    const regNumber = 'R25SR500010912PA'
-    const accNumber = 'R-ACC12145PA'
+    await setupAccreditedReprocessor()
 
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor'
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          accNumber,
-          status: 'approved'
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    // Upload reprocessor summary log so report data exists
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    const filePath = `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-    // Navigate to reports
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await uploadAndNavigateToReports()
 
     // Start the report — should redirect to tonnes-recycled for accredited reprocessor
     await ReportsPage.selectActionLink(1)
@@ -130,49 +138,8 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   })
 
   it('should save and come back later from tonnes recycled page @accreditedReprocessorSave', async () => {
-    const regNumber = 'R25SR500010912PA'
-    const accNumber = 'R-ACC12145PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor'
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          accNumber,
-          status: 'approved'
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    const filePath = `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await setupAccreditedReprocessor()
+    await uploadAndNavigateToReports()
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
@@ -222,49 +189,8 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   })
 
   it('should navigate to delete confirmation from tonnes recycled and PRN summary pages @accreditedReprocessorDelete', async () => {
-    const regNumber = 'R25SR500010912PA'
-    const accNumber = 'R-ACC12145PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor'
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          accNumber,
-          status: 'approved'
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    const filePath = `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await setupAccreditedReprocessor()
+    await uploadAndNavigateToReports()
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
@@ -317,49 +243,8 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   })
 
   it('should navigate back correctly through the accredited reprocessor flow @accreditedReprocessorBackLinks', async () => {
-    const regNumber = 'R25SR500010912PA'
-    const accNumber = 'R-ACC12145PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor'
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          accNumber,
-          status: 'approved'
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    const filePath = `resources/sanity/reprocessorOutput_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await setupAccreditedReprocessor()
+    await uploadAndNavigateToReports()
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
@@ -422,8 +307,6 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   })
 
   it('should return 404 when registered-only reprocessor tries to access PRN pages @registeredOnlyReprocessorRouteGuard', async () => {
-    const regNumber = 'R25SR500030913PA'
-
     const organisationDetails = await createLinkedOrganisation([
       {
         material: 'Paper or board (R3)',
@@ -437,7 +320,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       [
         {
           reprocessingType: 'output',
-          regNumber,
+          regNumber: 'R25SR500030913PA',
           status: 'approved',
           withoutAccreditation: true
         }

@@ -22,40 +22,46 @@ import {
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
 
-describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', () => {
-  it('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
-    const regNumber = 'R25SR5111050912PA'
+const REG_NUMBER = 'R25SR5111050912PA'
 
-    const organisationDetails = await createLinkedOrganisation([
+async function setupRegisteredOnlyReprocessor() {
+  const organisationDetails = await createLinkedOrganisation([
+    {
+      material: 'Paper or board (R3)',
+      wasteProcessingType: 'Reprocessor',
+      withoutAccreditation: true
+    }
+  ])
+
+  const migrationResponse = await updateMigratedOrganisation(
+    organisationDetails.refNo,
+    [
       {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
+        reprocessingType: 'output',
+        regNumber: REG_NUMBER,
+        status: 'approved',
         withoutAccreditation: true
       }
-    ])
+    ]
+  )
 
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          status: 'approved',
-          withoutAccreditation: true
-        }
-      ]
-    )
+  const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+  await linkDefraIdUser(
+    organisationDetails.refNo,
+    user.userId,
+    migrationResponse.email
+  )
 
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
+  await HomePage.openStart()
+  await HomePage.clickStartNow()
+  await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+  return { organisationDetails, migrationResponse }
+}
+
+describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', () => {
+  it('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
+    await setupRegisteredOnlyReprocessor()
 
     // Upload registered-only reprocessor summary log
     await DashboardPage.selectTableLink(1, 1)
@@ -118,38 +124,8 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
   })
 
   it('should return 404 when navigating directly to PRN pages @registeredOnlyReprocessorRouteGuard', async () => {
-    const regNumber = 'R25SR5111050912PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          status: 'approved',
-          withoutAccreditation: true
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+    const { organisationDetails, migrationResponse } =
+      await setupRegisteredOnlyReprocessor()
 
     // Try to access prn-summary directly — should get 404
     await browser.url(
@@ -170,38 +146,7 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
   })
 
   it('should navigate back correctly through the registered-only reprocessor flow @registeredOnlyReprocessorBackLinks', async () => {
-    const regNumber = 'R25SR5111050912PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber,
-          status: 'approved',
-          withoutAccreditation: true
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+    await setupRegisteredOnlyReprocessor()
 
     // Upload summary log
     await DashboardPage.selectTableLink(1, 1)
