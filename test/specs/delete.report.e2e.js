@@ -6,6 +6,10 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import ReportsPage from '../page-objects/reports.page.js'
 import ReportDetailPage from '../page-objects/report.detail.page.js'
+import TonnesRecycledPage from '../page-objects/reports/tonnes.recycled.page.js'
+import TonnesNotRecycledPage from '../page-objects/reports/tonnes.not.recycled.page.js'
+import ReprocessorPrnSummaryPage from '../page-objects/reports/reprocessor.prn.summary.page.js'
+import FreePrnsPage from '../page-objects/reports/free.prns.page.js'
 import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
 import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
@@ -15,6 +19,17 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+
+async function navigateReprocessorToSupportingInfo() {
+  await TonnesRecycledPage.enterTonnage('10')
+  await TonnesRecycledPage.continue()
+  await TonnesNotRecycledPage.enterTonnage('5')
+  await TonnesNotRecycledPage.continue()
+  await ReprocessorPrnSummaryPage.enterRevenue('100')
+  await ReprocessorPrnSummaryPage.continue()
+  await FreePrnsPage.enterTonnage('0')
+  await FreePrnsPage.continue()
+}
 
 describe('Deleting an in-progress report', () => {
   it('should delete from supporting information and check your answers pages @delreport', async () => {
@@ -63,9 +78,12 @@ describe('Deleting an in-progress report', () => {
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
 
-    // Create report
+    // Create report — accredited reprocessor redirects to tonnes-recycled
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
+
+    // Navigate through reprocessor pages to reach supporting information
+    await navigateReprocessorToSupportingInfo()
 
     // On supporting information page — click delete
     const supportingInfoHeading =
@@ -102,9 +120,12 @@ describe('Deleting an in-progress report', () => {
 
     // --- Delete from check your answers page ---
 
-    // Create report again
+    // Create report again — accredited reprocessor redirects to tonnes-recycled
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
+
+    // Navigate through reprocessor pages to reach supporting information
+    await navigateReprocessorToSupportingInfo()
 
     // Continue through supporting information
     await ReportSupportingInformationPage.continue()
