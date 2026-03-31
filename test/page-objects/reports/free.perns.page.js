@@ -1,14 +1,22 @@
 import { $ } from '@wdio/globals'
 
-class ReportSupportingInformationPage {
+class FreePernPage {
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
     await element.waitForExist({ timeout: 5000 })
     return await element.getText()
   }
 
+  async enterTonnage(value) {
+    await $('#freePernTonnage').setValue(value)
+  }
+
   async continue() {
     await $('button[value="continue"]').click()
+  }
+
+  async saveAndComeBackLater() {
+    await $('button[value="save"]').click()
   }
 
   async deleteReportLink() {
@@ -20,4 +28,4 @@ class ReportSupportingInformationPage {
   }
 }
 
-export default new ReportSupportingInformationPage()
+export default new FreePernPage()
