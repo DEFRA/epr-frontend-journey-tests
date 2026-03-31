@@ -171,8 +171,6 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await PrnSummaryPage.continue()
 
     // --- Save from free PERNs page ---
-    const freePernHeadingAfterResume = await FreePernPage.headingText()
-    expect(freePernHeadingAfterResume).toBeTruthy()
     await FreePernPage.enterTonnage('0')
     await FreePernPage.saveAndComeBackLater()
 

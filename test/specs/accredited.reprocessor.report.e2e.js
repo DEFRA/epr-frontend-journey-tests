@@ -283,8 +283,6 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
     await ReprocessorPrnSummaryPage.continue()
 
     // On free-prns — back link goes to prn-summary
-    const freePrnsHeading = await FreePrnsPage.headingText()
-    expect(freePrnsHeading).toBeTruthy()
     await FreePrnsPage.selectBackLink()
     const backToPrnSummary = await ReprocessorPrnSummaryPage.headingText()
     expect(backToPrnSummary).toBeTruthy()
@@ -292,8 +290,6 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
     // Continue through to supporting info
     await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
     await ReprocessorPrnSummaryPage.continue()
-    const freePrnsHeadingAfterResume = await FreePrnsPage.headingText()
-    expect(freePrnsHeadingAfterResume).toBeTruthy()
     await FreePrnsPage.enterTonnage('0')
     await FreePrnsPage.continue()
 

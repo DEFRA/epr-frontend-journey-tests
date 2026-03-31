@@ -3,7 +3,9 @@ import { ReportDataBasePage } from './report-data.base.page.js'
 
 class FreePernPage extends ReportDataBasePage {
   async enterTonnage(value) {
-    await $('#freeTonnage').setValue(value)
+    const el = await $('#freeTonnage')
+    await el.waitForExist({ timeout: 5000 })
+    await el.setValue(value)
   }
 }
 
