@@ -1,4 +1,4 @@
-// Debug: trigger CI to pick up backend PATCH logging
+// Debug: trigger CI to pick up backend PATCH prn logging
 import { browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
