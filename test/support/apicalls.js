@@ -366,6 +366,11 @@ export async function linkDefraIdUser(organisationId, userId, email) {
 
   const payload = await users.authorisationPayload(email)
   const response = await defraIdStub.authorise(payload)
+  if (!response) {
+    throw new Error(
+      `DefraID stub authorise returned no location header for ${email}`
+    )
+  }
   const sessionId = response.split('sessionId=')[1]
 
   const tokenPayload = await users.tokenPayload(sessionId)
