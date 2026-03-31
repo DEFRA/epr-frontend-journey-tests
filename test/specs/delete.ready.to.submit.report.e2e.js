@@ -1,4 +1,4 @@
-import { browser, expect } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
@@ -68,6 +68,14 @@ describe('Deleting a ready to submit report', () => {
 
     // Create the draft report (transitions to ready_to_submit)
     await ReportCheckAnswersPage.createReport()
+
+    // Lands on confirmation page — navigate to reports list
+    await $('a*=Go to reports').click()
+
+    // Report should now be ready to submit — click into it
+    const statusBefore = await ReportsPage.getStatusBadge(1)
+    expect(statusBefore).toBe('Ready to submit')
+    await ReportsPage.selectActionLink(1)
 
     // On the submit/declaration page — click delete report
     await MonthlyReportDraftDeclarationPage.deleteReport()
