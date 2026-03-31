@@ -8,7 +8,7 @@ class FreePernPage {
   }
 
   async enterTonnage(value) {
-    await $('#freePernTonnage').setValue(value)
+    await $('#freeTonnage').setValue(value)
   }
 
   async continue() {
