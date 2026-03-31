@@ -18,7 +18,7 @@ import {
 } from '../support/apicalls.js'
 
 describe('Deleting a ready to submit report', () => {
-  it('should delete from the submit page @delreportsubmit', async () => {
+  it('should delete from the submit page @delete-report', async () => {
     const regNumber = 'R25SR500010912PL'
     const accNumber = 'R-ACC12145PL'
 
