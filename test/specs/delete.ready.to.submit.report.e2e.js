@@ -6,16 +6,32 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import ReportsPage from '../page-objects/reports.page.js'
 import ReportDetailPage from '../page-objects/report.detail.page.js'
+import TonnesRecycledPage from '../page-objects/reports/tonnes.recycled.page.js'
+import TonnesNotRecycledPage from '../page-objects/reports/tonnes.not.recycled.page.js'
+import ReprocessorPrnSummaryPage from '../page-objects/reports/reprocessor.prn.summary.page.js'
+import FreePrnsPage from '../page-objects/reports/free.prns.page.js'
 import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
 import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
 import MonthlyReportDraftDeclarationPage from '../page-objects/reports/monthly.report.draft.declaration.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
+import { checkBodyText } from '../support/checks.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+
+async function navigateReprocessorToSupportingInfo() {
+  await TonnesRecycledPage.enterTonnage('10')
+  await TonnesRecycledPage.continue()
+  await TonnesNotRecycledPage.enterTonnage('5')
+  await TonnesNotRecycledPage.continue()
+  await ReprocessorPrnSummaryPage.enterRevenue('100')
+  await ReprocessorPrnSummaryPage.continue()
+  await FreePrnsPage.enterTonnage('0')
+  await FreePrnsPage.continue()
+}
 
 describe('Deleting a ready to submit report', () => {
   it('should delete from the submit page @delete-report', async () => {
@@ -64,12 +80,16 @@ describe('Deleting a ready to submit report', () => {
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
+
+    // Navigate through reprocessor data entry pages
+    await navigateReprocessorToSupportingInfo()
     await ReportSupportingInformationPage.continue()
 
     // Create the draft report (transitions to ready_to_submit)
     await ReportCheckAnswersPage.createReport()
 
-    // Lands on confirmation page — navigate to reports list
+    // Confirmation page — go back to reports list
+    await checkBodyText('report created', 30)
     await $('a*=Go to reports').click()
 
     // Report should now be ready to submit — click into it
