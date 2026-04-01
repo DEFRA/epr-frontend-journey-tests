@@ -48,16 +48,21 @@ class DefraIdStub {
       .join('&')
 
     const instanceHeaders = { ...this.defaultHeaders }
-    const response = await request(
-      `${this.baseUrl}/cdp-defra-id-stub/authorize?${query}`,
-      {
-        method: 'GET',
-        headers: instanceHeaders
-      }
-    )
+    const url = `${this.baseUrl}/cdp-defra-id-stub/authorize?${query}`
+    const response = await request(url, {
+      method: 'GET',
+      headers: instanceHeaders,
+      maxRedirections: 0
+    })
 
-    const headers = await response.headers
-    return headers.location
+    const location = response.headers.location
+    if (!location) {
+      const body = await response.body.text()
+      throw new Error(
+        `DefraID stub authorise did not redirect (${response.statusCode}): ${body.slice(0, 200)}`
+      )
+    }
+    return location
   }
 
   async generateToken(payload, userId) {
