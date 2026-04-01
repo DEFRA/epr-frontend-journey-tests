@@ -1,7 +1,7 @@
 import { $ } from '@wdio/globals'
 import { ReportDataBasePage } from './report-data.base.page.js'
 
-class FreePernPage extends ReportDataBasePage {
+class FreePrnsPage extends ReportDataBasePage {
   async enterTonnage(value) {
     const el = await $('#freeTonnage')
     await el.waitForExist({ timeout: 5000 })
@@ -9,4 +9,4 @@ class FreePernPage extends ReportDataBasePage {
   }
 }
 
-export default new FreePernPage()
+export default new FreePrnsPage()
