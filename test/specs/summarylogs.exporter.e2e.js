@@ -9,6 +9,7 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
+  seedOverseasSites,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 
@@ -37,6 +38,8 @@ describe('Summary Logs Exporter', () => {
         }
       ]
     )
+    await seedOverseasSites(organisationDetails.refNo, 1)
+
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 
     await linkDefraIdUser(

@@ -385,6 +385,67 @@ export async function linkDefraIdUser(organisationId, userId, email) {
   expect(linkResponse.statusCode).toBe(200)
 }
 
+/**
+ * Seeds overseas site records and links them to an exporter registration.
+ * Creates a single approved overseas site, then maps all 3-digit ORS keys
+ * (001–999) on the specified registration so that ORS waste balance
+ * validation passes for any OSR ID in the summary log data.
+ *
+ * @param {string} orgRefNo - Organisation reference number
+ * @param {number} registrationIndex - Index of the exporter registration
+ */
+export async function seedOverseasSites(orgRefNo, registrationIndex = 0) {
+  const authClient = new AuthClient()
+  const eprBackend = new EprBackend()
+
+  const clientId = 'clientId'
+  const username = 'ea@test.gov.uk'
+  const payload = JSON.stringify({ clientId, username })
+  await authClient.generateToken(payload, '/sign')
+
+  const siteResponse = await eprBackend.post(
+    '/v1/overseas-sites',
+    JSON.stringify({
+      name: 'Test Overseas Reprocessor',
+      address: {
+        line1: '1 Test Street',
+        townOrCity: 'Test City'
+      },
+      country: 'Germany',
+      validFrom: '2024-01-01'
+    }),
+    authClient.authHeader()
+  )
+  const site = await assertSuccessResponse(
+    siteResponse,
+    'POST /v1/overseas-sites'
+  )
+
+  const orgResponse = await eprBackend.get(
+    `/v1/organisations/${orgRefNo}`,
+    authClient.authHeader()
+  )
+  const orgData = await assertSuccessResponse(
+    orgResponse,
+    `GET /v1/organisations/${orgRefNo}`
+  )
+
+  const overseasSites = {}
+  for (let i = 1; i <= 999; i++) {
+    overseasSites[String(i).padStart(3, '0')] = {
+      overseasSiteId: site.id
+    }
+  }
+  orgData.registrations[registrationIndex].overseasSites = overseasSites
+
+  const putResponse = await eprBackend.put(
+    `/v1/dev/organisations/${orgRefNo}`,
+    JSON.stringify({ organisation: orgData }),
+    authClient.authHeader()
+  )
+  expect(putResponse.statusCode).toBe(200)
+}
+
 export async function externalAPICancelPrn(prnDetails) {
   await config.cognitoAuth.generateToken()
 

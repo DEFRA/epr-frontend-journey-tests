@@ -7,6 +7,7 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
+  seedOverseasSites,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import CreatePRNPage from 'page-objects/create.prn.page.js'
@@ -40,6 +41,8 @@ describe('Deleting Packing Recycling Notes (Exporter)', () => {
         }
       ]
     )
+
+    await seedOverseasSites(organisationDetails.refNo)
 
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
     await linkDefraIdUser(

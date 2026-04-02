@@ -15,6 +15,7 @@ import {
   createLinkedOrganisation,
   externalAPICancelPrn,
   linkDefraIdUser,
+  seedOverseasSites,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
@@ -47,6 +48,8 @@ describe('Issuing Packing Recycling Notes (Exporter)', () => {
         }
       ]
     )
+
+    await seedOverseasSites(organisationDetails.refNo)
 
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
     await linkDefraIdUser(
