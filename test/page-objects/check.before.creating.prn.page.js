@@ -1,9 +1,12 @@
-import { $, $$ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 
 class CheckBeforeCreatingPRNPage {
   async headingText() {
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes('/view'),
+      { timeout: 10000 }
+    )
     const element = await $('h1.govuk-heading-xl')
-    await element.waitForExist({ timeout: 10000 })
     return await element.getText()
   }
 
