@@ -1,3 +1,2 @@
 [tools]
-node = "24.14.1"
 gitleaks = "8.30.0"
