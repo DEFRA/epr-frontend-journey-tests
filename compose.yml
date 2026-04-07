@@ -192,7 +192,6 @@ services:
       FEATURE_FLAG_DEV_ENDPOINTS: true
       FEATURE_FLAG_ORS_WASTE_BALANCE_VALIDATION: true
       FEATURE_FLAG_OVERSEAS_SITES: true
-      FEATURE_FLAG_REGISTERED_ONLY: true
       FEATURE_FLAG_REPORTS: true
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       LOCALSTACK_ENDPOINT: http://localstack:4566
@@ -222,7 +221,6 @@ services:
       DEFRA_ID_OIDC_CONFIGURATION_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
-      FEATURE_FLAG_REGISTERED_ONLY: true
       FEATURE_FLAG_REPORTS: true
       LOCALSTACK_ENDPOINT: http://localstack:4566
       NODE_ENV: development
