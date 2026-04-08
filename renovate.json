@@ -1,7 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "minimumReleaseAge": "3 days",
-  "recreateWhen": "always",
-  "commitMessagePrefix": "Renovate:",
+  "extends": ["github>DEFRA/epr-re-ex-service//renovate-presets/default"],
   "enabledManagers": ["dockerfile", "docker-compose"]
 }
