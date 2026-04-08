@@ -9,8 +9,10 @@ class CreatePRNPage {
 
   async headingText() {
     const headingElement = await $('h1.govuk-heading-xl')
-
-    await headingElement.waitForExist({ timeout: 5000 })
+    await browser.waitUntil(
+      async () => (await headingElement.getText()).includes('Create a'),
+      { timeout: 10000 }
+    )
     return await headingElement.getText()
   }
 
@@ -45,8 +47,7 @@ class CreatePRNPage {
     const wasteBalanceHintElement = await $(
       '#main-content > div > div > div.govuk-inset-text'
     )
-
-    await wasteBalanceHintElement.waitForExist({ timeout: 5000 })
+    await wasteBalanceHintElement.waitForExist({ timeout: 10000 })
     return wasteBalanceHintElement.getText()
   }
 
