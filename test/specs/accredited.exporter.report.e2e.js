@@ -20,96 +20,7 @@ import {
 import { checkBodyText } from '../support/checks.js'
 
 describe('Accredited exporter report flow @accreditedExporter', () => {
-  it('should complete the full accredited exporter report flow through to confirmation @accreditedExporterFullFlow', async () => {
-    const regNumber = 'E25SR500020912PA'
-    const accNumber = 'E-ACC12245PA'
-
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Exporter'
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          regNumber,
-          accNumber,
-          status: 'approved'
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    // Upload summary log so report data exists
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    const filePath = `resources/sanity/exporter_${accNumber}_${regNumber}.xlsx`
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-    // Navigate to reports
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
-
-    // Start the report — should redirect to prn-summary for accredited exporter
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-
-    // --- PRN Summary page ---
-    const prnSummaryHeading = await PrnSummaryPage.headingText()
-    expect(prnSummaryHeading).toBeTruthy()
-
-    // Enter revenue
-    await PrnSummaryPage.enterRevenue('1500.50')
-    await PrnSummaryPage.continue()
-
-    // --- Free PERNs page ---
-    const freePernHeading = await FreePernPage.headingText()
-    expect(freePernHeading).toBeTruthy()
-
-    // Enter free PERN tonnage (must be <= issued tonnage)
-    await FreePernPage.enterTonnage('0')
-    await FreePernPage.continue()
-
-    // --- Supporting information page ---
-    const supportingInfoHeading =
-      await ReportSupportingInformationPage.headingText()
-    expect(supportingInfoHeading).toBe(
-      'Add supporting information for your regulator (optional)'
-    )
-    await ReportSupportingInformationPage.continue()
-
-    // --- Check your answers page ---
-    const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
-
-    // Verify PRN revenue persists to CYA
-    await checkBodyText('1,500.50', 10)
-
-    // Submit the report
-    await ReportCheckAnswersPage.createReport()
-
-    // Verify confirmation page
-    await checkBodyText('report created', 30)
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should save and come back later from PRN summary and free PERNs pages @accreditedExporterSave', async () => {
+  it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
     const regNumber = 'E25SR500020912PA'
     const accNumber = 'E-ACC12245PA'
 
@@ -155,32 +66,36 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // --- Save from PRN summary page ---
-    await PrnSummaryPage.enterRevenue('500')
-    await PrnSummaryPage.saveAndComeBackLater()
+    // On prn-summary — back link goes to detail page
+    await PrnSummaryPage.selectBackLink()
+    const detailHeading = await ReportDetailPage.headingText()
+    expect(detailHeading).toBeTruthy()
 
-    // Should redirect back to reports list
-    const reportsHeading = await ReportsPage.headingText()
-    expect(reportsHeading).toContain('Reports')
+    // Go forward again
+    await ReportDetailPage.useThisData()
 
-    // Resume the report — Continue goes directly to prn-summary for accredited exporters
-    await ReportsPage.selectActionLink(1)
-
-    // Continue past prn-summary to free-perns
-    await PrnSummaryPage.enterRevenue('500')
+    // Continue to free-perns
+    await PrnSummaryPage.enterRevenue('100')
     await PrnSummaryPage.continue()
 
-    // --- Save from free PERNs page ---
+    // On free-perns — back link goes to prn-summary
+    await FreePernPage.selectBackLink()
+    const backToPrnSummary = await PrnSummaryPage.headingText()
+    expect(backToPrnSummary).toBeTruthy()
+
+    // Continue through to supporting info
+    await PrnSummaryPage.enterRevenue('100')
+    await PrnSummaryPage.continue()
     await FreePernPage.enterTonnage('0')
-    await FreePernPage.saveAndComeBackLater()
+    await FreePernPage.continue()
 
-    // Should redirect back to reports list
-    const reportsHeadingAfterSave = await ReportsPage.headingText()
-    expect(reportsHeadingAfterSave).toContain('Reports')
+    // On supporting info — back link goes to free-perns
+    await ReportSupportingInformationPage.selectBackLink()
+    const backToFreePern = await FreePernPage.headingText()
+    expect(backToFreePern).toBeTruthy()
 
-    // Clean up — delete the report (Continue goes directly to prn-summary)
-    await ReportsPage.selectActionLink(1)
-    await PrnSummaryPage.deleteReportLink()
+    // Clean up
+    await FreePernPage.deleteReportLink()
     await ConfirmDeleteReportPage.confirmDeletion()
 
     await HomePage.signOut()
@@ -279,7 +194,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
+  it('should save and come back later from PRN summary and free PERNs pages @accreditedExporterSave', async () => {
     const regNumber = 'E25SR500020912PA'
     const accNumber = 'E-ACC12245PA'
 
@@ -325,37 +240,122 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // On prn-summary — back link goes to detail page
-    await PrnSummaryPage.selectBackLink()
-    const detailHeading = await ReportDetailPage.headingText()
-    expect(detailHeading).toBeTruthy()
+    // --- Save from PRN summary page ---
+    await PrnSummaryPage.enterRevenue('500')
+    await PrnSummaryPage.saveAndComeBackLater()
 
-    // Go forward again
+    // Should redirect back to reports list
+    const reportsHeading = await ReportsPage.headingText()
+    expect(reportsHeading).toContain('Reports')
+
+    // Resume the report — Continue goes directly to prn-summary for accredited exporters
+    await ReportsPage.selectActionLink(1)
+
+    // Continue past prn-summary to free-perns
+    await PrnSummaryPage.enterRevenue('500')
+    await PrnSummaryPage.continue()
+
+    // --- Save from free PERNs page ---
+    await FreePernPage.enterTonnage('0')
+    await FreePernPage.saveAndComeBackLater()
+
+    // Should redirect back to reports list
+    const reportsHeadingAfterSave = await ReportsPage.headingText()
+    expect(reportsHeadingAfterSave).toContain('Reports')
+
+    // Clean up — delete the report (Continue goes directly to prn-summary)
+    await ReportsPage.selectActionLink(1)
+    await PrnSummaryPage.deleteReportLink()
+    await ConfirmDeleteReportPage.confirmDeletion()
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('should complete the full accredited exporter report flow through to confirmation @accreditedExporterFullFlow', async () => {
+    const regNumber = 'E25SR500020912PA'
+    const accNumber = 'E-ACC12245PA'
+
+    const organisationDetails = await createLinkedOrganisation([
+      {
+        material: 'Paper or board (R3)',
+        wasteProcessingType: 'Exporter'
+      }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          regNumber,
+          accNumber,
+          status: 'approved'
+        }
+      ]
+    )
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    // Upload summary log so report data exists
+    await DashboardPage.selectTableLink(1, 1)
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    const filePath = `resources/sanity/exporter_${accNumber}_${regNumber}.xlsx`
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
+
+    // Navigate to reports
+    await DashboardPage.selectTableLink(1, 1)
+    await WasteRecordsPage.manageReportsLink()
+
+    // Start the report — should redirect to prn-summary for accredited exporter
+    await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // Continue to free-perns
-    await PrnSummaryPage.enterRevenue('100')
+    // --- PRN Summary page ---
+    const prnSummaryHeading = await PrnSummaryPage.headingText()
+    expect(prnSummaryHeading).toBeTruthy()
+
+    // Enter revenue
+    await PrnSummaryPage.enterRevenue('1500.50')
     await PrnSummaryPage.continue()
 
-    // On free-perns — back link goes to prn-summary
-    await FreePernPage.selectBackLink()
-    const backToPrnSummary = await PrnSummaryPage.headingText()
-    expect(backToPrnSummary).toBeTruthy()
+    // --- Free PERNs page ---
+    const freePernHeading = await FreePernPage.headingText()
+    expect(freePernHeading).toBeTruthy()
 
-    // Continue through to supporting info
-    await PrnSummaryPage.enterRevenue('100')
-    await PrnSummaryPage.continue()
+    // Enter free PERN tonnage (must be <= issued tonnage)
     await FreePernPage.enterTonnage('0')
     await FreePernPage.continue()
 
-    // On supporting info — back link goes to free-perns
-    await ReportSupportingInformationPage.selectBackLink()
-    const backToFreePern = await FreePernPage.headingText()
-    expect(backToFreePern).toBeTruthy()
+    // --- Supporting information page ---
+    const supportingInfoHeading =
+      await ReportSupportingInformationPage.headingText()
+    expect(supportingInfoHeading).toBe(
+      'Add supporting information for your regulator (optional)'
+    )
+    await ReportSupportingInformationPage.continue()
 
-    // Clean up
-    await FreePernPage.deleteReportLink()
-    await ConfirmDeleteReportPage.confirmDeletion()
+    // --- Check your answers page ---
+    const checkHeading = await ReportCheckAnswersPage.headingText()
+    expect(checkHeading).toBe('Check your answers before creating draft report')
+
+    // Verify PRN revenue persists to CYA
+    await checkBodyText('1,500.50', 10)
+
+    // Submit the report
+    await ReportCheckAnswersPage.createReport()
+
+    // Verify confirmation page
+    await checkBodyText('report created', 30)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
