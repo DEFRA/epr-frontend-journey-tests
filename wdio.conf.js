@@ -67,7 +67,7 @@ export const config = {
   },
 
   // Number of failures before the test suite bails.
-  bail: 0,
+  bail: 1,
   waitforTimeout: 10000,
   waitforInterval: 200,
   connectionRetryTimeout: 6000,

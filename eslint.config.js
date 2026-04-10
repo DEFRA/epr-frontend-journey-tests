@@ -26,6 +26,12 @@ for (const item of ns) {
 export default [
   ...ns,
   {
+    languageOptions: {
+      globals: {
+        before: 'readonly',
+        after: 'readonly'
+      }
+    },
     rules: {
       camelcase: [
         'error',

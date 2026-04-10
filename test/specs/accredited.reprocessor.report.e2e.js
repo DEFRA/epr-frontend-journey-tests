@@ -70,289 +70,284 @@ async function uploadAndNavigateToReports() {
 }
 
 describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
-  it('should navigate back correctly through the accredited reprocessor flow @accreditedReprocessorBackLinks', async () => {
-    await setupAccreditedReprocessor()
-    await uploadAndNavigateToReports()
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
+  describe('accredited reprocessor with upload', () => {
+    before(async () => {
+      await setupAccreditedReprocessor()
+      await uploadAndNavigateToReports()
+    })
 
-    // On tonnes-recycled — back link goes to detail page
-    await TonnesRecycledPage.selectBackLink()
-    const detailHeading = await ReportDetailPage.headingText()
-    expect(detailHeading).toBeTruthy()
+    after(async () => {
+      await HomePage.signOut()
+      await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+    })
 
-    // Go forward again
-    await ReportDetailPage.useThisData()
+    it('should navigate back correctly through the accredited reprocessor flow @accreditedReprocessorBackLinks', async () => {
+      await ReportsPage.selectActionLink(1)
+      await ReportDetailPage.useThisData()
 
-    // Continue to tonnes-not-recycled
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.continue()
+      // On tonnes-recycled — back link goes to detail page
+      await TonnesRecycledPage.selectBackLink()
+      const detailHeading = await ReportDetailPage.headingText()
+      expect(detailHeading).toBeTruthy()
 
-    // On tonnes-not-recycled — back link goes to tonnes-recycled
-    await TonnesNotRecycledPage.selectBackLink()
-    const backToTonnesRecycled = await TonnesRecycledPage.headingText()
-    expect(backToTonnesRecycled).toBeTruthy()
+      // Go forward again
+      await ReportDetailPage.useThisData()
 
-    // Continue through to prn-summary
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.continue()
-    await TonnesNotRecycledPage.enterTonnage('89.31')
-    await TonnesNotRecycledPage.continue()
+      // Continue to tonnes-not-recycled
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.continue()
 
-    // On prn-summary — back link goes to tonnes-not-recycled
-    await ReprocessorPrnSummaryPage.selectBackLink()
-    const backToTonnesNotRecycled = await TonnesNotRecycledPage.headingText()
-    expect(backToTonnesNotRecycled).toBeTruthy()
+      // On tonnes-not-recycled — back link goes to tonnes-recycled
+      await TonnesNotRecycledPage.selectBackLink()
+      const backToTonnesRecycled = await TonnesRecycledPage.headingText()
+      expect(backToTonnesRecycled).toBeTruthy()
 
-    // Continue through to free-prns
-    await TonnesNotRecycledPage.enterTonnage('89.31')
-    await TonnesNotRecycledPage.continue()
-    await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
-    await ReprocessorPrnSummaryPage.continue()
+      // Continue through to prn-summary
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.continue()
+      await TonnesNotRecycledPage.enterTonnage('89.31')
+      await TonnesNotRecycledPage.continue()
 
-    // On free-prns — back link goes to prn-summary
-    await FreePrnsPage.selectBackLink()
-    const backToPrnSummary = await ReprocessorPrnSummaryPage.headingText()
-    expect(backToPrnSummary).toBeTruthy()
+      // On prn-summary — back link goes to tonnes-not-recycled
+      await ReprocessorPrnSummaryPage.selectBackLink()
+      const backToTonnesNotRecycled = await TonnesNotRecycledPage.headingText()
+      expect(backToTonnesNotRecycled).toBeTruthy()
 
-    // Continue through to supporting info
-    await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
-    await ReprocessorPrnSummaryPage.continue()
-    await FreePrnsPage.enterTonnage('0')
-    await FreePrnsPage.continue()
+      // Continue through to free-prns
+      await TonnesNotRecycledPage.enterTonnage('89.31')
+      await TonnesNotRecycledPage.continue()
+      await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
+      await ReprocessorPrnSummaryPage.continue()
 
-    // On supporting info — back link goes to free-prns
-    await ReportSupportingInformationPage.selectBackLink()
-    const backToFreePrns = await FreePrnsPage.headingText()
-    expect(backToFreePrns).toBeTruthy()
+      // On free-prns — back link goes to prn-summary
+      await FreePrnsPage.selectBackLink()
+      const backToPrnSummary = await ReprocessorPrnSummaryPage.headingText()
+      expect(backToPrnSummary).toBeTruthy()
 
-    // Clean up
-    await FreePrnsPage.deleteReportLink()
-    await ConfirmDeleteReportPage.confirmDeletion()
+      // Continue through to supporting info
+      await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
+      await ReprocessorPrnSummaryPage.continue()
+      await FreePrnsPage.enterTonnage('0')
+      await FreePrnsPage.continue()
 
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+      // On supporting info — back link goes to free-prns
+      await ReportSupportingInformationPage.selectBackLink()
+      const backToFreePrns = await FreePrnsPage.headingText()
+      expect(backToFreePrns).toBeTruthy()
+
+      // Clean up — delete report so next test starts fresh
+      await FreePrnsPage.deleteReportLink()
+      await ConfirmDeleteReportPage.confirmDeletion()
+    })
+
+    it('should navigate to delete confirmation from tonnes recycled and PRN summary pages @accreditedReprocessorDelete', async () => {
+      await ReportsPage.selectActionLink(1)
+      await ReportDetailPage.useThisData()
+
+      // --- Delete from tonnes recycled page ---
+      await TonnesRecycledPage.deleteReportLink()
+
+      const deleteHeading = await ConfirmDeleteReportPage.headingText()
+      expect(deleteHeading).toBe('Confirm deletion of this report')
+
+      // Back link should return to tonnes-recycled
+      await ConfirmDeleteReportPage.selectBackLink()
+      const backToTonnesRecycled = await TonnesRecycledPage.headingText()
+      expect(backToTonnesRecycled).toBeTruthy()
+
+      // Confirm deletion
+      await TonnesRecycledPage.deleteReportLink()
+      await ConfirmDeleteReportPage.confirmDeletion()
+
+      // Should be back on reports list with status reverted to Due
+      let reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
+
+      let statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Due')
+
+      // --- Create report again, navigate to prn-summary, delete from there ---
+      await ReportsPage.selectActionLink(1)
+      await ReportDetailPage.useThisData()
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.continue()
+      await TonnesNotRecycledPage.enterTonnage('89.31')
+      await TonnesNotRecycledPage.continue()
+
+      await ReprocessorPrnSummaryPage.deleteReportLink()
+
+      const deleteHeading2 = await ConfirmDeleteReportPage.headingText()
+      expect(deleteHeading2).toBe('Confirm deletion of this report')
+
+      await ConfirmDeleteReportPage.confirmDeletion()
+
+      // Should be back on reports list with status reverted to Due
+      reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
+
+      statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Due')
+    })
+
+    it('should save and come back later from tonnes recycled page @accreditedReprocessorSave', async () => {
+      await ReportsPage.selectActionLink(1)
+      await ReportDetailPage.useThisData()
+
+      // --- Save from tonnes recycled page ---
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.saveAndComeBackLater()
+
+      // Should redirect back to reports list
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
+
+      // Resume the report — should land on tonnes-recycled with pre-populated data
+      await ReportsPage.selectActionLink(1)
+
+      // Verify we're back on tonnes-recycled with pre-populated data
+      const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
+      expect(tonnesRecycledHeading).toBeTruthy()
+
+      const prePopulatedValue = await TonnesRecycledPage.getValue()
+      expect(prePopulatedValue).toBe('15.02')
+
+      // Complete the remaining flow
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.continue()
+
+      await TonnesNotRecycledPage.enterTonnage('89.31')
+      await TonnesNotRecycledPage.continue()
+
+      await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
+      await ReprocessorPrnSummaryPage.continue()
+
+      await FreePrnsPage.enterTonnage('0')
+      await FreePrnsPage.continue()
+
+      await ReportSupportingInformationPage.continue()
+
+      // Verify CYA page
+      const checkHeading = await ReportCheckAnswersPage.headingText()
+      expect(checkHeading).toBe(
+        'Check your answers before creating draft report'
+      )
+
+      // Clean up — delete the report
+      await ReportCheckAnswersPage.deleteAndStartAgainLink()
+      await ConfirmDeleteReportPage.confirmDeletion()
+    })
+
+    it('should complete the full accredited reprocessor report flow through to confirmation @accreditedReprocessorFullFlow', async () => {
+      await ReportsPage.selectActionLink(1)
+      await ReportDetailPage.useThisData()
+
+      // --- Tonnes recycled page ---
+      const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
+      expect(tonnesRecycledHeading).toBeTruthy()
+
+      await TonnesRecycledPage.enterTonnage('15.02')
+      await TonnesRecycledPage.continue()
+
+      // --- Tonnes not recycled page ---
+      const tonnesNotRecycledHeading = await TonnesNotRecycledPage.headingText()
+      expect(tonnesNotRecycledHeading).toBeTruthy()
+
+      await TonnesNotRecycledPage.enterTonnage('89.31')
+      await TonnesNotRecycledPage.continue()
+
+      // --- PRN summary page ---
+      const prnSummaryHeading = await ReprocessorPrnSummaryPage.headingText()
+      expect(prnSummaryHeading).toBeTruthy()
+
+      await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
+      await ReprocessorPrnSummaryPage.continue()
+
+      // --- Free PRNs page ---
+      const freePrnsHeading = await FreePrnsPage.headingText()
+      expect(freePrnsHeading).toBeTruthy()
+
+      await FreePrnsPage.enterTonnage('0')
+      await FreePrnsPage.continue()
+
+      // --- Supporting information page ---
+      const supportingInfoHeading =
+        await ReportSupportingInformationPage.headingText()
+      expect(supportingInfoHeading).toBe(
+        'Add supporting information for your regulator (optional)'
+      )
+      await ReportSupportingInformationPage.continue()
+
+      // --- Check your answers page ---
+      const checkHeading = await ReportCheckAnswersPage.headingText()
+      expect(checkHeading).toBe(
+        'Check your answers before creating draft report'
+      )
+
+      // Verify data persists to CYA
+      await checkBodyText('15.02', 10)
+      await checkBodyText('89.31', 10)
+      await checkBodyText('1,576.12', 10)
+
+      // Verify average price per tonne is calculated and displayed
+      await checkBodyText('Average price per tonne', 10)
+
+      // Submit the report
+      await ReportCheckAnswersPage.createReport()
+
+      // Verify confirmation page
+      await checkBodyText('report created', 30)
+    })
   })
 
-  it('should navigate to delete confirmation from tonnes recycled and PRN summary pages @accreditedReprocessorDelete', async () => {
-    await setupAccreditedReprocessor()
-    await uploadAndNavigateToReports()
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-
-    // --- Delete from tonnes recycled page ---
-    await TonnesRecycledPage.deleteReportLink()
-
-    const deleteHeading = await ConfirmDeleteReportPage.headingText()
-    expect(deleteHeading).toBe('Confirm deletion of this report')
-
-    // Back link should return to tonnes-recycled
-    await ConfirmDeleteReportPage.selectBackLink()
-    const backToTonnesRecycled = await TonnesRecycledPage.headingText()
-    expect(backToTonnesRecycled).toBeTruthy()
-
-    // Confirm deletion
-    await TonnesRecycledPage.deleteReportLink()
-    await ConfirmDeleteReportPage.confirmDeletion()
-
-    // Should be back on reports list with status reverted to Due
-    let reportsHeading = await ReportsPage.headingText()
-    expect(reportsHeading).toContain('Reports')
-
-    let statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Due')
-
-    // --- Create report again, navigate to prn-summary, delete from there ---
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.continue()
-    await TonnesNotRecycledPage.enterTonnage('89.31')
-    await TonnesNotRecycledPage.continue()
-
-    await ReprocessorPrnSummaryPage.deleteReportLink()
-
-    const deleteHeading2 = await ConfirmDeleteReportPage.headingText()
-    expect(deleteHeading2).toBe('Confirm deletion of this report')
-
-    await ConfirmDeleteReportPage.confirmDeletion()
-
-    // Should be back on reports list with status reverted to Due
-    reportsHeading = await ReportsPage.headingText()
-    expect(reportsHeading).toContain('Reports')
-
-    statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Due')
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should save and come back later from tonnes recycled page @accreditedReprocessorSave', async () => {
-    await setupAccreditedReprocessor()
-    await uploadAndNavigateToReports()
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-
-    // --- Save from tonnes recycled page ---
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.saveAndComeBackLater()
-
-    // Should redirect back to reports list
-    const reportsHeading = await ReportsPage.headingText()
-    expect(reportsHeading).toContain('Reports')
-
-    // Resume the report — should land on tonnes-recycled with pre-populated data
-    await ReportsPage.selectActionLink(1)
-
-    // Verify we're back on tonnes-recycled with pre-populated data
-    const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
-    expect(tonnesRecycledHeading).toBeTruthy()
-
-    const prePopulatedValue = await TonnesRecycledPage.getValue()
-    expect(prePopulatedValue).toBe('15.02')
-
-    // Complete the remaining flow
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.continue()
-
-    await TonnesNotRecycledPage.enterTonnage('89.31')
-    await TonnesNotRecycledPage.continue()
-
-    await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
-    await ReprocessorPrnSummaryPage.continue()
-
-    await FreePrnsPage.enterTonnage('0')
-    await FreePrnsPage.continue()
-
-    await ReportSupportingInformationPage.continue()
-
-    // Verify CYA page
-    const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
-
-    // Clean up — delete the report
-    await ReportCheckAnswersPage.deleteAndStartAgainLink()
-    await ConfirmDeleteReportPage.confirmDeletion()
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should complete the full accredited reprocessor report flow through to confirmation @accreditedReprocessorFullFlow', async () => {
-    await setupAccreditedReprocessor()
-
-    await uploadAndNavigateToReports()
-
-    // Start the report — should redirect to tonnes-recycled for accredited reprocessor
-    await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
-
-    // --- Tonnes recycled page ---
-    const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
-    expect(tonnesRecycledHeading).toBeTruthy()
-
-    await TonnesRecycledPage.enterTonnage('15.02')
-    await TonnesRecycledPage.continue()
-
-    // --- Tonnes not recycled page ---
-    const tonnesNotRecycledHeading = await TonnesNotRecycledPage.headingText()
-    expect(tonnesNotRecycledHeading).toBeTruthy()
-
-    await TonnesNotRecycledPage.enterTonnage('89.31')
-    await TonnesNotRecycledPage.continue()
-
-    // --- PRN summary page ---
-    const prnSummaryHeading = await ReprocessorPrnSummaryPage.headingText()
-    expect(prnSummaryHeading).toBeTruthy()
-
-    await ReprocessorPrnSummaryPage.enterRevenue('1576.12')
-    await ReprocessorPrnSummaryPage.continue()
-
-    // --- Free PRNs page ---
-    const freePrnsHeading = await FreePrnsPage.headingText()
-    expect(freePrnsHeading).toBeTruthy()
-
-    await FreePrnsPage.enterTonnage('0')
-    await FreePrnsPage.continue()
-
-    // --- Supporting information page ---
-    const supportingInfoHeading =
-      await ReportSupportingInformationPage.headingText()
-    expect(supportingInfoHeading).toBe(
-      'Add supporting information for your regulator (optional)'
-    )
-    await ReportSupportingInformationPage.continue()
-
-    // --- Check your answers page ---
-    const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
-
-    // Verify data persists to CYA
-    await checkBodyText('15.02', 10)
-    await checkBodyText('89.31', 10)
-    await checkBodyText('1,576.12', 10)
-
-    // Verify average price per tonne is calculated and displayed
-    await checkBodyText('Average price per tonne', 10)
-
-    // Submit the report
-    await ReportCheckAnswersPage.createReport()
-
-    // Verify confirmation page
-    await checkBodyText('report created', 30)
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should return 404 when registered-only reprocessor tries to access PRN pages @registeredOnlyReprocessorRouteGuard', async () => {
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
+  describe('non-accredited reprocessor route guard', () => {
+    it('should return 404 when registered-only reprocessor tries to access PRN pages @registeredOnlyReprocessorRouteGuard', async () => {
+      const organisationDetails = await createLinkedOrganisation([
         {
-          reprocessingType: 'output',
-          regNumber: 'R25SR500030913PA',
-          status: 'approved',
+          material: 'Paper or board (R3)',
+          wasteProcessingType: 'Reprocessor',
           withoutAccreditation: true
         }
-      ]
-    )
+      ])
 
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
+      const migrationResponse = await updateMigratedOrganisation(
+        organisationDetails.refNo,
+        [
+          {
+            reprocessingType: 'output',
+            regNumber: 'R25SR500030913PA',
+            status: 'approved',
+            withoutAccreditation: true
+          }
+        ]
+      )
 
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+      const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+      await linkDefraIdUser(
+        organisationDetails.refNo,
+        user.userId,
+        migrationResponse.email
+      )
 
-    // Try to access prn-summary directly — should get 404
-    await browser.url(
-      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/prn-summary`
-    )
-    await checkBodyText('404', 10)
-    await checkBodyText('Page not found', 10)
+      await HomePage.openStart()
+      await HomePage.clickStartNow()
+      await DefraIdStubPage.loginViaEmail(migrationResponse.email)
 
-    // Try to access free-prns directly — should get 404
-    await browser.url(
-      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/free-prns`
-    )
-    await checkBodyText('404', 10)
-    await checkBodyText('Page not found', 10)
+      // Try to access prn-summary directly — should get 404
+      await browser.url(
+        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/prn-summary`
+      )
+      await checkBodyText('404', 10)
+      await checkBodyText('Page not found', 10)
 
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+      // Try to access free-prns directly — should get 404
+      await browser.url(
+        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/free-prns`
+      )
+      await checkBodyText('404', 10)
+      await checkBodyText('Page not found', 10)
+
+      await HomePage.signOut()
+      await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+    })
   })
 })
