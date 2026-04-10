@@ -38,7 +38,9 @@ class DefraIdStubPage {
   }
 
   async loginViaEmail(email) {
-    await $(`//tr[th[text()="${email}"]]//a`).click()
+    const loginLink = await $(`//tr[th[text()="${email}"]]//a`)
+    await loginLink.waitForExist({ timeout: 15000 })
+    await loginLink.click()
   }
 
   async selectOrganisation(index) {

@@ -67,6 +67,7 @@ export const config = {
   connectionRetryCount: 3,
 
   framework: 'mocha',
+  specFileRetries: 1,
 
   reporters: [
     [
