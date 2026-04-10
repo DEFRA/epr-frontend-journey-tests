@@ -6,7 +6,6 @@ import {
 
 import { fakerEN_GB } from '@faker-js/faker'
 import { expect } from '@wdio/globals'
-import { FormData } from 'undici'
 import { EprBackend } from '../apis/epr-backend.js'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
@@ -172,23 +171,7 @@ export async function updateMigratedOrganisation(
   const authClient = new AuthClient()
   const eprBackend = new EprBackend()
 
-  let payload, urlSuffix
-  if (process.env.ENVIRONMENT === 'test') {
-    payload = new FormData()
-    payload.append('client_id', config.auth.clientId)
-    payload.append('client_secret', config.auth.clientSecret)
-    payload.append('username', config.auth.username)
-    payload.append('password', config.auth.password)
-    payload.append('scope', config.auth.scope)
-    payload.append('grant_type', config.auth.grantType)
-    urlSuffix = ''
-  } else {
-    const clientId = 'clientId'
-    const username = 'ea@test.gov.uk'
-    payload = JSON.stringify({ clientId, username })
-    urlSuffix = '/sign'
-  }
-  await authClient.generateToken(payload, urlSuffix)
+  await authClient.authenticate()
 
   const timeout = 5000
   const startTime = Date.now()
@@ -398,10 +381,7 @@ export async function seedOverseasSites(orgRefNo, registrationIndex = 0) {
   const authClient = new AuthClient()
   const eprBackend = new EprBackend()
 
-  const clientId = 'clientId'
-  const username = 'ea@test.gov.uk'
-  const payload = JSON.stringify({ clientId, username })
-  await authClient.generateToken(payload, '/sign')
+  await authClient.authenticate()
 
   const siteResponse = await eprBackend.post(
     '/v1/overseas-sites',
