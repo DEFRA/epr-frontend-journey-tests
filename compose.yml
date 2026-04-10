@@ -34,7 +34,7 @@ services:
   ################################################################################
 
   mongodb:
-    image: mongo:7.0.28
+    image: mongo:7.0.31
     restart: always
     ports:
       - '27017:27017'
@@ -45,7 +45,7 @@ services:
       retries: 3
 
   localstack:
-    image: localstack/localstack:3.2.0
+    image: localstack/localstack:3.8.1
     ports:
       - '4566:4566'
     environment:
@@ -63,7 +63,7 @@ services:
       retries: 10
 
   redis:
-    image: redis:7.2.11-alpine3.21
+    image: redis:7.4.8-alpine3.21
     ports:
       - '6379:6379'
     restart: always
