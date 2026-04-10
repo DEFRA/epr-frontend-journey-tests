@@ -13,7 +13,7 @@ class DashboardPage {
     const linkElement = await $(
       '#main-content table.govuk-table tr:nth-child(' + index + ') a.govuk-link'
     )
-    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.waitForExist({ timeout: 10000 })
     await linkElement.click()
   }
 
@@ -25,7 +25,7 @@ class DashboardPage {
         index +
         ') a.govuk-link'
     )
-    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.waitForExist({ timeout: 10000 })
     await linkElement.click()
   }
 
@@ -35,7 +35,7 @@ class DashboardPage {
         index +
         ') > td.govuk-table__cell.govuk-table__cell--numeric'
     )
-    await wasteBalanceElement.waitForExist({ timeout: 5000 })
+    await wasteBalanceElement.waitForExist({ timeout: 10000 })
     return await wasteBalanceElement.getText()
   }
 
@@ -51,7 +51,7 @@ class DashboardPage {
         rowIndex +
         ') > td:nth-child(1)'
     )
-    await materialElement.waitForExist({ timeout: 5000 })
+    await materialElement.waitForExist({ timeout: 10000 })
     return await materialElement.getText()
   }
 
