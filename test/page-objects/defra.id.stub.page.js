@@ -38,7 +38,17 @@ class DefraIdStubPage {
   }
 
   async loginViaEmail(email) {
-    await $(`//tr[th[text()="${email}"]]//a`).click()
+    const selector = `//tr[th[text()="${email}"]]//a`
+    await browser.waitUntil(
+      async () => {
+        const el = await $(selector)
+        if (await el.isExisting()) return true
+        await browser.refresh()
+        return false
+      },
+      { timeout: 15000, interval: 2000 }
+    )
+    await $(selector).click()
   }
 
   async selectOrganisation(index) {
