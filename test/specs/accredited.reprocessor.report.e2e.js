@@ -20,6 +20,11 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
+import ConfirmationPage from '../page-objects/reports/confirmation.page.js'
+import {
+  switchToNewTab,
+  closeCurrentTabAndReturn
+} from '../support/windowtabs.js'
 
 const REG_NUMBER = 'R25SR500010912PA'
 const ACC_NUMBER = 'R-ACC12145PA'
@@ -296,6 +301,27 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // Verify confirmation page
       await checkBodyText('report created', 30)
+
+      // --- View draft report in new tab ---
+      await ConfirmationPage.viewDraftReport()
+      const originalTab = await switchToNewTab()
+
+      // Verify draft report page content
+      await checkBodyText('Draft report for', 10)
+      await checkBodyText('Ready to submit', 10)
+      await checkBodyText('Created by:', 10)
+      await checkBodyText('Created on:', 10)
+      await checkBodyText('Packaging waste received for reprocessing', 10)
+      await checkBodyText('Packaging waste recycling', 10)
+      await checkBodyText('Packaging waste sent on', 10)
+      await checkBodyText('Supporting information', 10)
+
+      // Verify the tonnage values from the report
+      await checkBodyText('15.02', 5)
+      await checkBodyText('89.31', 5)
+
+      // Close draft tab and return to confirmation page
+      await closeCurrentTabAndReturn(originalTab)
     })
   })
 

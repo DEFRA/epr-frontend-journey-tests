@@ -18,6 +18,11 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
+import ConfirmationPage from '../page-objects/reports/confirmation.page.js'
+import {
+  switchToNewTab,
+  closeCurrentTabAndReturn
+} from '../support/windowtabs.js'
 
 describe('Accredited exporter report flow @accreditedExporter', () => {
   describe('accredited exporter with upload', () => {
@@ -230,6 +235,23 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       // Verify confirmation page
       await checkBodyText('report created', 30)
+
+      // --- View draft report in new tab ---
+      await ConfirmationPage.viewDraftReport()
+      const originalTab = await switchToNewTab()
+
+      // Verify draft report page content
+      await checkBodyText('Draft report for', 10)
+      await checkBodyText('Ready to submit', 10)
+      await checkBodyText('Created by:', 10)
+      await checkBodyText('Created on:', 10)
+      await checkBodyText('Packaging waste received for exporting', 10)
+      await checkBodyText('Packaging waste exported for recycling', 10)
+      await checkBodyText('Packaging waste sent on', 10)
+      await checkBodyText('Supporting information', 10)
+
+      // Close draft tab and return to confirmation page
+      await closeCurrentTabAndReturn(originalTab)
     })
   })
 
