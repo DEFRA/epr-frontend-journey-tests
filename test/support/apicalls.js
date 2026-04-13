@@ -9,6 +9,7 @@ import { expect } from '@wdio/globals'
 import { EprBackend } from '../apis/epr-backend.js'
 import config from '../config/config.js'
 import { AuthClient } from './auth.js'
+import { trackCreatedOrgId } from './cleanup-tracker.js'
 import { defraIdStub } from './defra-id-stub.js'
 import { MATERIALS } from './materials.js'
 import Users from './users.js'
@@ -111,6 +112,7 @@ export async function createLinkedOrganisation(dataRows) {
   const orgResponseData = await response.body.json()
 
   const orgId = orgResponseData?.orgId
+  trackCreatedOrgId(orgId)
   const refNo = orgResponseData?.referenceNumber
 
   const regAddresses = []
