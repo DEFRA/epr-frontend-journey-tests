@@ -22,7 +22,7 @@ describe('Summary Logs Reprocessor Input', () => {
       [
         {
           reprocessingType: 'input',
-          regNumber: 'R25SR500030912PA',
+          regNumber: 'R25SR5111050912PA',
           accNumber: 'ACC123456',
           status: 'approved'
         }
@@ -81,7 +81,7 @@ describe('Summary Logs Reprocessor Input', () => {
 
     await DashboardPage.selectLink(1)
 
-    const regNo = await $('//a[normalize-space()="R25SR500030912PA"]')
+    const regNo = await $('//a[normalize-space()="R25SR5111050912PA"]')
     expect(regNo).toExist()
 
     const accNo = await $('//a[normalize-space()="ACC123456"]')
