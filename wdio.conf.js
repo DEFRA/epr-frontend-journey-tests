@@ -3,6 +3,7 @@ import fs from 'node:fs'
 const oneMinute = 60 * 1000
 
 import { defraIdStub } from './test/support/defra-id-stub.js'
+import { resetTracker } from './test/support/cleanup-tracker.js'
 
 export const config = {
   //
@@ -114,7 +115,9 @@ export const config = {
    * @param {object} config wdio configuration object
    * @param {Array.<Object>} capabilities list of capabilities details
    */
-  // onPrepare: function (config, capabilities) {},
+  onPrepare: function () {
+    resetTracker()
+  },
   /**
    * Gets executed before a worker process is spawned and can be used to initialise specific service
    * for that worker as well as modify runtime environments in an async fashion.

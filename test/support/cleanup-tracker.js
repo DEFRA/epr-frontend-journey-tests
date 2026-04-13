@@ -1,16 +1,22 @@
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
 
-const filePath = resolve(
-  process.env.CLEANUP_ID_FILE ??
-    join(process.cwd(), 'test-artifacts', 'created-org-ids.txt')
+const cleanupFilePath = resolve(
+  process.cwd(),
+  'test-artifacts',
+  'created-org-ids.txt'
 )
 
-export const cleanupFilePath = filePath
+function ensureDir() {
+  const dir = dirname(cleanupFilePath)
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true })
+  }
+}
 
 /**
  * Appends an orgId to the cleanup file. Called on every successful org creation
- * so the CI cleanup step can delete them after the run.
+ * so entrypoint.sh can delete them after the run.
  *
  * Uses appendFileSync because POSIX guarantees atomic writes for small payloads
  * under PIPE_BUF (4096 bytes). A 6-digit orgId + newline is 7 bytes, so
@@ -19,13 +25,15 @@ export const cleanupFilePath = filePath
  * Swallows write errors — never fail a test because the tracker couldn't write.
  */
 export function trackCreatedOrgId(orgId) {
+  if (!orgId) {
+    return
+  }
   try {
-    mkdirSync(dirname(filePath), { recursive: true })
-    appendFileSync(filePath, `${orgId}\n`)
+    ensureDir()
+    appendFileSync(cleanupFilePath, `${orgId}\n`)
   } catch (err) {
     console.warn(
-      `cleanup-tracker: failed to write orgId ${orgId}:`,
-      err.message
+      `cleanup-tracker: failed to record orgId ${orgId}: ${err.message}`
     )
   }
 }
@@ -36,9 +44,11 @@ export function trackCreatedOrgId(orgId) {
  */
 export function resetTracker() {
   try {
-    mkdirSync(dirname(filePath), { recursive: true })
-    writeFileSync(filePath, '')
+    ensureDir()
+    writeFileSync(cleanupFilePath, '')
   } catch (err) {
-    console.warn('cleanup-tracker: failed to reset tracker:', err.message)
+    console.warn(`cleanup-tracker: failed to reset tracker: ${err.message}`)
   }
 }
+
+export { cleanupFilePath }

@@ -131,43 +131,9 @@ runs:
 
     - name: Run the tests
       shell: bash
-      env:
-        CLEANUP_ID_FILE: ${{ github.workspace }}/test-artifacts/created-org-ids.txt
       run: |
         npm run test:github
         npm run report
-
-    - name: Cleanup created test data
-      if: always()
-      shell: bash
-      env:
-        ID_FILE: ${{ github.workspace }}/test-artifacts/created-org-ids.txt
-        EPR_BACKEND_URL: http://localhost:3001
-      run: |
-        set -u
-        if [ ! -s "$ID_FILE" ]; then
-          echo "No cleanup file (or empty); nothing to do."
-          exit 0
-        fi
-        total=$(wc -l < "$ID_FILE" | tr -d ' ')
-        echo "Cleaning up $total orgs..."
-        fail=0
-        while IFS= read -r id; do
-          [ -z "$id" ] && continue
-          status=$(curl -sS -o /dev/null -w '%{http_code}' \
-            -X DELETE "$EPR_BACKEND_URL/v1/dev/organisations/$id" || echo "000")
-          echo "  $id -> $status"
-          [ "$status" = "200" ] || fail=$((fail + 1))
-        done < "$ID_FILE"
-        echo "Cleanup complete. Failures: $fail / $total"
-
-    - name: Upload cleanup log
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: cleanup-ids
-        path: test-artifacts/created-org-ids.txt
-        if-no-files-found: ignore
 
     - name: debug
       if: always()
