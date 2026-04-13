@@ -80,7 +80,6 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     const tonnesNotExportedHeading = await TonnesNotExportedPage.headingText()
     expect(tonnesNotExportedHeading).toBeTruthy()
 
-    await browser.pause(10000)
     await TonnesNotExportedPage.enterTonnage('5.50')
     await TonnesNotExportedPage.continue()
 
@@ -162,7 +161,6 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await ReportDetailPage.useThisData()
 
     // Continue to tonnage not exported page
-    await browser.pause(10000)
     await TonnesNotExportedPage.enterTonnage('5.50')
 
     await TonnesNotExportedPage.continue()
