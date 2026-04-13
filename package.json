@@ -51,6 +51,8 @@
     "undici": "7.24.5"
   },
   "overrides": {
+    "axios": "^1.15.0",
+    "basic-ftp": "5.2.2",
     "serialize-javascript": "^7.0.5"
   },
   "devDependencies": {
