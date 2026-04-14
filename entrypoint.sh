@@ -39,8 +39,6 @@ else
 fi
 test_exit_code=$?
 
-cleanup_created_orgs
-
 npm run report:publish
 publish_exit_code=$?
 
