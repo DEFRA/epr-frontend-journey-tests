@@ -324,6 +324,15 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
     })
+
+    it('should redirect to reports list when navigating back to check-answers after report is created @accreditedReprocessorCheckAnswersGuard', async () => {
+      // Report is now ready_to_submit. Navigating back to check-answers
+      // should redirect to the reports list, not show the form again.
+      await browser.back()
+
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
+    })
   })
 
   describe('non-accredited reprocessor route guard', () => {

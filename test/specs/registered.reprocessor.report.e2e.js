@@ -24,6 +24,28 @@ import {
 
 const REG_NUMBER = 'R25SR5111050912PA'
 
+async function startAndSubmitReport() {
+  await ReportsPage.selectActionLink(1)
+  await ReportDetailPage.useThisData()
+  await TonnesRecycledPage.enterTonnage('12.50')
+  await TonnesRecycledPage.continue()
+  await TonnesNotRecycledPage.enterTonnage('7.50')
+  await TonnesNotRecycledPage.continue()
+  await ReportSupportingInformationPage.continue()
+  await ReportCheckAnswersPage.createReport()
+  await checkBodyText('report created', 30)
+}
+
+async function uploadAndNavigateToReports() {
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.submitSummaryLogLink()
+  await UploadSummaryLogPage.performUploadAndReturnToHomepage(
+    'resources/reprocessor-output-regonly.xlsx'
+  )
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.manageReportsLink()
+}
+
 async function setupRegisteredOnlyReprocessor() {
   const organisationDetails = await createLinkedOrganisation([
     {
@@ -60,21 +82,9 @@ async function setupRegisteredOnlyReprocessor() {
 }
 
 describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', () => {
-  // Skip: registered-only reprocessors use quarterly cadence.
-  // Q1 2026 ends March 31 — no quarterly period is available until April 1.
-  it.skip('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
+  it('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
     await setupRegisteredOnlyReprocessor()
-
-    // Upload registered-only reprocessor summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-      'resources/reprocessor-output-regonly.xlsx'
-    )
-
-    // Navigate to reports
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await uploadAndNavigateToReports()
 
     // Start the report — should redirect to tonnes-recycled
     await ReportsPage.selectActionLink(1)
@@ -106,9 +116,9 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     const checkHeading = await ReportCheckAnswersPage.headingText()
     expect(checkHeading).toBe('Check your answers before creating draft report')
 
-    // Verify recycling activity values displayed
-    await checkBodyText('12.50', 10)
-    await checkBodyText('7.50', 10)
+    // Verify recycling activity values displayed (rendered without formatTonnage, so no trailing zero)
+    await checkBodyText('12.5', 10)
+    await checkBodyText('7.5', 10)
 
     // Verify NO PRN section present
     await checkBodyTextDoesNotInclude('PRN revenue', 5)
@@ -147,20 +157,25 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  // Skip: same Q1 timing issue as full flow test above
-  it.skip('should navigate back correctly through the registered-only reprocessor flow @registeredOnlyReprocessorBackLinks', async () => {
+  it('should redirect to reports list when navigating back to check-answers after report is created @registeredOnlyReprocessorCheckAnswersGuard', async () => {
     await setupRegisteredOnlyReprocessor()
+    await uploadAndNavigateToReports()
+    await startAndSubmitReport()
 
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-      'resources/reprocessor-output-regonly.xlsx'
-    )
+    // Navigate back to check-answers — the guard should redirect to the reports list
+    await browser.back()
 
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    const reportsHeading = await ReportsPage.headingText()
+    expect(reportsHeading).toContain('Reports')
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('should navigate back correctly through the registered-only reprocessor flow @registeredOnlyReprocessorBackLinks', async () => {
+    await setupRegisteredOnlyReprocessor()
+    await uploadAndNavigateToReports()
+
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 

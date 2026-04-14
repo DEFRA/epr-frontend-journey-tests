@@ -23,6 +23,16 @@ import {
 
 const REG_NUMBER = 'E25SR500030913PA'
 
+async function uploadAndNavigateToReports() {
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.submitSummaryLogLink()
+  await UploadSummaryLogPage.performUploadAndReturnToHomepage(
+    'resources/exporter-regonly.xlsx'
+  )
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.manageReportsLink()
+}
+
 async function setupRegisteredOnlyExporter() {
   const organisationDetails = await createLinkedOrganisation([
     {
@@ -60,17 +70,7 @@ async function setupRegisteredOnlyExporter() {
 describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
   it('should complete the full registered-only exporter report flow through to confirmation @registeredOnlyExporterFullFlow', async () => {
     await setupRegisteredOnlyExporter()
-
-    // Upload registered-only exporter summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-      'resources/exporter-regonly.xlsx'
-    )
-
-    // Navigate to reports
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
+    await uploadAndNavigateToReports()
 
     // Start the report — should redirect to tonnes-not-exported
     await ReportsPage.selectActionLink(1)
@@ -136,19 +136,33 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
+  it('should redirect to reports list when navigating back to check-answers after report is created @registeredOnlyExporterCheckAnswersGuard', async () => {
+    await setupRegisteredOnlyExporter()
+    await uploadAndNavigateToReports()
+
+    // Complete the full flow through to confirmation
+    await ReportsPage.selectActionLink(1)
+    await ReportDetailPage.useThisData()
+    await TonnesNotExportedPage.enterTonnage('5.50')
+    await TonnesNotExportedPage.continue()
+    await ReportSupportingInformationPage.continue()
+    await ReportCheckAnswersPage.createReport()
+    await checkBodyText('report created', 30)
+
+    // Navigate back to check-answers — the guard should redirect to the reports list
+    await browser.back()
+
+    const reportsHeading = await ReportsPage.headingText()
+    expect(reportsHeading).toContain('Reports')
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
   it('should navigate back correctly through the registered-only exporter flow @registeredOnlyExporterBackLinks', async () => {
     await setupRegisteredOnlyExporter()
+    await uploadAndNavigateToReports()
 
-    // Upload summary log
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-      'resources/exporter-regonly.xlsx'
-    )
-
-    // Navigate to reports and start report
-    await DashboardPage.selectTableLink(1, 1)
-    await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
