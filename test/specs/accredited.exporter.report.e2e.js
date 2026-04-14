@@ -80,13 +80,14 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       await ReportsPage.selectActionLink(1)
       await ReportDetailPage.useThisData()
 
-      // On prn-summary — back link goes to detail page
+      // On prn-summary — back link goes to reports list
       await PrnSummaryPage.selectBackLink()
-      const detailHeading = await ReportDetailPage.headingText()
-      expect(detailHeading).toBeTruthy()
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
 
-      // Go forward again
-      await ReportDetailPage.useThisData()
+      // Re-enter the wizard — report is in_progress so the action link
+      // routes straight to prn-summary
+      await ReportsPage.selectActionLink(1)
 
       // Continue to free-perns
       await PrnSummaryPage.enterRevenue('100')
