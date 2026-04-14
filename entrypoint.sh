@@ -1,13 +1,6 @@
 #!/bin/sh
 
 echo "run_id: $RUN_ID"
-# Run tests based on PROFILE (if all, then all tests are run)
-if [ "$PROFILE" = "all" ]; then
-  npm test
-else
-  npm run test:smoketest
-fi
-test_exit_code=$?
 
 # Best-effort cleanup of every orgId the test suite created. Runs regardless
 # of pass/fail — we still want to delete data from failed runs. See PAE-1194.
@@ -35,6 +28,16 @@ cleanup_created_orgs() {
   echo "cleanup: complete. failures: $fail / $total"
   return 0
 }
+
+trap 'cleanup_created_orgs' EXIT
+
+# Run tests based on PROFILE (if all, then all tests are run)
+if [ "$PROFILE" = "all" ]; then
+  npm test
+else
+  npm run test:smoketest
+fi
+test_exit_code=$?
 
 cleanup_created_orgs
 
