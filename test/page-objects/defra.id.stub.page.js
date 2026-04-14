@@ -1,5 +1,21 @@
 import { browser, $, $$ } from '@wdio/globals'
 
+// Triggers a navigation via `click` and waits for the browser URL to
+// actually change before returning. Needed for the OAuth login flow: the
+// click kicks off a redirect chain (stub login page → stub org picker
+// and/or app callback → dashboard), and the session cookie is only set
+// once the chain has settled. A caller that issues browser.url(...) next
+// can otherwise race the chain and hit the app as unauthenticated, which
+// redirects to /logged-out and leaves the test staring at the wrong page.
+async function clickAndWaitForNavigation(click, timeoutMsg) {
+  const urlBeforeClick = await browser.getUrl()
+  await click()
+  await browser.waitUntil(
+    async () => (await browser.getUrl()) !== urlBeforeClick,
+    { timeout: 15000, timeoutMsg }
+  )
+}
+
 class DefraIdStubPage {
   constructor() {
     this.baseUrl = 'http://localhost:3200'
@@ -48,30 +64,19 @@ class DefraIdStubPage {
       },
       { timeout: 15000, interval: 2000 }
     )
-    await $(selector).click()
-
-    // The click triggers an OAuth redirect chain (stub → app callback →
-    // dashboard) that sets the userSession cookie on the way through. A
-    // caller that issues browser.url(...) next can race the chain and
-    // arrive before the cookie lands, so the request hits the app as
-    // unauthenticated. Wait until we've left the stub host to guarantee
-    // the chain has finished before returning.
-    await browser.waitUntil(
-      async () => {
-        const currentUrl = await browser.getUrl()
-        return !currentUrl.includes('defra-id-stub')
-      },
-      {
-        timeout: 15000,
-        timeoutMsg: 'Login did not redirect away from defra-id-stub'
-      }
+    await clickAndWaitForNavigation(
+      () => $(selector).click(),
+      'Login click did not trigger navigation'
     )
   }
 
   async selectOrganisation(index) {
     const suffix = index === 1 ? '' : `-${index}`
     await $(`#relationshipId${suffix}`).click()
-    await $('button[type=submit]').click()
+    await clickAndWaitForNavigation(
+      () => $('button[type=submit]').click(),
+      'Organisation submit did not trigger navigation'
+    )
   }
 }
 
