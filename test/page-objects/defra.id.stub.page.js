@@ -49,6 +49,23 @@ class DefraIdStubPage {
       { timeout: 15000, interval: 2000 }
     )
     await $(selector).click()
+
+    // The click triggers an OAuth redirect chain (stub → app callback →
+    // dashboard) that sets the userSession cookie on the way through. A
+    // caller that issues browser.url(...) next can race the chain and
+    // arrive before the cookie lands, so the request hits the app as
+    // unauthenticated. Wait until we've left the stub host to guarantee
+    // the chain has finished before returning.
+    await browser.waitUntil(
+      async () => {
+        const currentUrl = await browser.getUrl()
+        return !currentUrl.includes('defra-id-stub')
+      },
+      {
+        timeout: 15000,
+        timeoutMsg: 'Login did not redirect away from defra-id-stub'
+      }
+    )
   }
 
   async selectOrganisation(index) {
