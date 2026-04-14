@@ -1,4 +1,4 @@
-import { browser, expect } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
@@ -6,8 +6,7 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import ReportsPage from '../page-objects/reports.page.js'
 import ReportDetailPage from '../page-objects/report.detail.page.js'
-import TonnesRecycledPage from '../page-objects/reports/tonnes.recycled.page.js'
-import TonnesNotRecycledPage from '../page-objects/reports/tonnes.not.recycled.page.js'
+import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
 import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
 import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
@@ -22,35 +21,23 @@ import {
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
 
-const REG_NUMBER = 'R25SR5111050912PA'
-
-async function startAndSubmitReport() {
-  await ReportsPage.selectActionLink(1)
-  await ReportDetailPage.useThisData()
-  await TonnesRecycledPage.enterTonnage('12.50')
-  await TonnesRecycledPage.continue()
-  await TonnesNotRecycledPage.enterTonnage('7.50')
-  await TonnesNotRecycledPage.continue()
-  await ReportSupportingInformationPage.continue()
-  await ReportCheckAnswersPage.createReport()
-  await checkBodyText('report created', 30)
-}
+const REG_NUMBER = 'E25SR500030913PA'
 
 async function uploadAndNavigateToReports() {
   await DashboardPage.selectTableLink(1, 1)
   await WasteRecordsPage.submitSummaryLogLink()
   await UploadSummaryLogPage.performUploadAndReturnToHomepage(
-    'resources/reprocessor-output-regonly.xlsx'
+    'resources/exporter-regonly.xlsx'
   )
   await DashboardPage.selectTableLink(1, 1)
   await WasteRecordsPage.manageReportsLink()
 }
 
-async function setupRegisteredOnlyReprocessor() {
+async function setupRegisteredOnlyExporter() {
   const organisationDetails = await createLinkedOrganisation([
     {
       material: 'Paper or board (R3)',
-      wasteProcessingType: 'Reprocessor',
+      wasteProcessingType: 'Exporter',
       withoutAccreditation: true
     }
   ])
@@ -59,7 +46,6 @@ async function setupRegisteredOnlyReprocessor() {
     organisationDetails.refNo,
     [
       {
-        reprocessingType: 'output',
         regNumber: REG_NUMBER,
         status: 'approved',
         withoutAccreditation: true
@@ -81,30 +67,23 @@ async function setupRegisteredOnlyReprocessor() {
   return { organisationDetails, migrationResponse }
 }
 
-describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', () => {
-  it('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
-    await setupRegisteredOnlyReprocessor()
+describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
+  it('should complete the full registered-only exporter report flow through to confirmation @registeredOnlyExporterFullFlow', async () => {
+    await setupRegisteredOnlyExporter()
     await uploadAndNavigateToReports()
 
-    // Start the report — should redirect to tonnes-recycled
+    // Start the report — should redirect to tonnes-not-exported
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // --- Tonnes recycled page ---
-    const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
-    expect(tonnesRecycledHeading).toBeTruthy()
+    // --- Tonnes not exported page ---
+    const tonnesNotExportedHeading = await TonnesNotExportedPage.headingText()
+    expect(tonnesNotExportedHeading).toBeTruthy()
 
-    await TonnesRecycledPage.enterTonnage('12.50')
-    await TonnesRecycledPage.continue()
+    await TonnesNotExportedPage.enterTonnage('5.50')
+    await TonnesNotExportedPage.continue()
 
-    // --- Tonnes not recycled page ---
-    const tonnesNotRecycledHeading = await TonnesNotRecycledPage.headingText()
-    expect(tonnesNotRecycledHeading).toBeTruthy()
-
-    await TonnesNotRecycledPage.enterTonnage('7.50')
-    await TonnesNotRecycledPage.continue()
-
-    // --- Supporting information page (no PRN pages for registered-only) ---
+    // --- Supporting information page (no PERN pages for registered-only) ---
     const supportingInfoHeading =
       await ReportSupportingInformationPage.headingText()
     expect(supportingInfoHeading).toBe(
@@ -116,14 +95,14 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     const checkHeading = await ReportCheckAnswersPage.headingText()
     expect(checkHeading).toBe('Check your answers before creating draft report')
 
-    // Verify recycling activity values displayed (rendered without formatTonnage, so no trailing zero)
-    await checkBodyText('12.5', 10)
-    await checkBodyText('7.5', 10)
+    // Verify tonnage not exported value and change link present on CYA
+    await checkBodyText('5.50', 10)
+    const changeLink = await $('a[href*="tonnes-not-exported"]')
+    expect(await changeLink.isExisting()).toBe(true)
 
-    // Verify NO PRN section present
-    await checkBodyTextDoesNotInclude('PRN revenue', 5)
-    await checkBodyTextDoesNotInclude('Free PRNs', 5)
-    await checkBodyTextDoesNotInclude('Average price per tonne', 5)
+    // Verify NO PERN section present
+    await checkBodyTextDoesNotInclude('PERN revenue', 5)
+    await checkBodyTextDoesNotInclude('Free PERNs', 5)
 
     // Submit the report
     await ReportCheckAnswersPage.createReport()
@@ -135,9 +114,9 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should return 404 when navigating directly to PRN pages @registeredOnlyReprocessorRouteGuard', async () => {
+  it('should return 404 when navigating directly to PERN pages @registeredOnlyExporterRouteGuard', async () => {
     const { organisationDetails, migrationResponse } =
-      await setupRegisteredOnlyReprocessor()
+      await setupRegisteredOnlyExporter()
 
     // Try to access prn-summary directly — should get 404
     await browser.url(
@@ -146,9 +125,9 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await checkBodyText('404', 10)
     await checkBodyText('Page not found', 10)
 
-    // Try to access free-prns directly — should get 404
+    // Try to access free-perns directly — should get 404
     await browser.url(
-      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/quarterly/1/free-prns`
+      `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/quarterly/1/free-perns`
     )
     await checkBodyText('404', 10)
     await checkBodyText('Page not found', 10)
@@ -157,10 +136,18 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should redirect to reports list when navigating back to check-answers after report is created @registeredOnlyReprocessorCheckAnswersGuard', async () => {
-    await setupRegisteredOnlyReprocessor()
+  it('should redirect to reports list when navigating back to check-answers after report is created @registeredOnlyExporterCheckAnswersGuard', async () => {
+    await setupRegisteredOnlyExporter()
     await uploadAndNavigateToReports()
-    await startAndSubmitReport()
+
+    // Complete the full flow through to confirmation
+    await ReportsPage.selectActionLink(1)
+    await ReportDetailPage.useThisData()
+    await TonnesNotExportedPage.enterTonnage('5.50')
+    await TonnesNotExportedPage.continue()
+    await ReportSupportingInformationPage.continue()
+    await ReportCheckAnswersPage.createReport()
+    await checkBodyText('report created', 30)
 
     // Navigate back to check-answers — the guard should redirect to the reports list
     await browser.back()
@@ -172,44 +159,34 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should navigate back correctly through the registered-only reprocessor flow @registeredOnlyReprocessorBackLinks', async () => {
-    await setupRegisteredOnlyReprocessor()
+  it('should navigate back correctly through the registered-only exporter flow @registeredOnlyExporterBackLinks', async () => {
+    await setupRegisteredOnlyExporter()
     await uploadAndNavigateToReports()
 
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // On tonnes-recycled — back link goes to reports list
-    await TonnesRecycledPage.selectBackLink()
+    // On tonnes-not-exported — back link goes to reports list
+    await TonnesNotExportedPage.selectBackLink()
     const reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
     // Re-enter the wizard — report is in_progress so the action link
-    // routes straight to tonnes-recycled
+    // routes straight to tonnes-not-exported
     await ReportsPage.selectActionLink(1)
 
-    // Continue to tonnes-not-recycled
-    await TonnesRecycledPage.enterTonnage('12.50')
-    await TonnesRecycledPage.continue()
+    // Continue to tonnage not exported page
+    await TonnesNotExportedPage.enterTonnage('5.50')
 
-    // On tonnes-not-recycled — back link goes to tonnes-recycled
-    await TonnesNotRecycledPage.selectBackLink()
-    const backToTonnesRecycled = await TonnesRecycledPage.headingText()
-    expect(backToTonnesRecycled).toBeTruthy()
+    await TonnesNotExportedPage.continue()
 
-    // Continue to supporting-information (skips PRN pages)
-    await TonnesRecycledPage.enterTonnage('12.50')
-    await TonnesRecycledPage.continue()
-    await TonnesNotRecycledPage.enterTonnage('7.50')
-    await TonnesNotRecycledPage.continue()
-
-    // On supporting-information — back link goes to tonnes-not-recycled (not free-prns)
+    // On supporting-information — back link goes to tonnes-not-exported (not free-perns)
     await ReportSupportingInformationPage.selectBackLink()
-    const backToTonnesNotRecycled = await TonnesNotRecycledPage.headingText()
-    expect(backToTonnesNotRecycled).toBeTruthy()
+    const backToTonnesNotExported = await TonnesNotExportedPage.headingText()
+    expect(backToTonnesNotExported).toBeTruthy()
 
     // Clean up
-    await TonnesNotRecycledPage.deleteReportLink()
+    await TonnesNotExportedPage.deleteReportLink()
     await ConfirmDeleteReportPage.confirmDeletion()
 
     await HomePage.signOut()

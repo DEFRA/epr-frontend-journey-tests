@@ -80,13 +80,14 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       await ReportsPage.selectActionLink(1)
       await ReportDetailPage.useThisData()
 
-      // On prn-summary — back link goes to detail page
+      // On prn-summary — back link goes to reports list
       await PrnSummaryPage.selectBackLink()
-      const detailHeading = await ReportDetailPage.headingText()
-      expect(detailHeading).toBeTruthy()
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
 
-      // Go forward again
-      await ReportDetailPage.useThisData()
+      // Re-enter the wizard — report is in_progress so the action link
+      // routes straight to prn-summary
+      await ReportsPage.selectActionLink(1)
 
       // Continue to free-perns
       await PrnSummaryPage.enterRevenue('100')
@@ -252,6 +253,15 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
+    })
+
+    it('should redirect to reports list when navigating back to check-answers after report is created @accreditedExporterCheckAnswersGuard', async () => {
+      // Report is now ready_to_submit. Navigating back to check-answers
+      // should redirect to the reports list, not show the form again.
+      await browser.back()
+
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
     })
   })
 

@@ -90,13 +90,14 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await ReportsPage.selectActionLink(1)
       await ReportDetailPage.useThisData()
 
-      // On tonnes-recycled — back link goes to detail page
+      // On tonnes-recycled — back link goes to reports list
       await TonnesRecycledPage.selectBackLink()
-      const detailHeading = await ReportDetailPage.headingText()
-      expect(detailHeading).toBeTruthy()
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
 
-      // Go forward again
-      await ReportDetailPage.useThisData()
+      // Re-enter the wizard — report is in_progress so the action link
+      // routes straight to tonnes-recycled
+      await ReportsPage.selectActionLink(1)
 
       // Continue to tonnes-not-recycled
       await TonnesRecycledPage.enterTonnage('15.02')
@@ -322,6 +323,15 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
+    })
+
+    it('should redirect to reports list when navigating back to check-answers after report is created @accreditedReprocessorCheckAnswersGuard', async () => {
+      // Report is now ready_to_submit. Navigating back to check-answers
+      // should redirect to the reports list, not show the form again.
+      await browser.back()
+
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
     })
   })
 
