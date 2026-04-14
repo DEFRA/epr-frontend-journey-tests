@@ -152,13 +152,14 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // On tonnes-not-exported — back link goes to detail page
+    // On tonnes-not-exported — back link goes to reports list
     await TonnesNotExportedPage.selectBackLink()
-    const detailHeading = await ReportDetailPage.headingText()
-    expect(detailHeading).toBeTruthy()
+    const reportsHeading = await ReportsPage.headingText()
+    expect(reportsHeading).toContain('Reports')
 
-    // Go forward again
-    await ReportDetailPage.useThisData()
+    // Re-enter the wizard — report is in_progress so the action link
+    // routes straight to tonnes-not-exported
+    await ReportsPage.selectActionLink(1)
 
     // Continue to tonnage not exported page
     await TonnesNotExportedPage.enterTonnage('5.50')

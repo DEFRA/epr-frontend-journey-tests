@@ -164,13 +164,14 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await ReportsPage.selectActionLink(1)
     await ReportDetailPage.useThisData()
 
-    // On tonnes-recycled — back link goes to detail page
+    // On tonnes-recycled — back link goes to reports list
     await TonnesRecycledPage.selectBackLink()
-    const detailHeading = await ReportDetailPage.headingText()
-    expect(detailHeading).toBeTruthy()
+    const reportsHeading = await ReportsPage.headingText()
+    expect(reportsHeading).toContain('Reports')
 
-    // Go forward again
-    await ReportDetailPage.useThisData()
+    // Re-enter the wizard — report is in_progress so the action link
+    // routes straight to tonnes-recycled
+    await ReportsPage.selectActionLink(1)
 
     // Continue to tonnes-not-recycled
     await TonnesRecycledPage.enterTonnage('12.50')
