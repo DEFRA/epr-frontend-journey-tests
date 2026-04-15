@@ -86,8 +86,9 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await setupRegisteredOnlyReprocessor()
     await uploadAndNavigateToReports()
 
-    // Start the report — should redirect to tonnes-recycled
+    // Start the report — verify registration number visible on detail page
     await ReportsPage.selectActionLink(1)
+    await checkBodyText(REG_NUMBER, 10)
     await ReportDetailPage.useThisData()
 
     // --- Tonnes recycled page ---
