@@ -312,6 +312,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await checkBodyText('Ready to submit', 10)
       await checkBodyText('Created by:', 10)
       await checkBodyText('Created on:', 10)
+      await checkBodyText('Site', 10)
       await checkBodyText('Packaging waste received for reprocessing', 10)
       await checkBodyText('Packaging waste recycling', 10)
       await checkBodyText('Packaging waste sent on', 10)
