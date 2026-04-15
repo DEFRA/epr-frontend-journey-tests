@@ -25,6 +25,7 @@ services:
   # containers.
   selenium-chrome:
     image: selenium/standalone-chrome:145.0
+    platform: linux/amd64
     ports:
       - 4444:4444
     environment:
