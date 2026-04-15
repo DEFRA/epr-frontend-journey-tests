@@ -135,19 +135,17 @@ describe('Deleting an in-progress report', () => {
     expect(checkHeading).toBe('Check your answers before creating draft report')
     await ReportCheckAnswersPage.deleteAndStartAgainLink()
 
-    // Confirm deletion page — test back link goes to supporting information
+    // Confirm deletion page — test back link returns to check your answers
     deleteHeading = await ConfirmDeleteReportPage.headingText()
     expect(deleteHeading).toBe('Confirm deletion of this report')
 
     await ConfirmDeleteReportPage.selectBackLink()
-    const backToSupportingInfo =
-      await ReportSupportingInformationPage.headingText()
-    expect(backToSupportingInfo).toBe(
-      'Add supporting information for your regulator (optional)'
+    const backToCheckAnswers = await ReportCheckAnswersPage.headingText()
+    expect(backToCheckAnswers).toBe(
+      'Check your answers before creating draft report'
     )
 
-    // Navigate back to check answers and delete
-    await ReportSupportingInformationPage.continue()
+    // Return to confirm deletion and delete
     await ReportCheckAnswersPage.deleteAndStartAgainLink()
     await ConfirmDeleteReportPage.confirmDeletion()
 
