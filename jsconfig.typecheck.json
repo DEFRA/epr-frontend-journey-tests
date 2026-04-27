@@ -23,6 +23,6 @@
       "components/*": ["./test/components/*"]
     }
   },
-  "include": ["test/**/*.js", "docker/mock/**/*.js"],
+  "include": ["test/**/*.js"],
   "exclude": ["node_modules", "archived_form_tests"]
 }
