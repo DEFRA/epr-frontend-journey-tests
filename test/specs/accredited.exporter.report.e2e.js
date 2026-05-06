@@ -4,12 +4,12 @@ import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import ReportsPage from '../page-objects/reports.page.js'
-import ReportDetailPage from '../page-objects/report.detail.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
 import PrnSummaryPage from '../page-objects/reports/prn.summary.page.js'
 import FreePernPage from '../page-objects/reports/free.perns.page.js'
-import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
-import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
+import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
 import {
   createAndRegisterDefraIdUser,
@@ -23,6 +23,8 @@ import {
   switchToNewTab,
   closeCurrentTabAndReturn
 } from '../support/windowtabs.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 describe('Accredited exporter report flow @accreditedExporter', () => {
   describe('accredited exporter with upload', () => {
@@ -239,7 +241,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       // --- View draft report in new tab ---
       await ConfirmationPage.viewDraftReport()
-      const originalTab = await switchToNewTab()
+      let originalTab = await switchToNewTab()
 
       // Verify draft report page content
       await checkBodyText('Draft report for', 10)
@@ -253,6 +255,35 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
+
+      await ConfirmationPage.goToReports()
+      await ReportsPage.selectActionLink(1)
+
+      // Confirm and submit report
+      await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+
+      const confirmationText = await ReportSubmittedPage.confirmationText()
+      expect(confirmationText).toContain('report submitted to regulator')
+
+      await ReportSubmittedPage.viewReportLink()
+      originalTab = await switchToNewTab()
+
+      await checkBodyText('Report for', 10)
+      await checkBodyText('Submitted', 10)
+      await checkBodyText('Submitted by:', 10)
+      await checkBodyText('Submitted on:', 10)
+      await checkBodyText('Packaging waste received for exporting', 10)
+      await checkBodyText('Packaging waste exported for recycling', 10)
+      await checkBodyText('Packaging waste sent on', 10)
+      await checkBodyText('Supporting information', 10)
+
+      // Close report tab and return to submission confirmation page
+      await closeCurrentTabAndReturn(originalTab)
+
+      await ReportSubmittedPage.returnToReportsLink()
+
+      const statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Submitted')
     })
 
     it('should redirect to reports list when navigating back to check-answers after report is created @accreditedExporterCheckAnswersGuard', async () => {
