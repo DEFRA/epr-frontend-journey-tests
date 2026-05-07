@@ -15,6 +15,7 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
+  unsubmitReport,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import {
@@ -90,7 +91,7 @@ async function setupRegisteredOnlyReprocessor() {
 
 describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', () => {
   it('should complete the full registered-only reprocessor report flow through to confirmation @registeredOnlyReprocessorFullFlow', async () => {
-    await setupRegisteredOnlyReprocessor()
+    const setupResponse = await setupRegisteredOnlyReprocessor()
     await uploadAndNavigateToReports()
 
     // Start the report — verify registration number visible on detail page
@@ -184,8 +185,24 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
 
     await ReportSubmittedPage.returnToReportsLink()
 
-    const statusBadge = await ReportsPage.getStatusBadge(1)
+    let statusBadge = await ReportsPage.getStatusBadge(1)
     expect(statusBadge).toBe('Submitted')
+
+    // Now we unsubmit the report via epr-backend to see the effects on the frontend
+    await unsubmitReport(
+      setupResponse.organisationDetails.refNo,
+      setupResponse.migrationResponse.registrationIds[0],
+      2026,
+      'quarterly',
+      1
+    )
+
+    // Refresh to see the status change
+    await browser.refresh()
+
+    statusBadge = await ReportsPage.getStatusBadge(1)
+    expect(statusBadge).toBe('Ready to submit')
+
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })

@@ -15,6 +15,7 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
+  unsubmitReport,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
@@ -28,18 +29,20 @@ import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 describe('Accredited exporter report flow @accreditedExporter', () => {
   describe('accredited exporter with upload', () => {
+    let organisationDetails
+    let migrationResponse
     before(async () => {
       const regNumber = 'E25SR500020912PA'
       const accNumber = 'E-ACC12245PA'
 
-      const organisationDetails = await createLinkedOrganisation([
+      organisationDetails = await createLinkedOrganisation([
         {
           material: 'Paper or board (R3)',
           wasteProcessingType: 'Exporter'
         }
       ])
 
-      const migrationResponse = await updateMigratedOrganisation(
+      migrationResponse = await updateMigratedOrganisation(
         organisationDetails.refNo,
         [
           {
@@ -288,8 +291,23 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       await ReportSubmittedPage.returnToReportsLink()
 
-      const statusBadge = await ReportsPage.getStatusBadge(1)
+      let statusBadge = await ReportsPage.getStatusBadge(1)
       expect(statusBadge).toBe('Submitted')
+
+      // Now we unsubmit the report via epr-backend to see the effects on the frontend
+      await unsubmitReport(
+        organisationDetails.refNo,
+        migrationResponse.registrationIds[0],
+        2026,
+        'monthly',
+        1
+      )
+
+      // Refresh to see the status change
+      await browser.refresh()
+
+      statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Ready to submit')
     })
   })
 
