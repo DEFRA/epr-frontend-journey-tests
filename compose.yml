@@ -208,6 +208,7 @@ services:
       FEATURE_FLAG_DEV_ENDPOINTS: true
       FEATURE_FLAG_ORS_WASTE_BALANCE_VALIDATION: true
       FEATURE_FLAG_REPORTS: true
+      FEATURE_FLAG_REPORT_UNSUBMIT: true
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       MONGO_URI: mongodb://mongodb:27017/
       NODE_ENV: development

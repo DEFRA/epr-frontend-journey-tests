@@ -17,6 +17,7 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
+  unsubmitReport,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
@@ -78,8 +79,9 @@ async function uploadAndNavigateToReports() {
 
 describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
   describe('accredited reprocessor with upload', () => {
+    let setupResponse
     before(async () => {
-      await setupAccreditedReprocessor()
+      setupResponse = await setupAccreditedReprocessor()
       await uploadAndNavigateToReports()
     })
 
@@ -245,7 +247,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await ConfirmDeleteReportPage.confirmDeletion()
     })
 
-    it('should complete the full accredited reprocessor report flow through to confirmation @accreditedReprocessorFullFlow', async () => {
+    it('should complete the full accredited reprocessor report flow through to confirmation with submission and unsubmission via backend @accreditedReprocessorFullFlow @smoketest', async () => {
       await ReportsPage.selectActionLink(1)
       await ReportDetailPage.useThisData()
 
@@ -364,8 +366,23 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       await ReportSubmittedPage.returnToReportsLink()
 
-      const statusBadge = await ReportsPage.getStatusBadge(1)
+      let statusBadge = await ReportsPage.getStatusBadge(1)
       expect(statusBadge).toBe('Submitted')
+
+      // Now we unsubmit the report via epr-backend to see the effects on the frontend
+      await unsubmitReport(
+        setupResponse.organisationDetails.refNo,
+        setupResponse.migrationResponse.registrationIds[0],
+        2026,
+        'monthly',
+        1
+      )
+
+      // Refresh to see the status change
+      await browser.refresh()
+
+      statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Ready to submit')
     })
   })
 

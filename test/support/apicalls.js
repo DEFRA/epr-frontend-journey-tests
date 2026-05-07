@@ -428,6 +428,26 @@ export async function seedOverseasSites(orgRefNo, registrationIndex = 0) {
   expect(putResponse.statusCode).toBe(200)
 }
 
+export async function unsubmitReport(
+  organisationId,
+  registrationId,
+  year,
+  cadence,
+  period
+) {
+  const authClient = new AuthClient()
+  const eprBackend = new EprBackend()
+  await authClient.authenticate()
+  const unsubmitEndpoint = `/v1/organisations/${organisationId}/registrations/${registrationId}/reports/${year}/${cadence}/${period}/unsubmit`
+  const response = await eprBackend.post(
+    unsubmitEndpoint,
+    '',
+    authClient.authHeader()
+  )
+
+  await assertSuccessResponseWithoutBody(response, `POST ${unsubmitEndpoint}`)
+}
+
 export async function externalAPICancelPrn(prnDetails) {
   await config.cognitoAuth.generateToken()
 
