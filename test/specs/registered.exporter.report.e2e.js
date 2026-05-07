@@ -4,11 +4,11 @@ import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import ReportsPage from '../page-objects/reports.page.js'
-import ReportDetailPage from '../page-objects/report.detail.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
 import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
-import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
-import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
+import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
 import {
   createAndRegisterDefraIdUser,
@@ -20,6 +20,13 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
+import {
+  closeCurrentTabAndReturn,
+  switchToNewTab
+} from '../support/windowtabs.js'
+import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 const REG_NUMBER = 'E25SR500030913PA'
 
@@ -110,6 +117,50 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     // Verify confirmation page
     await checkBodyText('report created', 30)
 
+    // --- View draft report in new tab ---
+    await ConfirmationPage.viewDraftReport()
+    let originalTab = await switchToNewTab()
+
+    // Verify draft report page content
+    await checkBodyText('Draft report for Quarter', 10)
+    await checkBodyText('Ready to submit', 10)
+    await checkBodyText('Created by:', 10)
+    await checkBodyText('Created on:', 10)
+    await checkBodyText('Packaging waste received for exporting', 10)
+    await checkBodyText('Packaging waste exported for recycling', 10)
+    await checkBodyText('Packaging waste sent on', 10)
+    await checkBodyText('Supporting information', 10)
+
+    // Close draft tab and return to confirmation page
+    await closeCurrentTabAndReturn(originalTab)
+
+    await ConfirmationPage.goToReports()
+    await ReportsPage.selectActionLink(1)
+
+    // Confirm and submit report
+    await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+
+    const confirmationText = await ReportSubmittedPage.confirmationText()
+    expect(confirmationText).toContain('report submitted to regulator')
+
+    await ReportSubmittedPage.viewReportLink()
+    originalTab = await switchToNewTab()
+
+    await checkBodyText('Report for Quarter', 10)
+    await checkBodyText('Submitted', 10)
+    await checkBodyText('Submitted by:', 10)
+    await checkBodyText('Submitted on:', 10)
+    await checkBodyText('Packaging waste received for exporting', 10)
+    await checkBodyText('Packaging waste exported for recycling', 10)
+    await checkBodyText('Packaging waste sent on', 10)
+    await checkBodyText('Supporting information', 10)
+
+    // Close report tab and return to submission confirmation page
+    await closeCurrentTabAndReturn(originalTab)
+
+    await ReportSubmittedPage.returnToReportsLink()
+    const statusBadge = await ReportsPage.getStatusBadge(1)
+    expect(statusBadge).toBe('Submitted')
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
