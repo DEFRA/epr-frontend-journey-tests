@@ -4,14 +4,14 @@ import HomePage from 'page-objects/homepage.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import ReportsPage from '../page-objects/reports.page.js'
-import ReportDetailPage from '../page-objects/report.detail.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
 import TonnesRecycledPage from '../page-objects/reports/tonnes.recycled.page.js'
 import TonnesNotRecycledPage from '../page-objects/reports/tonnes.not.recycled.page.js'
 import ReprocessorPrnSummaryPage from '../page-objects/reports/reprocessor.prn.summary.page.js'
 import FreePrnsPage from '../page-objects/reports/free.prns.page.js'
-import ReportSupportingInformationPage from '../page-objects/report.supporting.information.page.js'
-import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
+import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
 import {
   createAndRegisterDefraIdUser,
@@ -25,6 +25,8 @@ import {
   switchToNewTab,
   closeCurrentTabAndReturn
 } from '../support/windowtabs.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 const REG_NUMBER = 'R25SR500010912PA'
 const ACC_NUMBER = 'R-ACC12145PA'
@@ -305,7 +307,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // --- View draft report in new tab ---
       await ConfirmationPage.viewDraftReport()
-      const originalTab = await switchToNewTab()
+      let originalTab = await switchToNewTab()
 
       // Verify draft report page content
       await checkBodyText('Draft report for', 10)
@@ -324,15 +326,46 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
-    })
 
-    it('should redirect to reports list when navigating back to check-answers after report is created @accreditedReprocessorCheckAnswersGuard', async () => {
       // Report is now ready_to_submit. Navigating back to check-answers
       // should redirect to the reports list, not show the form again.
       await browser.back()
 
       const reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
+
+      await ReportsPage.selectActionLink(1)
+
+      // Confirm and submit report
+      await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+
+      const confirmationText = await ReportSubmittedPage.confirmationText()
+      expect(confirmationText).toContain('report submitted to regulator')
+
+      await ReportSubmittedPage.viewReportLink()
+      originalTab = await switchToNewTab()
+
+      await checkBodyText('Report for', 10)
+      await checkBodyText('Submitted', 10)
+      await checkBodyText('Submitted by:', 10)
+      await checkBodyText('Submitted on:', 10)
+      await checkBodyText('Site', 10)
+      await checkBodyText('Packaging waste received for reprocessing', 10)
+      await checkBodyText('Packaging waste recycling', 10)
+      await checkBodyText('Packaging waste sent on', 10)
+      await checkBodyText('Supporting information', 10)
+
+      // Verify the tonnage values from the report
+      await checkBodyText('15.02', 5)
+      await checkBodyText('89.31', 5)
+
+      // Close report tab and return to submission confirmation page
+      await closeCurrentTabAndReturn(originalTab)
+
+      await ReportSubmittedPage.returnToReportsLink()
+
+      const statusBadge = await ReportsPage.getStatusBadge(1)
+      expect(statusBadge).toBe('Submitted')
     })
   })
 

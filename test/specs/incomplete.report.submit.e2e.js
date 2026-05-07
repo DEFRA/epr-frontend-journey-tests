@@ -3,9 +3,9 @@ import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
-import ReportCheckAnswersPage from '../page-objects/report.check.answers.page.js'
-import ReportDetailPage from '../page-objects/report.detail.page.js'
-import ReportsPage from '../page-objects/reports.page.js'
+import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
