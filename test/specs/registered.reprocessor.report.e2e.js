@@ -25,7 +25,7 @@ import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
 import {
   closeCurrentTabAndReturn,
   switchToNewTab
-} from '~/test/support/windowtabs.js'
+} from '../support/windowtabs.js'
 import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
 import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
