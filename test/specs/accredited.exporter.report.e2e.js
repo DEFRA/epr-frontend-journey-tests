@@ -256,7 +256,13 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
 
-      await ConfirmationPage.goToReports()
+      // Report is now ready_to_submit. Navigating back to check-answers
+      // should redirect to the reports list, not show the form again.
+      await browser.back()
+
+      const reportsHeading = await ReportsPage.headingText()
+      expect(reportsHeading).toContain('Reports')
+
       await ReportsPage.selectActionLink(1)
 
       // Confirm and submit report
@@ -284,15 +290,6 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       const statusBadge = await ReportsPage.getStatusBadge(1)
       expect(statusBadge).toBe('Submitted')
-    })
-
-    it('should redirect to reports list when navigating back to check-answers after report is created @accreditedExporterCheckAnswersGuard', async () => {
-      // Report is now ready_to_submit. Navigating back to check-answers
-      // should redirect to the reports list, not show the form again.
-      await browser.back()
-
-      const reportsHeading = await ReportsPage.headingText()
-      expect(reportsHeading).toContain('Reports')
     })
   })
 
