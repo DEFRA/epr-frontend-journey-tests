@@ -247,7 +247,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await ConfirmDeleteReportPage.confirmDeletion()
     })
 
-    it('should complete the full accredited reprocessor report flow through to confirmation with submission and unsubmission via backend @accreditedReprocessorFullFlow', async () => {
+    it('should complete the full accredited reprocessor report flow through to confirmation with submission and unsubmission via backend @accreditedReprocessorFullFlow @smoketest', async () => {
       await ReportsPage.selectActionLink(1)
       await ReportDetailPage.useThisData()
 
