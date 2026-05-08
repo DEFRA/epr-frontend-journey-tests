@@ -332,6 +332,11 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // Report is now ready_to_submit. Navigating back to check-answers
       // should redirect to the reports list, not show the form again.
       await browser.back()
+      await browser.waitUntil(
+        async () =>
+          (await browser.execute(() => document.readyState)) === 'complete',
+        { timeout: 5000, timeoutMsg: 'Page not ready after back()' }
+      )
 
       const reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')

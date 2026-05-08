@@ -11,7 +11,7 @@ class ReportsPage {
     const linkElement = await $(
       `#main-content table.govuk-table:nth-of-type(${tableIndex}) tr:nth-child(${rowIndex}) a.govuk-link`
     )
-    await linkElement.waitForExist({ timeout: 5000 })
+    await linkElement.waitForClickable({ timeout: 5000 })
     await linkElement.click()
   }
 
