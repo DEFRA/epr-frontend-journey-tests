@@ -6,7 +6,9 @@ class MonthlyReportDraftDeclarationPage {
   }
 
   async confirmAndSubmit() {
-    await $('#main-content button[type=submit]').click()
+    const buttonElement = await $('#main-content button[type=submit]')
+    await buttonElement.waitForExist({ timeout: 5000 })
+    await buttonElement.click()
   }
 
   async deleteReport() {
