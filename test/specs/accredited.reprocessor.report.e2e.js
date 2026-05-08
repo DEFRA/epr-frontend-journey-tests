@@ -329,14 +329,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // Close draft tab and return to confirmation page
       await closeCurrentTabAndReturn(originalTab)
 
-      // Report is now ready_to_submit. Navigating back to check-answers
-      // should redirect to the reports list, not show the form again.
-      await browser.back()
-      await browser.waitUntil(
-        async () =>
-          (await browser.execute(() => document.readyState)) === 'complete',
-        { timeout: 5000, timeoutMsg: 'Page not ready after back()' }
-      )
+      await ConfirmationPage.goToReports()
 
       const reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
