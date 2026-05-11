@@ -47,6 +47,12 @@ class UploadSummaryLogPage {
     return await $('#main-content h1').getText()
   }
 
+  async confirmAndSubmitPreventsDoubleClick() {
+    return await $('#main-content button[type=submit]').getAttribute(
+      'data-prevent-double-click'
+    )
+  }
+
   async confirmAndSubmit() {
     await $('#main-content button[type=submit]').click()
   }

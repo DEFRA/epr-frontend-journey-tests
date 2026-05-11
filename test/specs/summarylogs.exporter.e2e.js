@@ -70,6 +70,9 @@ describe('Summary Logs Exporter', () => {
     await checkBodyText('Your file is being checked', 30)
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('2 new loads will be added to your waste balance', 10)
+    expect(
+      await UploadSummaryLogPage.confirmAndSubmitPreventsDoubleClick()
+    ).toBe('true')
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)

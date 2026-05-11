@@ -68,6 +68,9 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('1 new load will be added to your waste balance', 30)
+    expect(
+      await UploadSummaryLogPage.confirmAndSubmitPreventsDoubleClick()
+    ).toBe('true')
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)
