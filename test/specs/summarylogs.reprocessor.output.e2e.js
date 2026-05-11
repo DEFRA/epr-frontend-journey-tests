@@ -105,7 +105,9 @@ describe('Summary Logs Reprocessor Output', () => {
       '1 adjusted load will be reflected in your waste balance',
       30
     )
-
+    expect(
+      await UploadSummaryLogPage.confirmAndSubmitPreventsDoubleClick()
+    ).toBe('true')
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Your waste records are being updated', 30)

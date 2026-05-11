@@ -184,6 +184,9 @@ describe('@registered-only', () => {
     await checkBodyText('Loads exported', 30)
     await checkBodyText('Loads sent on', 30)
     await checkBodyText('new loads have been added', 30)
+    expect(
+      await UploadSummaryLogPage.confirmAndSubmitPreventsDoubleClick()
+    ).toBe('true')
     await UploadSummaryLogPage.confirmAndSubmit()
 
     await checkBodyText('Summary log uploaded', 30)

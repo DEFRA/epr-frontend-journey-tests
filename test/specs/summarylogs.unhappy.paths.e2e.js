@@ -15,6 +15,8 @@ import {
   updateMigratedOrganisation,
   linkDefraIdUser
 } from '../support/apicalls.js'
+import { AuthClient } from '../support/auth.js'
+import { EprBackend } from '../apis/epr-backend.js'
 
 describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
   it('Should get an error message with an empty Summary Log spreadsheet @emptyMessage', async () => {
@@ -276,6 +278,73 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       'Sorry, there is a problem with the service - try again later',
       60
     )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  it('Should show conflict page when summary log is already being submitted @summLogsConflict', async () => {
+    const organisationDetails = await createLinkedOrganisation([
+      { material: 'Steel (R4)', wasteProcessingType: 'Reprocessor' }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          reprocessingType: 'output',
+          regNumber: 'R25SR500050912PA',
+          accNumber: 'ACC500591',
+          status: 'approved',
+          validFrom: '2026-01-01'
+        }
+      ]
+    )
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.open()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    await DashboardPage.selectLink(1)
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await UploadSummaryLogPage.uploadFile('resources/reprocessor-output.xlsx')
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Check before confirming upload', 60)
+    expect(
+      await UploadSummaryLogPage.confirmAndSubmitPreventsDoubleClick()
+    ).toBe('true')
+
+    const url = await browser.getUrl()
+    const [, orgId, regId, summaryLogId] = url.match(
+      /organisations\/([^/]+)\/registrations\/([^/]+)\/summary-logs\/([^/?#]+)/
+    )
+
+    // Pre-submit via backend API — bypasses the browser session guard and
+    // puts the log into SUBMITTING before the browser POSTs, guaranteeing a 409
+    const authClient = new AuthClient()
+    await authClient.authenticate()
+    const eprBackend = new EprBackend()
+    await eprBackend.post(
+      `/v1/organisations/${orgId}/registrations/${regId}/summary-logs/${summaryLogId}/submit`,
+      '',
+      authClient.authHeader()
+    )
+
+    await UploadSummaryLogPage.confirmAndSubmit()
+
+    await checkBodyText('Your waste records cannot be updated', 10)
+    await checkBodyTextDoesNotInclude('Your waste records are being updated', 5)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
