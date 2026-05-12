@@ -31,6 +31,12 @@ class CreatePRNPage {
     await $('#recipient').setValue(producer)
   }
 
+  async preventDoubleClick() {
+    return await $('#main-content button[type=submit]').getAttribute(
+      'data-prevent-double-click'
+    )
+  }
+
   async continue() {
     await $('#main-content button[type=submit]').click()
   }

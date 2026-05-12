@@ -48,6 +48,12 @@ class PRNViewPage {
     await $('#main-content > div > div > form > div > a').click()
   }
 
+  async issueButtonPreventsDoubleClick() {
+    return await $(
+      '#main-content > div > div > form > div > button'
+    ).getAttribute('data-prevent-double-click')
+  }
+
   async issuePRNButton() {
     await $('#main-content > div > div > form > div > button').click()
   }

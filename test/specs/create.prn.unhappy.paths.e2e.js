@@ -75,6 +75,7 @@ describe('Creating Packing Recycling Notes', () => {
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
     const discardHeading = await ConfirmDiscardPRNPage.headingText()
     expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
+    expect(await ConfirmDiscardPRNPage.preventDoubleClick()).toBe('true')
     await ConfirmDiscardPRNPage.discardAndStartAgain()
 
     prnDetails.issuerNotes = 'Testing'
@@ -92,6 +93,7 @@ describe('Creating Packing Recycling Notes', () => {
     let materialDetails = await CreatePRNPage.materialDetails()
     expect(materialDetails).toBe('Material: Paper and board')
 
+    expect(await CreatePRNPage.preventDoubleClick()).toBe('true')
     await CreatePRNPage.continue()
 
     let errorMessages = await CreatePRNPage.errorMessages(2)

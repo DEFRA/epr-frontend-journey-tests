@@ -7,6 +7,12 @@ class ConfirmCancelPRNPage {
     return await element.getText()
   }
 
+  async preventDoubleClick() {
+    return await $('button[type=submit]').getAttribute(
+      'data-prevent-double-click'
+    )
+  }
+
   async confirmCancelPrn() {
     await $('button[type=submit]').click()
   }
