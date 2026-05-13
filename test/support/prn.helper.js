@@ -190,7 +190,7 @@ export class PrnHelper {
       `Confirm cancellation of this ${this.prnWording}`
     )
 
-    await ConfirmCancelPrnPage.confirmCancelPrn()
+    await ConfirmCancelPrnPage.confirmCancelAndCheckDoubleClickPrevented()
     const cancelledMessageText = await PrnCancelledPage.messageText()
     expect(cancelledMessageText).toContain(`${this.prnWording} cancelled`)
 

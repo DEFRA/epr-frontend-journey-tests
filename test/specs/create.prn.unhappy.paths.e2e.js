@@ -75,8 +75,7 @@ describe('Creating Packing Recycling Notes', () => {
     await CheckBeforeCreatingPrnPage.discardAndStartAgain()
     const discardHeading = await ConfirmDiscardPRNPage.headingText()
     expect(discardHeading).toBe('Are you sure you want to discard this PRN?')
-    expect(await ConfirmDiscardPRNPage.preventDoubleClick()).toBe('true')
-    await ConfirmDiscardPRNPage.discardAndStartAgain()
+    await ConfirmDiscardPRNPage.discardAndCheckDoubleClickPrevented()
 
     prnDetails.issuerNotes = 'Testing'
     await prnHelper.createAndCheckDraftPrn(prnDetails)

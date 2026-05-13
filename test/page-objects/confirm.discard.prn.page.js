@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 
 class ConfirmDiscardPRNPage {
   async headingText() {
@@ -7,10 +7,13 @@ class ConfirmDiscardPRNPage {
     return await element.getText()
   }
 
-  async preventDoubleClick() {
-    return await $('button[type=submit]').getAttribute(
-      'data-prevent-double-click'
-    )
+  async discardAndCheckDoubleClickPrevented() {
+    const ariaDisabled = await browser.execute((selector) => {
+      const btn = document.querySelector(selector)
+      btn.click()
+      return btn.getAttribute('aria-disabled')
+    }, 'button[type=submit]')
+    expect(ariaDisabled).toBe('true')
   }
 
   async discardAndStartAgain() {
