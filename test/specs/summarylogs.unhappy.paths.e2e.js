@@ -115,9 +115,6 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       expect.stringContaining('Summary log: upload')
     )
 
-    // Prevent from uploading too quickly after clicking continue previously
-    await browser.pause(500)
-
     await UploadSummaryLogPage.uploadFile('resources/bad-marker.xlsx')
     await UploadSummaryLogPage.continue()
 

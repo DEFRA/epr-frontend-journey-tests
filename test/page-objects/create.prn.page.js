@@ -1,4 +1,4 @@
-import { browser, $, $$ } from '@wdio/globals'
+import { browser, $, $$, expect } from '@wdio/globals'
 
 class CreatePRNPage {
   open(orgId, regId) {
@@ -31,10 +31,13 @@ class CreatePRNPage {
     await $('#recipient').setValue(producer)
   }
 
-  async preventDoubleClick() {
-    return await $('#main-content button[type=submit]').getAttribute(
-      'data-prevent-double-click'
-    )
+  async submitAndCheckDoubleClickPrevented() {
+    const ariaDisabled = await browser.execute((selector) => {
+      const btn = document.querySelector(selector)
+      btn.click()
+      return btn.getAttribute('aria-disabled')
+    }, '#main-content button[type=submit]')
+    expect(ariaDisabled).toBe('true')
   }
 
   async continue() {
