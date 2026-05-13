@@ -157,7 +157,7 @@ export class PrnHelper {
   }
 
   async issuePrnAndUpdateDetails(prnDetails, prnPrefix = 'SR') {
-    await PrnViewPage.issuePRNButton()
+    await PrnViewPage.issueAndCheckDoubleClickPrevented()
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     const prnIssuedText = await PrnIssuedPage.messageText()
