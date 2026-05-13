@@ -93,8 +93,7 @@ describe('Creating Packing Recycling Notes', () => {
     let materialDetails = await CreatePRNPage.materialDetails()
     expect(materialDetails).toBe('Material: Paper and board')
 
-    expect(await CreatePRNPage.preventDoubleClick()).toBe('true')
-    await CreatePRNPage.continue()
+    await CreatePRNPage.submitAndCheckDoubleClickPrevented()
 
     let errorMessages = await CreatePRNPage.errorMessages(2)
     expect(errorMessages).toEqual([
