@@ -30,7 +30,14 @@ class ConfirmDeleteReportPage {
     await btn.click()
     await btn.click()
     expect(await browser.execute(() => window.__submitCount)).toBe(1)
+    const currentUrl = await browser.getUrl()
     await browser.execute(() => document.querySelector('form').submit())
+    await browser.waitUntil(
+      async () => (await browser.getUrl()) !== currentUrl,
+      {
+        timeout: 10000
+      }
+    )
   }
 
   async selectBackLink() {

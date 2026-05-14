@@ -29,12 +29,12 @@ import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
+  externalAPICancelPrn,
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import { checkBodyText } from '../support/checks.js'
 import { tonnageWordings, tradingName } from '../support/fixtures.js'
-import { switchToNewTabAndClosePreviousTab } from '../support/windowtabs.js'
 
 const prnRegNumber = 'R25SR500000912PA'
 const prnAccNumber = 'R-ACC12045PA'
@@ -140,9 +140,12 @@ describe('Double-click prevention on PRN action buttons', () => {
     await PrnDashboardPage.selectAwaitingLink(1)
     await PrnViewPage.issueAndCheckDoubleClickPrevented()
 
-    // Cancel PRN button (PRN is now awaiting acceptance)
-    await PrnIssuedPage.viewPdfButton()
-    await switchToNewTabAndClosePreviousTab()
+    // Cancel PRN button - PRN is awaiting acceptance; external API moves it to awaiting cancellation
+    const prnNumber = await PrnIssuedPage.prnNumberText()
+    await externalAPICancelPrn({ prnNumber })
+    const managePrnsEl = await PrnIssuedPage.managePRNs()
+    await managePrnsEl.click()
+    await PrnDashboardPage.selectAwaitingLink(1)
     await PrnViewPage.cancelPRNButton()
     await ConfirmCancelPrnPage.confirmCancelAndCheckDoubleClickPrevented()
 
