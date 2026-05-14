@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, expect } from '@wdio/globals'
 import {
   checkBodyText,
   checkBodyTextDoesNotInclude
@@ -49,6 +49,15 @@ class UploadSummaryLogPage {
 
   async confirmAndSubmit() {
     await $('#main-content button[type=submit]').click()
+  }
+
+  async confirmAndCheckDoubleClickPrevented() {
+    const ariaDisabled = await browser.execute((selector) => {
+      const btn = document.querySelector(selector)
+      btn.click()
+      return btn.getAttribute('aria-disabled')
+    }, '#main-content button[type=submit]')
+    expect(ariaDisabled).toBe('true')
   }
 
   async clickOnReturnToHomePage() {

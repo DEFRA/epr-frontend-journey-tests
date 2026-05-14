@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 
 class ReportDetailPage {
   async headingText() {
@@ -9,6 +9,15 @@ class ReportDetailPage {
 
   async useThisData() {
     await $('button[type=submit]').click()
+  }
+
+  async useThisDataAndCheckDoubleClickPrevented() {
+    const ariaDisabled = await browser.execute((selector) => {
+      const btn = document.querySelector(selector)
+      btn.click()
+      return btn.getAttribute('aria-disabled')
+    }, 'button[type=submit]')
+    expect(ariaDisabled).toBe('true')
   }
 }
 

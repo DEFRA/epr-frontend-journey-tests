@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, browser, expect } from '@wdio/globals'
 
 class ConfirmDeleteReportPage {
   async headingText() {
@@ -15,6 +15,15 @@ class ConfirmDeleteReportPage {
 
   async confirmDeletion() {
     await $('button[type=submit]').click()
+  }
+
+  async confirmDeletionAndCheckDoubleClickPrevented() {
+    const ariaDisabled = await browser.execute((selector) => {
+      const btn = document.querySelector(selector)
+      btn.click()
+      return btn.getAttribute('aria-disabled')
+    }, 'button[type=submit]')
+    expect(ariaDisabled).toBe('true')
   }
 
   async selectBackLink() {

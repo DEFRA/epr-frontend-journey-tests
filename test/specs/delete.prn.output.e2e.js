@@ -124,7 +124,7 @@ describe('Deleting Packing Recycling Notes (Reprocessor Output)', () => {
     expect(confirmDeleteHeadingText).toBe(
       'Are you sure you want to delete this PRN?'
     )
-    await ConfirmDeletePRNPage.deletePrnAndCheckDoubleClickPrevented()
+    await ConfirmDeletePRNPage.deletePrn()
 
     const noCreatedPrnMessage = await PrnDashboardPage.getNoCreatedPrnMessage()
     expect(noCreatedPrnMessage).toBe('You have not created any PRNs.')

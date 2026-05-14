@@ -157,7 +157,7 @@ export class PrnHelper {
   }
 
   async issuePrnAndUpdateDetails(prnDetails, prnPrefix = 'SR') {
-    await PrnViewPage.issueAndCheckDoubleClickPrevented()
+    await PrnViewPage.issuePRNButton()
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     const prnIssuedText = await PrnIssuedPage.messageText()
@@ -190,7 +190,7 @@ export class PrnHelper {
       `Confirm cancellation of this ${this.prnWording}`
     )
 
-    await ConfirmCancelPrnPage.confirmCancelAndCheckDoubleClickPrevented()
+    await ConfirmCancelPrnPage.confirmCancelPrn()
     const cancelledMessageText = await PrnCancelledPage.messageText()
     expect(cancelledMessageText).toContain(`${this.prnWording} cancelled`)
 

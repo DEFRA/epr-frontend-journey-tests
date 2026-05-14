@@ -48,6 +48,10 @@ class PRNViewPage {
     await $('#main-content > div > div > form > div > a').click()
   }
 
+  async issuePRNButton() {
+    await $('#main-content > div > div > form > div > button').click()
+  }
+
   async issueAndCheckDoubleClickPrevented() {
     const ariaDisabled = await browser.execute((selector) => {
       const btn = document.querySelector(selector)
@@ -55,10 +59,6 @@ class PRNViewPage {
       return btn.getAttribute('aria-disabled')
     }, '#main-content > div > div > form > div > button')
     expect(ariaDisabled).toBe('true')
-  }
-
-  async issuePRNButton() {
-    await $('#main-content > div > div > form > div > button').click()
   }
 }
 
