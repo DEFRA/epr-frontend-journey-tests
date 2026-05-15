@@ -1,4 +1,5 @@
 import { $ } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../../support/double-click.js'
 
 class ReportDetailPage {
   async headingText() {
@@ -9,6 +10,10 @@ class ReportDetailPage {
 
   async useThisData() {
     await $('button[type=submit]').click()
+  }
+
+  async useThisDataAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented('button[type=submit]')
   }
 }
 

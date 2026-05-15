@@ -245,11 +245,12 @@ describe('Issuing Packing Recycling Notes', () => {
 
     const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
     expect(confirmCancelHeading).toBe('Confirm cancellation of this PRN')
-    expect(await ConfirmCancelPrnPage.preventDoubleClick()).toBe('true')
     await ConfirmCancelPrnPage.selectBackLink()
 
     // Now cancel the PRN and return to PRN Dashboard page
-    await prnHelper.cancelPRNAndReturnToPRNsDashboard(prnDetails)
+    await prnHelper.cancelPRNAndReturnToPRNsDashboard(prnDetails, {
+      checkDoubleClick: true
+    })
 
     await PrnDashboardPage.selectCancelledTab()
     await prnHelper.checkCancelledRows(prnDetails, 1)
