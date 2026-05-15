@@ -153,7 +153,7 @@ describe('@registered-only', () => {
 
     await seedOverseasSites(
       organisationDetails.refNo,
-      [1],
+      [0],
       [143, 297, 565, 893]
     )
 
