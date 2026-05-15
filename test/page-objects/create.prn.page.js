@@ -1,4 +1,5 @@
-import { browser, $, $$ } from '@wdio/globals'
+import { $, $$, browser } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../support/double-click.js'
 
 class CreatePRNPage {
   open(orgId, regId) {
@@ -31,10 +32,10 @@ class CreatePRNPage {
     await $('#recipient').setValue(producer)
   }
 
-  async preventDoubleClick() {
-    return await $('#main-content button[type=submit]').getAttribute(
-      'data-prevent-double-click'
-    )
+  async submitAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented('#main-content button[type=submit]', {
+      waitForNavigation: false
+    })
   }
 
   async continue() {

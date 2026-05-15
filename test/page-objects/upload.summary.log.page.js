@@ -3,6 +3,7 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
+import { checkDoubleClickPrevented } from '../support/double-click.js'
 
 class UploadSummaryLogPage {
   open(orgId, regId) {
@@ -49,6 +50,12 @@ class UploadSummaryLogPage {
 
   async confirmAndSubmit() {
     await $('#main-content button[type=submit]').click()
+  }
+
+  async confirmAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented('#main-content button[type=submit]', {
+      waitForNavigation: false
+    })
   }
 
   async clickOnReturnToHomePage() {

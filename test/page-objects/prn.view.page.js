@@ -1,4 +1,5 @@
 import { $, $$ } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../support/double-click.js'
 
 class PRNViewPage {
   async headingText() {
@@ -48,14 +49,14 @@ class PRNViewPage {
     await $('#main-content > div > div > form > div > a').click()
   }
 
-  async issueButtonPreventsDoubleClick() {
-    return await $(
-      '#main-content > div > div > form > div > button'
-    ).getAttribute('data-prevent-double-click')
-  }
-
   async issuePRNButton() {
     await $('#main-content > div > div > form > div > button').click()
+  }
+
+  async issueAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented(
+      '#main-content > div > div > form > div > button'
+    )
   }
 }
 

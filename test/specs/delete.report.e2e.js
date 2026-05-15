@@ -80,7 +80,7 @@ describe('Deleting an in-progress report', () => {
 
     // Create report — accredited reprocessor redirects to tonnes-recycled
     await ReportsPage.selectActionLink(1)
-    await ReportDetailPage.useThisData()
+    await ReportDetailPage.useThisDataAndCheckDoubleClickPrevented()
 
     // Navigate through reprocessor pages to reach supporting information
     await navigateReprocessorToSupportingInfo()
@@ -109,7 +109,7 @@ describe('Deleting an in-progress report', () => {
 
     // Now delete
     await ReportSupportingInformationPage.deleteReportLink()
-    await ConfirmDeleteReportPage.confirmDeletion()
+    await ConfirmDeleteReportPage.confirmDeletionAndCheckDoubleClickPrevented()
 
     // Should be back on reports list with status reverted to Due
     let reportsHeading = await ReportsPage.headingText()
