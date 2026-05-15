@@ -372,14 +372,19 @@ export async function linkDefraIdUser(organisationId, userId, email) {
 
 /**
  * Seeds overseas site records and links them to an exporter registration.
- * Creates a single approved overseas site, then maps all 3-digit ORS keys
- * (001–999) on the specified registration so that ORS waste balance
+ * Creates a single approved overseas site, then maps a 3-digit ORS key
+ * on the specified registration so that ORS waste balance
  * validation passes for any OSR ID in the summary log data.
  *
  * @param {string} orgRefNo - Organisation reference number
- * @param {number} registrationIndex - Index of the exporter registration
+ * @param {number} registrationIndices - Indices of the exporter registration
+ * @param orsIds - Array of ORS IDs to link to the registration
  */
-export async function seedOverseasSites(orgRefNo, registrationIndex = 0) {
+async function seedOverseasSites(
+  orgRefNo,
+  registrationIndices = [0],
+  orsIds = [100]
+) {
   const authClient = new AuthClient()
   const eprBackend = new EprBackend()
 
@@ -413,20 +418,28 @@ export async function seedOverseasSites(orgRefNo, registrationIndex = 0) {
   )
 
   const overseasSites = {}
-  for (let i = 1; i <= 999; i++) {
-    overseasSites[String(i).padStart(3, '0')] = {
+  orsIds.forEach((orsId) => {
+    overseasSites[orsId] = {
       overseasSiteId: site.id
     }
-  }
-  orgData.registrations[registrationIndex].overseasSites = overseasSites
+  })
+  registrationIndices.forEach((registrationIndex) => {
+    orgData.registrations[registrationIndex].overseasSites = overseasSites
+  })
 
   const putResponse = await eprBackend.put(
     `/v1/dev/organisations/${orgRefNo}`,
     JSON.stringify({ organisation: orgData }),
     authClient.authHeader()
   )
-  expect(putResponse.statusCode).toBe(200)
+
+  await assertSuccessResponse(
+    putResponse,
+    `PUT /v1/dev/organisations/${orgRefNo}`
+  )
 }
+
+export default seedOverseasSites
 
 export async function unsubmitReport(
   organisationId,
