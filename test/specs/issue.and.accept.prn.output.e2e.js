@@ -92,7 +92,9 @@ describe('Issuing Packing Recycling Notes', () => {
 
     // Issue the created PRN
     await PrnDashboardPage.selectAwaitingLink(1)
-    await prnHelper.issuePrnAndUpdateDetails(prnDetails, 'WR')
+    await prnHelper.issuePrnAndUpdateDetails(prnDetails, 'WR', {
+      checkDoubleClick: true
+    })
 
     await PrnIssuedPage.viewPdfButton()
     await switchToNewTabAndClosePreviousTab()

@@ -1,4 +1,5 @@
-import { $, browser, expect } from '@wdio/globals'
+import { $ } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../../support/double-click.js'
 
 class MonthlyReportDraftDeclarationPage {
   async reportsPageLink() {
@@ -12,26 +13,7 @@ class MonthlyReportDraftDeclarationPage {
   }
 
   async submitAndCheckDoubleClickPrevented() {
-    const btn = $('#main-content button[type=submit]')
-    await btn.waitForClickable({ timeout: 5000 })
-    await browser.execute(() => {
-      window.__submitCount = 0
-      document.querySelector('form').addEventListener('submit', (e) => {
-        window.__submitCount++
-        e.preventDefault()
-      })
-    })
-    await btn.click()
-    await btn.click()
-    expect(await browser.execute(() => window.__submitCount)).toBe(1)
-    const currentUrl = await browser.getUrl()
-    await browser.execute(() => document.querySelector('form').submit())
-    await browser.waitUntil(
-      async () => (await browser.getUrl()) !== currentUrl,
-      {
-        timeout: 10000
-      }
-    )
+    await checkDoubleClickPrevented('#main-content button[type=submit]')
   }
 
   async deleteReport() {
