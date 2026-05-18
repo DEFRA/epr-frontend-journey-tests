@@ -5,11 +5,10 @@ import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText } from '../support/checks.js'
-import {
+import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
-  seedOverseasSites,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 
@@ -38,7 +37,11 @@ describe('Summary Logs Exporter', () => {
         }
       ]
     )
-    await seedOverseasSites(organisationDetails.refNo, 1)
+    await seedOverseasSites(
+      organisationDetails.refNo,
+      [1],
+      [124, 183, 512, 876]
+    )
 
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
 

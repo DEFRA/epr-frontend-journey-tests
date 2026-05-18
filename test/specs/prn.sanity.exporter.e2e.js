@@ -3,7 +3,7 @@ import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
-import {
+import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
@@ -18,6 +18,12 @@ describe('Packing Recycling Notes (Sanity)', () => {
   it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
+
+    await seedOverseasSites(
+      organisationDetails.refNo,
+      [16, 17, 18, 19, 20, 21, 22, 23]
+    )
+
     const user = await createAndRegisterDefraIdUser(userEmail)
     await linkDefraIdUser(organisationDetails.refNo, user.userId, userEmail)
 

@@ -308,7 +308,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await checkBodyText('Average price per tonne', 10)
 
       // Submit the report
-      await ReportCheckAnswersPage.createReport()
+      await ReportCheckAnswersPage.createReportAndCheckDoubleClickPrevented()
 
       // Verify confirmation page
       await checkBodyText('report created', 30)
@@ -343,7 +343,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await ReportsPage.selectActiveActionLink(1)
 
       // Confirm and submit report
-      await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+      await MonthlyReportDraftDeclarationPage.submitAndCheckDoubleClickPrevented()
 
       const confirmationText = await ReportSubmittedPage.confirmationText()
       expect(confirmationText).toContain('report submitted to regulator')

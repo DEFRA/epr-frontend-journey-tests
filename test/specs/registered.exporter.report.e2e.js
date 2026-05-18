@@ -10,7 +10,7 @@ import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.p
 import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
-import {
+import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
@@ -78,6 +78,13 @@ async function setupRegisteredOnlyExporter() {
 describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
   it('should complete the full registered-only exporter report flow through to confirmation @registeredOnlyExporterFullFlow @smoketest', async () => {
     const setupResponse = await setupRegisteredOnlyExporter()
+
+    await seedOverseasSites(
+      setupResponse.organisationDetails.refNo,
+      [0],
+      [143, 297, 565, 893]
+    )
+
     await uploadAndNavigateToReports()
 
     // Start the report — should redirect to tonnes-not-exported

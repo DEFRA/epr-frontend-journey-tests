@@ -156,8 +156,16 @@ export class PrnHelper {
     await this.checkTableRows(issuedRow, prnDetails)
   }
 
-  async issuePrnAndUpdateDetails(prnDetails, prnPrefix = 'SR') {
-    await PrnViewPage.issuePRNButton()
+  async issuePrnAndUpdateDetails(
+    prnDetails,
+    prnPrefix = 'SR',
+    { checkDoubleClick = false } = {}
+  ) {
+    if (checkDoubleClick) {
+      await PrnViewPage.issueAndCheckDoubleClickPrevented()
+    } else {
+      await PrnViewPage.issuePRNButton()
+    }
 
     const awaitingAcceptanceStatus = 'Awaiting acceptance'
     const prnIssuedText = await PrnIssuedPage.messageText()
@@ -183,14 +191,21 @@ export class PrnHelper {
     )
   }
 
-  async cancelPRNAndReturnToPRNsDashboard(prnDetails) {
+  async cancelPRNAndReturnToPRNsDashboard(
+    prnDetails,
+    { checkDoubleClick = false } = {}
+  ) {
     await PrnViewPage.cancelPRNButton()
     const confirmCancelHeading = await ConfirmCancelPrnPage.headingText()
     expect(confirmCancelHeading).toBe(
       `Confirm cancellation of this ${this.prnWording}`
     )
 
-    await ConfirmCancelPrnPage.confirmCancelPrn()
+    if (checkDoubleClick) {
+      await ConfirmCancelPrnPage.confirmCancelAndCheckDoubleClickPrevented()
+    } else {
+      await ConfirmCancelPrnPage.confirmCancelPrn()
+    }
     const cancelledMessageText = await PrnCancelledPage.messageText()
     expect(cancelledMessageText).toContain(`${this.prnWording} cancelled`)
 

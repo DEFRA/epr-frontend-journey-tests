@@ -1,4 +1,5 @@
 import { $ } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../support/double-click.js'
 
 class ConfirmDeleteReportPage {
   async headingText() {
@@ -15,6 +16,10 @@ class ConfirmDeleteReportPage {
 
   async confirmDeletion() {
     await $('button[type=submit]').click()
+  }
+
+  async confirmDeletionAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented('button[type=submit]')
   }
 
   async selectBackLink() {

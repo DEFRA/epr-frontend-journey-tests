@@ -1,4 +1,5 @@
 import { $ } from '@wdio/globals'
+import { checkDoubleClickPrevented } from '../support/double-click.js'
 
 class ConfirmCancelPRNPage {
   async headingText() {
@@ -7,10 +8,8 @@ class ConfirmCancelPRNPage {
     return await element.getText()
   }
 
-  async preventDoubleClick() {
-    return await $('button[type=submit]').getAttribute(
-      'data-prevent-double-click'
-    )
+  async confirmCancelAndCheckDoubleClickPrevented() {
+    await checkDoubleClickPrevented('button[type=submit]')
   }
 
   async confirmCancelPrn() {
