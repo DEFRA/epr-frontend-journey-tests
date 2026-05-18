@@ -1,38 +1,44 @@
 import { $ } from '@wdio/globals'
 
-const ACTIVE_TABLE_INDEX = 1
-const SUBMITTED_TABLE_INDEX = 2
+const ACTIVE_HEADING = 'Action required'
+const SUBMITTED_HEADING = 'Submitted'
 
-const tableRowSelector = (tableIndex, rowIndex) =>
-  `#main-content table.govuk-table:nth-of-type(${tableIndex}) tr:nth-child(${rowIndex})`
+const tableAfterHeadingXPath = (heading) =>
+  `//h3[normalize-space()='${heading}']/following-sibling::table[contains(@class,'govuk-table')][1]`
 
-const selectActionLink = async (rowIndex, tableIndex) => {
+const rowXPath = (tableXPath, rowIndex) =>
+  `${tableXPath}//tbody/tr[${rowIndex}]`
+
+const selectActionLink = async (rowIndex, tableXPath) => {
   const linkElement = await $(
-    `${tableRowSelector(tableIndex, rowIndex)} a.govuk-link`
+    `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`
   )
   await linkElement.waitForClickable({ timeout: 5000 })
   await linkElement.click()
 }
 
-const getStatusBadgeElement = async (rowIndex, tableIndex) => {
+const getStatusBadgeElement = async (rowIndex, tableXPath) => {
   const element = await $(
-    `${tableRowSelector(tableIndex, rowIndex)} .govuk-tag`
+    `${rowXPath(tableXPath, rowIndex)}//*[contains(@class,'govuk-tag')]`
   )
   await element.waitForExist({ timeout: 5000 })
   return element
 }
 
-const getStatusBadge = async (rowIndex, tableIndex) => {
-  const element = await getStatusBadgeElement(rowIndex, tableIndex)
+const getStatusBadge = async (rowIndex, tableXPath) => {
+  const element = await getStatusBadgeElement(rowIndex, tableXPath)
   return await element.getText()
 }
 
-const getStatusColour = async (rowIndex, tableIndex) => {
-  const element = await getStatusBadgeElement(rowIndex, tableIndex)
+const getStatusColour = async (rowIndex, tableXPath) => {
+  const element = await getStatusBadgeElement(rowIndex, tableXPath)
   const classAttr = (await element.getAttribute('class')) ?? ''
   const match = classAttr.match(/govuk-tag--(\w+)/)
   return match ? match[1] : 'blue'
 }
+
+const activeTableXPath = tableAfterHeadingXPath(ACTIVE_HEADING)
+const submittedTableXPath = tableAfterHeadingXPath(SUBMITTED_HEADING)
 
 class ReportsPage {
   async headingText() {
@@ -42,27 +48,27 @@ class ReportsPage {
   }
 
   async selectActiveActionLink(rowIndex) {
-    await selectActionLink(rowIndex, ACTIVE_TABLE_INDEX)
+    await selectActionLink(rowIndex, activeTableXPath)
   }
 
   async selectSubmittedActionLink(rowIndex) {
-    await selectActionLink(rowIndex, SUBMITTED_TABLE_INDEX)
+    await selectActionLink(rowIndex, submittedTableXPath)
   }
 
   async getActiveStatusBadge(rowIndex) {
-    return await getStatusBadge(rowIndex, ACTIVE_TABLE_INDEX)
+    return await getStatusBadge(rowIndex, activeTableXPath)
   }
 
   async getSubmittedStatusBadge(rowIndex) {
-    return await getStatusBadge(rowIndex, SUBMITTED_TABLE_INDEX)
+    return await getStatusBadge(rowIndex, submittedTableXPath)
   }
 
   async getActiveStatusColour(rowIndex) {
-    return await getStatusColour(rowIndex, ACTIVE_TABLE_INDEX)
+    return await getStatusColour(rowIndex, activeTableXPath)
   }
 
   async getSubmittedStatusColour(rowIndex) {
-    return await getStatusColour(rowIndex, SUBMITTED_TABLE_INDEX)
+    return await getStatusColour(rowIndex, submittedTableXPath)
   }
 }
 
