@@ -33,7 +33,7 @@ import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 const REG_NUMBER = 'R25SR5111050912PA'
 
 async function startAndSubmitReport() {
-  await ReportsPage.selectActionLink(1)
+  await ReportsPage.selectActiveActionLink(1)
   await ReportDetailPage.useThisData()
   await TonnesRecycledPage.enterTonnage('12.50')
   await TonnesRecycledPage.continue()
@@ -95,7 +95,7 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await uploadAndNavigateToReports()
 
     // Start the report — verify registration number visible on detail page
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await checkBodyText(REG_NUMBER, 10)
     await ReportDetailPage.useThisData()
 
@@ -159,7 +159,7 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await closeCurrentTabAndReturn(originalTab)
 
     await ConfirmationPage.goToReports()
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
 
     // Confirm and submit report
     await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
@@ -185,8 +185,11 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
 
     await ReportSubmittedPage.returnToReportsLink()
 
-    let statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Submitted')
+    const submittedBadge = await ReportsPage.getSubmittedStatusBadge(1)
+    const submittedColour = await ReportsPage.getSubmittedStatusColour(1)
+
+    expect(submittedBadge).toBe('Submitted')
+    expect(submittedColour).toBe('green')
 
     // Now we unsubmit the report via epr-backend to see the effects on the frontend
     await unsubmitReport(
@@ -200,8 +203,11 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     // Refresh to see the status change
     await browser.refresh()
 
-    statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Ready to submit')
+    const unsubmittedBadge = await ReportsPage.getActiveStatusBadge(1)
+    const unsubmittedColour = await ReportsPage.getActiveStatusColour(1)
+
+    expect(unsubmittedBadge).toBe('Ready to submit')
+    expect(unsubmittedColour).toBe('blue')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -248,7 +254,7 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     await setupRegisteredOnlyReprocessor()
     await uploadAndNavigateToReports()
 
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // On tonnes-recycled — back link goes to reports list
@@ -258,7 +264,7 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
 
     // Re-enter the wizard — report is in_progress so the action link
     // routes straight to tonnes-recycled
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
 
     // Continue to tonnes-not-recycled
     await TonnesRecycledPage.enterTonnage('12.50')

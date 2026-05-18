@@ -82,7 +82,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     })
 
     it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // On prn-summary — back link goes to reports list
@@ -92,7 +92,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       // Re-enter the wizard — report is in_progress so the action link
       // routes straight to prn-summary
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
 
       // Continue to free-perns
       await PrnSummaryPage.enterRevenue('100')
@@ -120,7 +120,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     })
 
     it('should navigate to delete confirmation from PRN summary and free PERNs pages @accreditedExporterDelete', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- Delete from PRN summary page ---
@@ -142,11 +142,14 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       let reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      let statusBadge = await ReportsPage.getStatusBadge(1)
+      let statusBadge = await ReportsPage.getActiveStatusBadge(1)
+      let statusColour = await ReportsPage.getActiveStatusColour(1)
+
       expect(statusBadge).toBe('Due')
+      expect(statusColour).toBe('orange')
 
       // --- Create report again, navigate to free-perns, delete from there ---
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
       await PrnSummaryPage.enterRevenue('100')
       await PrnSummaryPage.continue()
@@ -162,12 +165,15 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      statusBadge = await ReportsPage.getStatusBadge(1)
+      statusBadge = await ReportsPage.getActiveStatusBadge(1)
+      statusColour = await ReportsPage.getActiveStatusColour(1)
+
       expect(statusBadge).toBe('Due')
+      expect(statusColour).toBe('orange')
     })
 
     it('should save and come back later from PRN summary and free PERNs pages @accreditedExporterSave', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- Save from PRN summary page ---
@@ -179,7 +185,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       expect(reportsHeading).toContain('Reports')
 
       // Resume the report — Continue goes directly to prn-summary for accredited exporters
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
 
       // Continue past prn-summary to free-perns
       await PrnSummaryPage.enterRevenue('500')
@@ -194,13 +200,13 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       expect(reportsHeadingAfterSave).toContain('Reports')
 
       // Clean up — delete the report (Continue goes directly to prn-summary)
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await PrnSummaryPage.deleteReportLink()
       await ConfirmDeleteReportPage.confirmDeletion()
     })
 
     it('should complete the full accredited exporter report flow through to confirmation @accreditedExporterFullFlow', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- PRN Summary page ---
@@ -266,7 +272,13 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       const reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      await ReportsPage.selectActionLink(1)
+      const readyStatusBadge = await ReportsPage.getActiveStatusBadge(1)
+      const readyStatusColour = await ReportsPage.getActiveStatusColour(1)
+
+      expect(readyStatusBadge).toBe('Ready to submit')
+      expect(readyStatusColour).toBe('blue')
+
+      await ReportsPage.selectActiveActionLink(1)
 
       // Confirm and submit report
       await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
@@ -291,8 +303,11 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
 
       await ReportSubmittedPage.returnToReportsLink()
 
-      let statusBadge = await ReportsPage.getStatusBadge(1)
-      expect(statusBadge).toBe('Submitted')
+      const submittedBadge = await ReportsPage.getSubmittedStatusBadge(1)
+      const submittedColour = await ReportsPage.getSubmittedStatusColour(1)
+
+      expect(submittedBadge).toBe('Submitted')
+      expect(submittedColour).toBe('green')
 
       // Now we unsubmit the report via epr-backend to see the effects on the frontend
       await unsubmitReport(
@@ -306,8 +321,11 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       // Refresh to see the status change
       await browser.refresh()
 
-      statusBadge = await ReportsPage.getStatusBadge(1)
-      expect(statusBadge).toBe('Ready to submit')
+      const unsubmittedBadge = await ReportsPage.getActiveStatusBadge(1)
+      const unsubmittedColour = await ReportsPage.getActiveStatusColour(1)
+
+      expect(unsubmittedBadge).toBe('Ready to submit')
+      expect(unsubmittedColour).toBe('blue')
     })
   })
 

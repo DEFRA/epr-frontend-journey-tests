@@ -91,7 +91,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
     })
 
     it('should navigate back correctly through the accredited reprocessor flow @accreditedReprocessorBackLinks', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // On tonnes-recycled — back link goes to reports list
@@ -101,7 +101,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // Re-enter the wizard — report is in_progress so the action link
       // routes straight to tonnes-recycled
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
 
       // Continue to tonnes-not-recycled
       await TonnesRecycledPage.enterTonnage('15.02')
@@ -151,7 +151,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
     })
 
     it('should navigate to delete confirmation from tonnes recycled and PRN summary pages @accreditedReprocessorDelete', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- Delete from tonnes recycled page ---
@@ -173,11 +173,14 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       let reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      let statusBadge = await ReportsPage.getStatusBadge(1)
+      let statusBadge = await ReportsPage.getActiveStatusBadge(1)
+      let statusColour = await ReportsPage.getActiveStatusColour(1)
+
       expect(statusBadge).toBe('Due')
+      expect(statusColour).toBe('orange')
 
       // --- Create report again, navigate to prn-summary, delete from there ---
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
       await TonnesRecycledPage.enterTonnage('15.02')
       await TonnesRecycledPage.continue()
@@ -195,12 +198,15 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      statusBadge = await ReportsPage.getStatusBadge(1)
+      statusBadge = await ReportsPage.getActiveStatusBadge(1)
+      statusColour = await ReportsPage.getActiveStatusColour(1)
+
       expect(statusBadge).toBe('Due')
+      expect(statusColour).toBe('orange')
     })
 
     it('should save and come back later from tonnes recycled page @accreditedReprocessorSave', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- Save from tonnes recycled page ---
@@ -212,7 +218,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       expect(reportsHeading).toContain('Reports')
 
       // Resume the report — should land on tonnes-recycled with pre-populated data
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
 
       // Verify we're back on tonnes-recycled with pre-populated data
       const tonnesRecycledHeading = await TonnesRecycledPage.headingText()
@@ -248,7 +254,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
     })
 
     it('should complete the full accredited reprocessor report flow through to confirmation with submission and unsubmission via backend @accreditedReprocessorFullFlow @smoketest', async () => {
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
 
       // --- Tonnes recycled page ---
@@ -334,7 +340,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       const reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      await ReportsPage.selectActionLink(1)
+      await ReportsPage.selectActiveActionLink(1)
 
       // Confirm and submit report
       await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
@@ -364,8 +370,11 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       await ReportSubmittedPage.returnToReportsLink()
 
-      let statusBadge = await ReportsPage.getStatusBadge(1)
-      expect(statusBadge).toBe('Submitted')
+      const submittedBadge = await ReportsPage.getSubmittedStatusBadge(1)
+      const submittedColour = await ReportsPage.getSubmittedStatusColour(1)
+
+      expect(submittedBadge).toBe('Submitted')
+      expect(submittedColour).toBe('green')
 
       // Now we unsubmit the report via epr-backend to see the effects on the frontend
       await unsubmitReport(
@@ -379,8 +388,11 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // Refresh to see the status change
       await browser.refresh()
 
-      statusBadge = await ReportsPage.getStatusBadge(1)
-      expect(statusBadge).toBe('Ready to submit')
+      const unsubmittedBadge = await ReportsPage.getActiveStatusBadge(1)
+      const unsubmittedColour = await ReportsPage.getActiveStatusColour(1)
+
+      expect(unsubmittedBadge).toBe('Ready to submit')
+      expect(unsubmittedColour).toBe('blue')
     })
   })
 
