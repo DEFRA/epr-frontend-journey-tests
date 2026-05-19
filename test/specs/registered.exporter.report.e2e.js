@@ -240,6 +240,33 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
+  it('should redirect to submitted confirmation page when navigating back to submit after submission @registeredOnlyExporterSubmitGuard', async () => {
+    await setupRegisteredOnlyExporter()
+    await uploadAndNavigateToReports()
+
+    // Complete the full flow through to submission
+    await ReportsPage.selectActionLink(1)
+    await ReportDetailPage.useThisData()
+    await TonnesNotExportedPage.enterTonnage('5.50')
+    await TonnesNotExportedPage.continue()
+    await ReportSupportingInformationPage.continue()
+    await ReportCheckAnswersPage.createReport()
+    await checkBodyText('report created', 30)
+    await ConfirmationPage.goToReports()
+    await ReportsPage.selectActionLink(1)
+    await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+    await checkBodyText('report submitted to regulator', 30)
+
+    // Navigate back to the submit page — the guard should redirect back to submitted
+    await browser.back()
+
+    const confirmationText = await ReportSubmittedPage.confirmationText()
+    expect(confirmationText).toContain('report submitted to regulator')
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
   it('should navigate back correctly through the registered-only exporter flow @registeredOnlyExporterBackLinks', async () => {
     await setupRegisteredOnlyExporter()
     await uploadAndNavigateToReports()
