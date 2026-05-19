@@ -1,15 +1,18 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import DashboardPage from '../page-objects/dashboard.page.js'
-import WasteRecordsPage from '../page-objects/waste.records.page.js'
-import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import ReportsPage from 'page-objects/reports/reports.page.js'
-import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
-import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
-import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
+import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
+import DashboardPage from '../page-objects/dashboard.page.js'
+import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
@@ -25,9 +28,6 @@ import {
   closeCurrentTabAndReturn,
   switchToNewTab
 } from '../support/windowtabs.js'
-import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
-import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
-import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 const REG_NUMBER = 'E25SR500030913PA'
 
@@ -245,7 +245,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await uploadAndNavigateToReports()
 
     // Complete the full flow through to submission
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
     await TonnesNotExportedPage.enterTonnage('5.50')
     await TonnesNotExportedPage.continue()
@@ -253,7 +253,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await ReportCheckAnswersPage.createReport()
     await checkBodyText('report created', 30)
     await ConfirmationPage.goToReports()
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
     await checkBodyText('report submitted to regulator', 30)
 
