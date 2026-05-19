@@ -1,15 +1,18 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import DashboardPage from '../page-objects/dashboard.page.js'
-import WasteRecordsPage from '../page-objects/waste.records.page.js'
-import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
-import ReportsPage from 'page-objects/reports/reports.page.js'
-import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
-import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
-import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
+import ReportDetailPage from 'page-objects/reports/report.detail.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
+import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
+import ReportsPage from 'page-objects/reports/reports.page.js'
+import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
+import DashboardPage from '../page-objects/dashboard.page.js'
+import TonnesNotExportedPage from '../page-objects/reports/tonnes.not.exported.page.js'
+import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
@@ -25,9 +28,6 @@ import {
   closeCurrentTabAndReturn,
   switchToNewTab
 } from '../support/windowtabs.js'
-import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
-import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
-import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
 const REG_NUMBER = 'E25SR500030913PA'
 
@@ -88,7 +88,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await uploadAndNavigateToReports()
 
     // Start the report — should redirect to tonnes-not-exported
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // --- Tonnes not exported page ---
@@ -143,7 +143,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await closeCurrentTabAndReturn(originalTab)
 
     await ConfirmationPage.goToReports()
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
 
     // Confirm and submit report
     await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
@@ -167,8 +167,11 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await closeCurrentTabAndReturn(originalTab)
 
     await ReportSubmittedPage.returnToReportsLink()
-    let statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Submitted')
+    const submittedBadge = await ReportsPage.getSubmittedStatusBadge(1)
+    const submittedColour = await ReportsPage.getSubmittedStatusColour(1)
+
+    expect(submittedBadge).toBe('Submitted')
+    expect(submittedColour).toBe('green')
 
     // Now we unsubmit the report via epr-backend to see the effects on the frontend
     await unsubmitReport(
@@ -182,8 +185,11 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     // Refresh to see the status change
     await browser.refresh()
 
-    statusBadge = await ReportsPage.getStatusBadge(1)
-    expect(statusBadge).toBe('Ready to submit')
+    const unsubmittedBadge = await ReportsPage.getActiveStatusBadge(1)
+    const unsubmittedColour = await ReportsPage.getActiveStatusColour(1)
+
+    expect(unsubmittedBadge).toBe('Ready to submit')
+    expect(unsubmittedColour).toBe('blue')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -216,7 +222,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await uploadAndNavigateToReports()
 
     // Complete the full flow through to confirmation
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
     await TonnesNotExportedPage.enterTonnage('5.50')
     await TonnesNotExportedPage.continue()
@@ -239,7 +245,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await uploadAndNavigateToReports()
 
     // Complete the full flow through to submission
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
     await TonnesNotExportedPage.enterTonnage('5.50')
     await TonnesNotExportedPage.continue()
@@ -247,7 +253,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await ReportCheckAnswersPage.createReport()
     await checkBodyText('report created', 30)
     await ConfirmationPage.goToReports()
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
     await checkBodyText('report submitted to regulator', 30)
 
@@ -265,7 +271,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
     await setupRegisteredOnlyExporter()
     await uploadAndNavigateToReports()
 
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // On tonnes-not-exported — back link goes to reports list
@@ -275,7 +281,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
 
     // Re-enter the wizard — report is in_progress so the action link
     // routes straight to tonnes-not-exported
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
 
     // Continue to tonnage not exported page
     await TonnesNotExportedPage.enterTonnage('5.50')

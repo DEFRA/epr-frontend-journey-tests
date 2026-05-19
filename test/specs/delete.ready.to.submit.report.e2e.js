@@ -78,7 +78,7 @@ describe('Deleting a ready to submit report', () => {
     // Navigate to reports and create a draft report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // Navigate through reprocessor data entry pages
@@ -93,9 +93,13 @@ describe('Deleting a ready to submit report', () => {
     await $('a*=Go to reports').click()
 
     // Report should now be ready to submit — click into it
-    const statusBefore = await ReportsPage.getStatusBadge(1)
+    const statusBefore = await ReportsPage.getActiveStatusBadge(1)
+    const colourBefore = await ReportsPage.getActiveStatusColour(1)
+
     expect(statusBefore).toBe('Ready to submit')
-    await ReportsPage.selectActionLink(1)
+    expect(colourBefore).toBe('blue')
+
+    await ReportsPage.selectActiveActionLink(1)
 
     // On the submit/declaration page — click delete report
     await MonthlyReportDraftDeclarationPage.deleteReport()
@@ -114,8 +118,11 @@ describe('Deleting a ready to submit report', () => {
     const reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    const statusBadge = await ReportsPage.getStatusBadge(1)
+    const statusBadge = await ReportsPage.getActiveStatusBadge(1)
+    const statusColour = await ReportsPage.getActiveStatusColour(1)
+
     expect(statusBadge).toBe('Due')
+    expect(statusColour).toBe('orange')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
