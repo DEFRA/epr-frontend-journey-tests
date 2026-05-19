@@ -75,7 +75,7 @@ describe('Incomplete report submit @incompleteReportBlock', () => {
   it('rejects submit on check-your-answers when manual fields are unpopulated @incompleteReportBlockReprocessor', async () => {
     // Start the report — creates it in `in_progress` with null manual fields
     // (tonnageRecycled, tonnageNotRecycled, prn.totalRevenue, prn.freeTonnage).
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // Navigate straight to check-your-answers, skipping every data-entry page.

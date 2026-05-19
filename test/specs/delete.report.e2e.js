@@ -79,7 +79,7 @@ describe('Deleting an in-progress report', () => {
     await WasteRecordsPage.manageReportsLink()
 
     // Create report — accredited reprocessor redirects to tonnes-recycled
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisDataAndCheckDoubleClickPrevented()
 
     // Navigate through reprocessor pages to reach supporting information
@@ -115,13 +115,16 @@ describe('Deleting an in-progress report', () => {
     let reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    let statusBadge = await ReportsPage.getStatusBadge(1)
+    let statusBadge = await ReportsPage.getActiveStatusBadge(1)
+    let statusColour = await ReportsPage.getActiveStatusColour(1)
+
     expect(statusBadge).toBe('Due')
+    expect(statusColour).toBe('orange')
 
     // --- Delete from check your answers page ---
 
     // Create report again — accredited reprocessor redirects to tonnes-recycled
-    await ReportsPage.selectActionLink(1)
+    await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
     // Navigate through reprocessor pages to reach supporting information
@@ -153,8 +156,11 @@ describe('Deleting an in-progress report', () => {
     reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    statusBadge = await ReportsPage.getStatusBadge(1)
+    statusBadge = await ReportsPage.getActiveStatusBadge(1)
+    statusColour = await ReportsPage.getActiveStatusColour(1)
+
     expect(statusBadge).toBe('Due')
+    expect(statusColour).toBe('orange')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
