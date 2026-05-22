@@ -3,7 +3,8 @@ import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
-import seedOverseasSites, {
+import {
+  seedOverseasSites,
   createAndRegisterDefraIdUser,
   createOrgWithAllWasteProcessingTypeAllMaterials,
   linkDefraIdUser
@@ -15,7 +16,7 @@ import { createPrnDetails } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck @sanityexporter', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
 

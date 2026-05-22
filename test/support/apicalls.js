@@ -377,10 +377,10 @@ export async function linkDefraIdUser(organisationId, userId, email) {
  * validation passes for any OSR ID in the summary log data.
  *
  * @param {string} orgRefNo - Organisation reference number
- * @param {number} registrationIndices - Indices of the exporter registration
+ * @param {number[]} registrationIndices - Indices of the exporter registration
  * @param orsIds - Array of ORS IDs to link to the registration
  */
-async function seedOverseasSites(
+export async function seedOverseasSites(
   orgRefNo,
   registrationIndices = [0],
   orsIds = [100]

@@ -18,6 +18,7 @@ export const createPrnDetails = ({
   materialDesc = 'Plastic',
   accNumber = '',
   tradingName = 'CS_GENERATED_3982709_England',
+  issuerNotes = 'Testing',
   organisationDetails = {},
   companyName = organisationDetails.organisation.companyName,
   regAddress = organisationDetails.regAddresses[0],
@@ -28,7 +29,7 @@ export const createPrnDetails = ({
 } = {}) => ({
   tonnageWordings,
   tradingName,
-  issuerNotes: 'Testing',
+  issuerNotes,
   companyName,
   regAddress,
   status: '',

@@ -12,6 +12,7 @@ import ReportSupportingInformationPage from 'page-objects/reports/report.support
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmDeleteReportPage from '../page-objects/confirm.delete.report.page.js'
 import {
+  seedOverseasSites,
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
@@ -52,6 +53,8 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
           }
         ]
       )
+
+      await seedOverseasSites(organisationDetails.refNo)
 
       const user = await createAndRegisterDefraIdUser(migrationResponse.email)
       await linkDefraIdUser(
