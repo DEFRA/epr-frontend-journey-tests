@@ -380,7 +380,7 @@ export async function linkDefraIdUser(organisationId, userId, email) {
  * @param {number} registrationIndices - Indices of the exporter registration
  * @param orsIds - Array of ORS IDs to link to the registration
  */
-async function seedOverseasSites(
+export async function seedOverseasSites(
   orgRefNo,
   registrationIndices = [0],
   orsIds = [100]

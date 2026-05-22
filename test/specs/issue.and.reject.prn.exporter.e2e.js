@@ -10,7 +10,8 @@ import PrnViewPage from 'page-objects/prn.view.page.js'
 import UploadSummaryLogPage from 'page-objects/upload.summary.log.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
-import seedOverseasSites, {
+import {
+  seedOverseasSites,
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   externalAPICancelPrn,

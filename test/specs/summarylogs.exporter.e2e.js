@@ -5,7 +5,8 @@ import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText } from '../support/checks.js'
-import seedOverseasSites, {
+import {
+  seedOverseasSites,
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
