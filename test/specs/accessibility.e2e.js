@@ -1,7 +1,7 @@
 import HomePage from 'page-objects/homepage.js'
 import { browser } from '@wdio/globals'
 
-import { default as AxeBuilder } from '@axe-core/webdriverio'
+import AxeBuilder from '@axe-core/webdriverio'
 import { logViolationsToAllure } from '../support/accessibility.js'
 
 function failOnViolationLevel(results) {
