@@ -10,6 +10,9 @@ export async function switchToNewTabAndClosePreviousTab() {
 
   const handles = await browser.getWindowHandles()
   const newWindow = handles.find((handle) => handle !== originalWindow)
+  if (!newWindow) {
+    throw new Error('New window handle not found')
+  }
   await browser.switchToWindow(newWindow)
 
   // Now switch back to original tab to close it
@@ -30,6 +33,9 @@ export async function switchToNewTab() {
 
   const handles = await browser.getWindowHandles()
   const newWindow = handles.find((handle) => handle !== originalWindow)
+  if (!newWindow) {
+    throw new Error('New window handle not found')
+  }
   await browser.switchToWindow(newWindow)
 
   return originalWindow
