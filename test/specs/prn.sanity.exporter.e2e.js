@@ -15,7 +15,7 @@ import { createPrnDetails } from '../support/fixtures.js'
 import { PrnHelper } from '../support/prn.helper.js'
 
 describe('Packing Recycling Notes (Sanity)', () => {
-  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck', async () => {
+  it('Should be able to create and manage PRNs for all materials for Exporter @sanitycheck @sanityexporter', async () => {
     const { organisationDetails, userEmail } =
       await createOrgWithAllWasteProcessingTypeAllMaterials()
 

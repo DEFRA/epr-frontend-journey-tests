@@ -7,7 +7,7 @@ import HomePage from 'page-objects/homepage.js'
 import PrnDashboardPage from 'page-objects/prn.dashboard.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
-import {
+import seedOverseasSites, {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   linkDefraIdUser,
@@ -41,6 +41,8 @@ describe('Creating Packing Recycling Notes', () => {
         }
       ]
     )
+
+    await seedOverseasSites(organisationDetails.refNo)
 
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
     await linkDefraIdUser(
