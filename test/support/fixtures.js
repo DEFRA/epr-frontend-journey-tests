@@ -23,23 +23,27 @@ export const createPrnDetails = ({
   tradingName = 'CS_GENERATED_3982709_England',
   issuerNotes = 'Testing',
   organisationDetails = {},
-  companyName = organisationDetails.organisation?.companyName ?? '',
-  regAddress = organisationDetails.regAddresses?.[0] ?? '',
+  regAddress = '',
   tonnageWordings = {
     integer: 203,
     word: 'Two hundred and three'
   }
-} = {}) => ({
-  tonnageWordings,
-  tradingName,
-  issuerNotes,
-  companyName,
-  regAddress,
-  status: '',
-  materialDesc,
-  accNumber,
-  prnNumber: '',
-  issuedDate: '',
-  process,
-  createdDate: todayddMMMMyyyy
-})
+} = {}) => {
+  const companyName = organisationDetails.organisation?.companyName ?? ''
+  if (regAddress === '') regAddress = organisationDetails.regAddresses?.[0]
+
+  return {
+    tonnageWordings,
+    tradingName,
+    issuerNotes,
+    companyName,
+    regAddress,
+    status: '',
+    materialDesc,
+    accNumber,
+    prnNumber: '',
+    issuedDate: '',
+    process,
+    createdDate: todayddMMMMyyyy
+  }
+}

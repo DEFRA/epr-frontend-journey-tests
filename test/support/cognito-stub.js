@@ -26,7 +26,8 @@ class CognitoStub {
       })
     })
 
-    const data = await body.json()
+    /** @typedef {{ AuthenticationResult?: { AccessToken?: string } }} AuthData */
+    const data = /** @type {AuthData} */ (await body.json())
 
     if (statusCode !== 200) {
       throw new Error(
