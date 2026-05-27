@@ -13,6 +13,17 @@ export const tonnageWordings = {
   word: 'Two hundred and three'
 }
 
+/**
+ * @param {Object} params
+ * @param {string} [params.process]
+ * @param {string} [params.materialDesc]
+ * @param {string} [params.accNumber]
+ * @param {string} [params.tradingName]
+ * @param {string} [params.issuerNotes]
+ * @param {Object} [params.organisationDetails]
+ * @param {string} [params.regAddress]
+ * @param {Object} [params.tonnageWordings]
+ */
 export const createPrnDetails = ({
   process = 'R3',
   materialDesc = 'Plastic',
