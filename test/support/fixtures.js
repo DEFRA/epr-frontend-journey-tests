@@ -20,8 +20,8 @@ export const createPrnDetails = ({
   tradingName = 'CS_GENERATED_3982709_England',
   issuerNotes = 'Testing',
   organisationDetails = {},
-  companyName = organisationDetails.organisation.companyName,
-  regAddress = organisationDetails.regAddresses[0],
+  companyName = organisationDetails.organisation?.companyName ?? '',
+  regAddress = organisationDetails.regAddresses?.[0] ?? '',
   tonnageWordings = {
     integer: 203,
     word: 'Two hundred and three'
