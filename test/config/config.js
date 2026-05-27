@@ -88,9 +88,11 @@ const cognito = {
   env: new CognitoAuth(cognitoAuthParams)
 }
 
-let globalUndiciAgent = agent
+let globalUndiciAgent
 if (environment) {
   globalUndiciAgent = proxy
+} else {
+  globalUndiciAgent = agent
 }
 
 let apiUri

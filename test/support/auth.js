@@ -41,7 +41,9 @@ export class AuthClient {
      * @property {string} token_type
      * @property {number} expires_in
      */
-    const responseJson = await response.body.json()
+    const responseJson = /** @type {AuthResponse} */ (
+      await response.body.json()
+    )
     this.accessToken = responseJson.access_token
   }
 
