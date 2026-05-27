@@ -35,7 +35,7 @@ class CognitoStub {
       )
     }
 
-    this.accessToken = data.AuthenticationResult.AccessToken
+    this.accessToken = data.AuthenticationResult?.AccessToken
   }
 
   authHeader() {

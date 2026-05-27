@@ -13,22 +13,21 @@ export const tonnageWordings = {
   word: 'Two hundred and three'
 }
 
-/**
- * @typedef {{ organisation?: { companyName?: string }, regAddresses?: string[] }} OrganisationDetails
- */
-export const createPrnDetails = ({
-  process = 'R3',
-  materialDesc = 'Plastic',
-  accNumber = '',
-  tradingName = 'CS_GENERATED_3982709_England',
-  issuerNotes = 'Testing',
-  organisationDetails = {},
-  regAddress = '',
-  tonnageWordings = {
-    integer: 203,
-    word: 'Two hundred and three'
-  }
-} = {}) => {
+export const createPrnDetails = (
+  /** @type {{ organisationDetails?: { organisation?: { companyName?: string }, regAddresses?: string[] } }} */ {
+    process = 'R3',
+    materialDesc = 'Plastic',
+    accNumber = '',
+    tradingName = 'CS_GENERATED_3982709_England',
+    issuerNotes = 'Testing',
+    organisationDetails = {},
+    regAddress = '',
+    tonnageWordings = {
+      integer: 203,
+      word: 'Two hundred and three'
+    }
+  } = {}
+) => {
   const companyName = organisationDetails.organisation?.companyName ?? ''
   if (regAddress === '') regAddress = organisationDetails.regAddresses?.[0]
 
