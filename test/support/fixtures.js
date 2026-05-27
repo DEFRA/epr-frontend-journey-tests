@@ -19,7 +19,7 @@ export const createPrnDetails = ({
   accNumber = '',
   tradingName = 'CS_GENERATED_3982709_England',
   issuerNotes = 'Testing',
-  organisationDetails = {},
+  organisationDetails,
   regAddress = '',
   tonnageWordings = {
     integer: 203,
