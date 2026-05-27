@@ -51,8 +51,7 @@ class DefraIdStub {
     const url = `${this.baseUrl}/cdp-defra-id-stub/authorize?${query}`
     const response = await request(url, {
       method: 'GET',
-      headers: instanceHeaders,
-      maxRedirections: 0
+      headers: instanceHeaders
     })
 
     const location = response.headers.location
@@ -72,6 +71,12 @@ class DefraIdStub {
       headers: instanceHeaders,
       body: payload
     })
+    /**
+     * @typedef {Object} AuthResponse
+     * @property {string} access_token
+     * @property {string} token_type
+     * @property {number} expires_in
+     */
     const responseJson = await response.body.json()
     this.accessTokens.set(userId, responseJson.access_token)
     return responseJson

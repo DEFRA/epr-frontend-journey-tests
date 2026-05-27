@@ -35,6 +35,12 @@ export class AuthClient {
       body: payload,
       dispatcher: config.undiciAgent
     })
+    /**
+     * @typedef {Object} AuthResponse
+     * @property {string} access_token
+     * @property {string} token_type
+     * @property {number} expires_in
+     */
     const responseJson = await response.body.json()
     this.accessToken = responseJson.access_token
   }

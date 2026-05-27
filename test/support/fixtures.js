@@ -13,6 +13,9 @@ export const tonnageWordings = {
   word: 'Two hundred and three'
 }
 
+/**
+ * @typedef {{ organisation?: { companyName?: string }, regAddresses?: string[] }} OrganisationDetails
+ */
 export const createPrnDetails = ({
   process = 'R3',
   materialDesc = 'Plastic',

@@ -71,7 +71,6 @@ const defraId = {
   env: `https://cdp-defra-id-stub.${environment}.cdp-int.defra.cloud`
 }
 
-/** @type CognitoAuthConfig */
 const cognitoAuthParams = {
   url: withProxy ? 'http://cognito-stub:9229' : 'http://localhost:9229',
   envUrl: process.env.COGNITO_URL,
