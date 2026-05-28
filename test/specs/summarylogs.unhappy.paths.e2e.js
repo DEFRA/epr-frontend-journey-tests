@@ -188,7 +188,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
 
     expect(errorRowCount).toBeGreaterThan(15)
 
-    await checkBodyText('Net weight (N)', 30)
+    await checkBodyText('Net weight', 30)
     await checkBodyText('Must be a number', 30)
     await checkBodyText('Must be a valid date', 30)
     await checkBodyText('Must be Yes or No', 30)
