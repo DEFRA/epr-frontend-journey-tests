@@ -189,11 +189,14 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     expect(errorRowCount).toBeGreaterThan(15)
 
     await checkBodyText('Net weight', 30)
-    await checkBodyText('Must be a number', 30)
+    await checkBodyText('N4', 30)
+    await checkBodyText('Must be 1,000 or less', 30)
+    await checkBodyText('Must be 0 or more', 30)
+    await checkBodyText('Must be 1 or less', 30)
+    await checkBodyText('Must be 100 characters or fewer', 30)
     await checkBodyText('Must be a valid date', 30)
     await checkBodyText('Must be Yes or No', 30)
     await checkBodyText('Select a value from the drop-down list', 30)
-    await checkBodyText('Contains characters that are not allowed', 30)
 
     await checkBodyTextDoesNotInclude(
       'The selected file contains tonnage and weight values with formats that do not match the examples provided in the summary log',
