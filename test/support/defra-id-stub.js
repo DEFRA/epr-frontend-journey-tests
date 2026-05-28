@@ -55,7 +55,7 @@ class DefraIdStub {
     })
 
     const headers = await response.headers
-    return headers.get('location') ?? ''
+    return headers.location
   }
 
   async generateToken(payload, userId) {
