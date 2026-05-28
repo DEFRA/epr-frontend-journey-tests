@@ -18,7 +18,7 @@ describe('WCAG Accessibility', () => {
   it('Should have no critical accessibility violations for Home Page', async () => {
     await HomePage.open()
 
-    const builder = new AxeBuilder({ client: browser })
+    const builder = new /** @type {any} */ (AxeBuilder)({ client: browser })
     const results = await builder.analyze()
     await logViolationsToAllure(results.violations)
     failOnViolationLevel(results)
