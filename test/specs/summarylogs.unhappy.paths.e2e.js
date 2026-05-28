@@ -132,7 +132,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('Should get error messages with a Summary Log spreadsheet that has many validation errors @summLogsValidationErrors', async () => {
+  it('Should show per-cell validation error detail for each failing cell @summLogsValidationErrors', async () => {
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
     ])
@@ -172,37 +172,40 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
 
     await checkBodyText('Your file is being checked', 30)
 
-    await checkBodyText(
-      'The selected file contains date formats that do not match the examples provided in the summary log',
-      60
+    await checkBodyText('Your summary log cannot be uploaded', 60)
+
+    const errorTable = await browser.$(
+      '[data-testid="app-page-body"] table.govuk-table'
     )
-    await checkBodyText(
-      'The selected file contains values in some fields that have not been selected from within the drop-down provided',
-      60
+    await errorTable.waitForExist({ timeout: 30000 })
+
+    const errorRowCount = await browser.execute(
+      () =>
+        document.querySelectorAll(
+          '[data-testid="app-page-body"] table.govuk-table tbody tr'
+        ).length
     )
-    await checkBodyText(
-      'The selected file contains answers to Yes / No questions with formats that do not match the examples provided in the summary log',
-      60
-    )
-    await checkBodyText(
+
+    expect(errorRowCount).toBeGreaterThan(15)
+
+    await checkBodyText('Net weight (column N)', 30)
+    await checkBodyText('Must be a number', 30)
+    await checkBodyText('Must be a valid date', 30)
+    await checkBodyText('Must be Yes or No', 30)
+    await checkBodyText('Select a value from the drop-down list', 30)
+    await checkBodyText('Contains characters that are not allowed', 30)
+
+    await checkBodyTextDoesNotInclude(
       'The selected file contains tonnage and weight values with formats that do not match the examples provided in the summary log',
-      60
+      10
     )
-    await checkBodyText(
-      'The selected file contains percentage values with formats that do not match the examples provided in the summary log',
-      60
-    )
-    await checkBodyText(
-      'The selected file contains unacceptable content within the fields that accept free text',
-      60
-    )
-    await checkBodyText(
+    await checkBodyTextDoesNotInclude(
       "The selected file contains data that's been entered incorrectly - check that the data you've entered matches the examples provided in the summary log",
-      60
+      10
     )
     await checkBodyTextDoesNotInclude(
       'Sorry, there is a problem with the service - try again later',
-      60
+      10
     )
 
     await HomePage.signOut()
