@@ -54,14 +54,8 @@ class DefraIdStub {
       headers: instanceHeaders
     })
 
-    const location = response.headers.location
-    if (!location) {
-      const body = await response.body.text()
-      throw new Error(
-        `DefraID stub authorise did not redirect (${response.statusCode}): ${body.slice(0, 200)}`
-      )
-    }
-    return location
+    const headers = await response.headers
+    return headers.location
   }
 
   async generateToken(payload, userId) {
