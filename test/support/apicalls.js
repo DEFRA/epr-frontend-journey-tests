@@ -109,9 +109,15 @@ export async function createLinkedOrganisation(dataRows) {
   )
   expect(response.statusCode).toBe(200)
 
-  const jsonResponse = await response.body.json()
-  /** @type {{ orgId: string, referenceNumber: string }} */
-  const orgResponseData = /** @type {any} */ (jsonResponse)
+  /**
+   * @typedef {Object} OrgCreatedResponse
+   * @property {number} orgId
+   * @property {string} orgName
+   * @property {string} referenceNumber
+   */
+  const orgResponseData = /** @type {OrgCreatedResponse} */ (
+    await response.body.json()
+  )
 
   const orgId = orgResponseData?.orgId
   trackCreatedOrgId(orgId)
