@@ -63,7 +63,14 @@ class UploadSummaryLogPage {
       }
 
       const [columnHeader, cell, dataEntered, errorMessage] = values
-      return { rowId: '', section: '', columnHeader, cell, dataEntered, errorMessage }
+      return {
+        rowId: '',
+        section: '',
+        columnHeader,
+        cell,
+        dataEntered,
+        errorMessage
+      }
     })
   }
 

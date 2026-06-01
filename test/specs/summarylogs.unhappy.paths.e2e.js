@@ -180,7 +180,6 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       30
     )
 
-
     const validationErrors = await UploadSummaryLogPage.getValidationErrors()
     const expectedErrors = [
       {
