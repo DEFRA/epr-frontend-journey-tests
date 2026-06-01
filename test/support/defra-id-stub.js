@@ -51,18 +51,11 @@ class DefraIdStub {
     const url = `${this.baseUrl}/cdp-defra-id-stub/authorize?${query}`
     const response = await request(url, {
       method: 'GET',
-      headers: instanceHeaders,
-      maxRedirections: 0
+      headers: instanceHeaders
     })
 
-    const location = response.headers.location
-    if (!location) {
-      const body = await response.body.text()
-      throw new Error(
-        `DefraID stub authorise did not redirect (${response.statusCode}): ${body.slice(0, 200)}`
-      )
-    }
-    return location
+    const headers = await response.headers
+    return String(headers.location)
   }
 
   async generateToken(payload, userId) {
@@ -72,7 +65,15 @@ class DefraIdStub {
       headers: instanceHeaders,
       body: payload
     })
-    const responseJson = await response.body.json()
+    /**
+     * @typedef {Object} AuthResponse
+     * @property {string} access_token
+     * @property {string} token_type
+     * @property {number} expires_in
+     */
+    const responseJson = /** @type {AuthResponse} */ (
+      await response.body.json()
+    )
     this.accessTokens.set(userId, responseJson.access_token)
     return responseJson
   }

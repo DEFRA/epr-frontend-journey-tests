@@ -1,9 +1,6 @@
-/** @import { CognitoAuthConfig } from '../config/config.js' */
-
 import { request } from 'undici'
 
 class CognitoStub {
-  /** @param {CognitoAuthConfig} config */
   constructor(config = {}) {
     this.url = config.url
     this.clientId = config.clientId
@@ -29,7 +26,8 @@ class CognitoStub {
       })
     })
 
-    const data = await body.json()
+    /** @typedef {{ AuthenticationResult?: { AccessToken?: string } }} AuthData */
+    const data = /** @type {AuthData} */ (await body.json())
 
     if (statusCode !== 200) {
       throw new Error(
@@ -37,7 +35,7 @@ class CognitoStub {
       )
     }
 
-    this.accessToken = data.AuthenticationResult.AccessToken
+    this.accessToken = data.AuthenticationResult?.AccessToken
   }
 
   authHeader() {
