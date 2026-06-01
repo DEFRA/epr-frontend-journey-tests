@@ -334,6 +334,29 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
 
     expect(validationErrors).toEqual(expectedErrors)
 
+    await checkBodyText('Sent on (sections 4 and 5)', 30)
+
+    const secondValidationErrors =
+      await UploadSummaryLogPage.getValidationErrors(2)
+    const secondExpectedErrors = [
+      {
+        rowId: '4000',
+        column: 'Date load left site',
+        cell: 'G4',
+        valueEntered: '???',
+        problem: 'Must be a valid date'
+      },
+      {
+        rowId: '',
+        column: 'Tonnage of UK packaging waste sent on',
+        cell: 'H4',
+        valueEntered: 'ABC',
+        problem: 'Must be a number'
+      }
+    ]
+
+    expect(secondValidationErrors).toEqual(secondExpectedErrors)
+
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })

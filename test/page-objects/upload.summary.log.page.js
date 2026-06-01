@@ -48,9 +48,11 @@ class UploadSummaryLogPage {
     return await $('#main-content h1').getText()
   }
 
-  async getValidationErrors() {
+  async getValidationErrors(tableIndex = 1) {
     let i = 0
-    return await $$('table.govuk-table tbody tr').map(async (row) => {
+    return await $$(
+      `table.govuk-table:nth-of-type(${tableIndex}) tbody tr`
+    ).map(async (row) => {
       if (i++ > 0) {
         const [column, cell, valueEntered, problem] = await Promise.all([
           row.$('td:nth-child(1)'),
