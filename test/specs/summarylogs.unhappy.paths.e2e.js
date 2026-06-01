@@ -55,14 +55,14 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await checkBodyText('Your file is being checked', 30)
 
     await checkUploadErrorText(
-      '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
+      '#main-content > div > div:nth-child(2) > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
       "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
       30
     )
 
     await UploadSummaryLogPage.continue()
     await checkUploadErrorText(
-      '#main-content > div > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
+      '#main-content > div > div:nth-child(2) > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
       "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
       30
     )
@@ -173,37 +173,166 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await checkBodyText('Your file is being checked', 30)
 
     await checkBodyText(
-      'The selected file contains date formats that do not match the examples provided in the summary log',
-      60
+      'You will need to correct these issues before uploading the file again.',
+      30
     )
-    await checkBodyText(
-      'The selected file contains values in some fields that have not been selected from within the drop-down provided',
-      60
-    )
-    await checkBodyText(
-      'The selected file contains answers to Yes / No questions with formats that do not match the examples provided in the summary log',
-      60
-    )
-    await checkBodyText(
-      'The selected file contains tonnage and weight values with formats that do not match the examples provided in the summary log',
-      60
-    )
-    await checkBodyText(
-      'The selected file contains percentage values with formats that do not match the examples provided in the summary log',
-      60
-    )
-    await checkBodyText(
-      'The selected file contains unacceptable content within the fields that accept free text',
-      60
-    )
-    await checkBodyText(
-      "The selected file contains data that's been entered incorrectly - check that the data you've entered matches the examples provided in the summary log",
-      60
-    )
-    await checkBodyTextDoesNotInclude(
-      'Sorry, there is a problem with the service - try again later',
-      60
-    )
+
+    await checkBodyText('Exported (sections 1, 2 and 3)', 30)
+
+    const validationErrors = await UploadSummaryLogPage.getValidationErrors()
+    const expectedErrors = [
+      {
+        rowId: '1000',
+        column: 'Date received for export',
+        cell: 'G4',
+        valueEntered: '????',
+        problem: 'Must be a valid date'
+      },
+      {
+        rowId: '',
+        column: 'Description of waste',
+        cell: 'I4',
+        valueEntered: 'WrongDesc',
+        problem: 'Select a value from the drop-down list'
+      },
+      {
+        rowId: '',
+        column: 'Were PRN or PERN issued on this waste',
+        cell: 'J4',
+        valueEntered: 'Unknown',
+        problem: 'Must be Yes or No'
+      },
+      {
+        rowId: '',
+        column: 'Gross weight',
+        cell: 'K4',
+        valueEntered: '1010',
+        problem: 'Must be 1,000 or less'
+      },
+      {
+        rowId: '',
+        column: 'Tare weight',
+        cell: 'L4',
+        valueEntered: '-10',
+        problem: 'Must be 0 or more'
+      },
+      {
+        rowId: '',
+        column: 'Pallet weight',
+        cell: 'M4',
+        valueEntered: '-50',
+        problem: 'Must be 0 or more'
+      },
+      {
+        rowId: '',
+        column: 'Net weight',
+        cell: 'N4',
+        valueEntered: '-50',
+        problem: 'Must be 0 or more'
+      },
+      {
+        rowId: '',
+        column: 'Bailing wire protocol',
+        cell: 'O4',
+        valueEntered: 'Invalid',
+        problem: 'Must be Yes or No'
+      },
+      {
+        rowId: '',
+        column: 'How did you calculate recyclable proportion',
+        cell: 'P4',
+        valueEntered: 'Invalid',
+        problem: 'Select a value from the drop-down list'
+      },
+      {
+        rowId: '',
+        column: 'Weight of non-target materials',
+        cell: 'Q4',
+        valueEntered: '1005',
+        problem: 'Must be 1,000 or less'
+      },
+      {
+        rowId: '',
+        column: 'Recyclable proportion percentage',
+        cell: 'R4',
+        valueEntered: '1.1',
+        problem: 'Must be 1 or less'
+      },
+      {
+        rowId: '',
+        column: 'Tonnage received for export',
+        cell: 'S4',
+        valueEntered: '-1160.5',
+        problem: 'Must be 0 or more'
+      },
+      {
+        rowId: '',
+        column: 'Tonnage of UK packaging waste exported',
+        cell: 'T4',
+        valueEntered: '1002',
+        problem: 'Must be 1,000 or less'
+      },
+      {
+        rowId: '',
+        column: 'Date of export',
+        cell: 'U4',
+        valueEntered: 'TBC',
+        problem: 'Must be a valid date'
+      },
+      {
+        rowId: '',
+        column: 'Basel export code',
+        cell: 'V4',
+        valueEntered: 'NotABasel',
+        problem: 'Select a value from the drop-down list'
+      },
+      {
+        rowId: '',
+        column: 'Customs codes',
+        cell: 'W4',
+        valueEntered:
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890',
+        problem: 'Must be 100 characters or fewer'
+      },
+      {
+        rowId: '',
+        column: 'Container number',
+        cell: 'X4',
+        valueEntered:
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890',
+        problem: 'Must be 100 characters or fewer'
+      },
+      {
+        rowId: '',
+        column: 'Date received by OSR',
+        cell: 'Y4',
+        valueEntered: '30-02-2025',
+        problem: 'Check this value'
+      },
+      {
+        rowId: '',
+        column: 'OSR ID',
+        cell: 'Z4',
+        valueEntered: '98A',
+        problem: 'Must be a 3-digit number'
+      },
+      {
+        rowId: '',
+        column: 'Did waste pass through an interim site',
+        cell: 'AA4',
+        valueEntered: 'notValid',
+        problem: 'Must be Yes or No'
+      },
+      {
+        rowId: '',
+        column: 'Tonnage passed to interim site received by OSR',
+        cell: 'AC4',
+        valueEntered: '-50',
+        problem: 'Must be 0 or more'
+      }
+    ]
+
+    expect(validationErrors).toEqual(expectedErrors)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

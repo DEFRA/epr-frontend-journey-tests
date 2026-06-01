@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals'
+import { browser, $, $$ } from '@wdio/globals'
 import {
   checkBodyText,
   checkBodyTextDoesNotInclude
@@ -46,6 +46,42 @@ class UploadSummaryLogPage {
       }
     )
     return await $('#main-content h1').getText()
+  }
+
+  async getValidationErrors() {
+    let i = 0
+    return await $$('table.govuk-table tbody tr').map(async (row) => {
+      if (i++ > 0) {
+        const [column, cell, valueEntered, problem] = await Promise.all([
+          row.$('td:nth-child(1)'),
+          row.$('td:nth-child(2)'),
+          row.$('td:nth-child(3)'),
+          row.$('td:nth-child(4)')
+        ])
+        return {
+          rowId: '',
+          column: await column.getText(),
+          cell: await cell.getText(),
+          valueEntered: await valueEntered.getText(),
+          problem: await problem.getText()
+        }
+      }
+
+      const [rowId, column, cell, valueEntered, problem] = await Promise.all([
+        row.$('td:nth-child(1)'),
+        row.$('td:nth-child(2)'),
+        row.$('td:nth-child(3)'),
+        row.$('td:nth-child(4)'),
+        row.$('td:nth-child(5)')
+      ])
+      return {
+        rowId: await rowId.getText(),
+        column: await column.getText(),
+        cell: await cell.getText(),
+        valueEntered: await valueEntered.getText(),
+        problem: await problem.getText()
+      }
+    })
   }
 
   async confirmAndSubmit() {
