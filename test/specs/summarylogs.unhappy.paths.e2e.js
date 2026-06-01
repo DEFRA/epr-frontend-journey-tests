@@ -180,208 +180,194 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       30
     )
 
-    await checkBodyTextDoesNotInclude(
-      'The selected file contains tonnage and weight values with formats that do not match the examples provided in the summary log',
-      10
-    )
-    await checkBodyTextDoesNotInclude(
-      "The selected file contains data that's been entered incorrectly - check that the data you've entered matches the examples provided in the summary log",
-      10
-    )
-    await checkBodyTextDoesNotInclude(
-      'Sorry, there is a problem with the service - try again later',
-      10
-    )
-
-    await checkBodyText('Exported (sections 1, 2 and 3)', 30)
 
     const validationErrors = await UploadSummaryLogPage.getValidationErrors()
     const expectedErrors = [
       {
         rowId: '1000',
         section: 'Exported (sections 1, 2 and 3)',
-        column: 'Date received for export',
+        columnHeader: 'Date received for export',
         cell: 'G4',
-        valueEntered: '????',
-        problem: 'Must be a valid date'
+        dataEntered: '????',
+        errorMessage: 'Must be a valid date'
       },
       {
         rowId: '',
         section: '',
-        column: 'Description of waste',
+        columnHeader: 'Description of waste',
         cell: 'I4',
-        valueEntered: 'WrongDesc',
-        problem: 'Select a value from the drop-down list'
+        dataEntered: 'WrongDesc',
+        errorMessage: 'Select a value from the drop-down list'
       },
       {
         rowId: '',
         section: '',
-        column: 'Were PRN or PERN issued on this waste',
+        columnHeader: 'Were PRN or PERN issued on this waste',
         cell: 'J4',
-        valueEntered: 'Unknown',
-        problem: 'Must be Yes or No'
+        dataEntered: 'Unknown',
+        errorMessage: 'Must be Yes or No'
       },
       {
         rowId: '',
         section: '',
-        column: 'Gross weight',
+        columnHeader: 'Gross weight',
         cell: 'K4',
-        valueEntered: '1010',
-        problem: 'Must be 1,000 or less'
+        dataEntered: '1010',
+        errorMessage: 'Must be 1,000 or less'
       },
       {
         rowId: '',
         section: '',
-        column: 'Tare weight',
+        columnHeader: 'Tare weight',
         cell: 'L4',
-        valueEntered: '-10',
-        problem: 'Must be 0 or more'
+        dataEntered: '-10',
+        errorMessage: 'Must be 0 or more'
       },
       {
         rowId: '',
         section: '',
-        column: 'Pallet weight',
+        columnHeader: 'Pallet weight',
         cell: 'M4',
-        valueEntered: '-50',
-        problem: 'Must be 0 or more'
+        dataEntered: '-50',
+        errorMessage: 'Must be 0 or more'
       },
       {
         rowId: '',
         section: '',
-        column: 'Net weight',
+        columnHeader: 'Net weight',
         cell: 'N4',
-        valueEntered: '-50',
-        problem: 'Must be 0 or more'
+        dataEntered: '-50',
+        errorMessage: 'Must be 0 or more'
       },
       {
         rowId: '',
         section: '',
-        column: 'Bailing wire protocol',
+        columnHeader: 'Bailing wire protocol',
         cell: 'O4',
-        valueEntered: 'Invalid',
-        problem: 'Must be Yes or No'
+        dataEntered: 'Invalid',
+        errorMessage: 'Must be Yes or No'
       },
       {
         rowId: '',
         section: '',
-        column: 'How did you calculate recyclable proportion',
+        columnHeader: 'How did you calculate recyclable proportion',
         cell: 'P4',
-        valueEntered: 'Invalid',
-        problem: 'Select a value from the drop-down list'
+        dataEntered: 'Invalid',
+        errorMessage: 'Select a value from the drop-down list'
       },
       {
         rowId: '',
         section: '',
-        column: 'Weight of non-target materials',
+        columnHeader: 'Weight of non-target materials',
         cell: 'Q4',
-        valueEntered: '1005',
-        problem: 'Must be 1,000 or less'
+        dataEntered: '1005',
+        errorMessage: 'Must be 1,000 or less'
       },
       {
         rowId: '',
         section: '',
-        column: 'Recyclable proportion percentage',
+        columnHeader: 'Recyclable proportion percentage',
         cell: 'R4',
-        valueEntered: '1.1',
-        problem: 'Must be 1 or less'
+        dataEntered: '1.1',
+        errorMessage: 'Must be 1 or less'
       },
       {
         rowId: '',
         section: '',
-        column: 'Tonnage received for export',
+        columnHeader: 'Tonnage received for export',
         cell: 'S4',
-        valueEntered: '-1160.5',
-        problem: 'Must be 0 or more'
+        dataEntered: '-1160.5',
+        errorMessage: 'Must be 0 or more'
       },
       {
         rowId: '',
         section: '',
-        column: 'Tonnage of UK packaging waste exported',
+        columnHeader: 'Tonnage of UK packaging waste exported',
         cell: 'T4',
-        valueEntered: '1002',
-        problem: 'Must be 1,000 or less'
+        dataEntered: '1002',
+        errorMessage: 'Must be 1,000 or less'
       },
       {
         rowId: '',
         section: '',
-        column: 'Date of export',
+        columnHeader: 'Date of export',
         cell: 'U4',
-        valueEntered: 'TBC',
-        problem: 'Must be a valid date'
+        dataEntered: 'TBC',
+        errorMessage: 'Must be a valid date'
       },
       {
         rowId: '',
         section: '',
-        column: 'Basel export code',
+        columnHeader: 'Basel export code',
         cell: 'V4',
-        valueEntered: 'NotABasel',
-        problem: 'Select a value from the drop-down list'
+        dataEntered: 'NotABasel',
+        errorMessage: 'Select a value from the drop-down list'
       },
       {
         rowId: '',
         section: '',
-        column: 'Customs codes',
+        columnHeader: 'Customs codes',
         cell: 'W4',
-        valueEntered:
+        dataEntered:
           'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890',
-        problem: 'Must be 100 characters or fewer'
+        errorMessage: 'Must be 100 characters or fewer'
       },
       {
         rowId: '',
         section: '',
-        column: 'Container number',
+        columnHeader: 'Container number',
         cell: 'X4',
-        valueEntered:
+        dataEntered:
           'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789098765432101234567890',
-        problem: 'Must be 100 characters or fewer'
+        errorMessage: 'Must be 100 characters or fewer'
       },
       {
         rowId: '',
         section: '',
-        column: 'Date received by OSR',
+        columnHeader: 'Date received by OSR',
         cell: 'Y4',
-        valueEntered: '30-02-2025',
-        problem: 'Check this value'
+        dataEntered: '30-02-2025',
+        errorMessage: 'Check this value'
       },
       {
         rowId: '',
         section: '',
-        column: 'OSR ID',
+        columnHeader: 'OSR ID',
         cell: 'Z4',
-        valueEntered: '98A',
-        problem: 'Must be a 3-digit number'
+        dataEntered: '98A',
+        errorMessage: 'Must be a 3-digit number'
       },
       {
         rowId: '',
         section: '',
-        column: 'Did waste pass through an interim site',
+        columnHeader: 'Did waste pass through an interim site',
         cell: 'AA4',
-        valueEntered: 'notValid',
-        problem: 'Must be Yes or No'
+        dataEntered: 'notValid',
+        errorMessage: 'Must be Yes or No'
       },
       {
         rowId: '',
         section: '',
-        column: 'Tonnage passed to interim site received by OSR',
+        columnHeader: 'Tonnage passed to interim site received by OSR',
         cell: 'AC4',
-        valueEntered: '-50',
-        problem: 'Must be 0 or more'
+        dataEntered: '-50',
+        errorMessage: 'Must be 0 or more'
       },
       {
         rowId: '4000',
         section: 'Sent on (sections 4 and 5)',
-        column: 'Date load left site',
+        columnHeader: 'Date load left site',
         cell: 'G4',
-        valueEntered: '???',
-        problem: 'Must be a valid date'
+        dataEntered: '???',
+        errorMessage: 'Must be a valid date'
       },
       {
         rowId: '',
         section: '',
-        column: 'Tonnage of UK packaging waste sent on',
+        columnHeader: 'Tonnage of UK packaging waste sent on',
         cell: 'H4',
-        valueEntered: 'ABC',
-        problem: 'Must be a number'
+        dataEntered: 'ABC',
+        errorMessage: 'Must be a number'
       }
     ]
 

@@ -57,12 +57,13 @@ class UploadSummaryLogPage {
       // A record's first row carries the rowspanned Row ID + Section cells
       // (6 cells); its remaining cells render only the 4 per-cell columns.
       if (values.length === 6) {
-        const [rowId, section, column, cell, valueEntered, problem] = values
-        return { rowId, section, column, cell, valueEntered, problem }
+        const [rowId, section, columnHeader, cell, dataEntered, errorMessage] =
+          values
+        return { rowId, section, columnHeader, cell, dataEntered, errorMessage }
       }
 
-      const [column, cell, valueEntered, problem] = values
-      return { rowId: '', section: '', column, cell, valueEntered, problem }
+      const [columnHeader, cell, dataEntered, errorMessage] = values
+      return { rowId: '', section: '', columnHeader, cell, dataEntered, errorMessage }
     })
   }
 
