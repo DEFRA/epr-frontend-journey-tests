@@ -199,6 +199,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     const expectedErrors = [
       {
         rowId: '1000',
+        section: 'Exported (sections 1, 2 and 3)',
         column: 'Date received for export',
         cell: 'G4',
         valueEntered: '????',
@@ -206,6 +207,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Description of waste',
         cell: 'I4',
         valueEntered: 'WrongDesc',
@@ -213,6 +215,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Were PRN or PERN issued on this waste',
         cell: 'J4',
         valueEntered: 'Unknown',
@@ -220,6 +223,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Gross weight',
         cell: 'K4',
         valueEntered: '1010',
@@ -227,6 +231,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Tare weight',
         cell: 'L4',
         valueEntered: '-10',
@@ -234,6 +239,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Pallet weight',
         cell: 'M4',
         valueEntered: '-50',
@@ -241,6 +247,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Net weight',
         cell: 'N4',
         valueEntered: '-50',
@@ -248,6 +255,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Bailing wire protocol',
         cell: 'O4',
         valueEntered: 'Invalid',
@@ -255,6 +263,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'How did you calculate recyclable proportion',
         cell: 'P4',
         valueEntered: 'Invalid',
@@ -262,6 +271,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Weight of non-target materials',
         cell: 'Q4',
         valueEntered: '1005',
@@ -269,6 +279,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Recyclable proportion percentage',
         cell: 'R4',
         valueEntered: '1.1',
@@ -276,6 +287,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Tonnage received for export',
         cell: 'S4',
         valueEntered: '-1160.5',
@@ -283,6 +295,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Tonnage of UK packaging waste exported',
         cell: 'T4',
         valueEntered: '1002',
@@ -290,6 +303,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Date of export',
         cell: 'U4',
         valueEntered: 'TBC',
@@ -297,6 +311,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Basel export code',
         cell: 'V4',
         valueEntered: 'NotABasel',
@@ -304,6 +319,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Customs codes',
         cell: 'W4',
         valueEntered:
@@ -312,6 +328,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Container number',
         cell: 'X4',
         valueEntered:
@@ -320,6 +337,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Date received by OSR',
         cell: 'Y4',
         valueEntered: '30-02-2025',
@@ -327,6 +345,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'OSR ID',
         cell: 'Z4',
         valueEntered: '98A',
@@ -334,6 +353,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Did waste pass through an interim site',
         cell: 'AA4',
         valueEntered: 'notValid',
@@ -341,22 +361,15 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Tonnage passed to interim site received by OSR',
         cell: 'AC4',
         valueEntered: '-50',
         problem: 'Must be 0 or more'
-      }
-    ]
-
-    expect(validationErrors).toEqual(expectedErrors)
-
-    await checkBodyText('Sent on (sections 4 and 5)', 30)
-
-    const secondValidationErrors =
-      await UploadSummaryLogPage.getValidationErrors(2)
-    const secondExpectedErrors = [
+      },
       {
         rowId: '4000',
+        section: 'Sent on (sections 4 and 5)',
         column: 'Date load left site',
         cell: 'G4',
         valueEntered: '???',
@@ -364,6 +377,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       },
       {
         rowId: '',
+        section: '',
         column: 'Tonnage of UK packaging waste sent on',
         cell: 'H4',
         valueEntered: 'ABC',
@@ -371,7 +385,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       }
     ]
 
-    expect(secondValidationErrors).toEqual(secondExpectedErrors)
+    expect(validationErrors).toEqual(expectedErrors)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

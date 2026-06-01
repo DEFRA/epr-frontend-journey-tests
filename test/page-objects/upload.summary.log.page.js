@@ -48,41 +48,21 @@ class UploadSummaryLogPage {
     return await $('#main-content h1').getText()
   }
 
-  async getValidationErrors(tableIndex = 1) {
-    let i = 0
+  async getValidationErrors() {
     return await $$(
-      `table.govuk-table:nth-of-type(${tableIndex}) tbody tr`
+      '[data-testid="app-page-body"] table.govuk-table tbody tr'
     ).map(async (row) => {
-      if (i++ > 0) {
-        const [column, cell, valueEntered, problem] = await Promise.all([
-          row.$('td:nth-child(1)'),
-          row.$('td:nth-child(2)'),
-          row.$('td:nth-child(3)'),
-          row.$('td:nth-child(4)')
-        ])
-        return {
-          rowId: '',
-          column: await column.getText(),
-          cell: await cell.getText(),
-          valueEntered: await valueEntered.getText(),
-          problem: await problem.getText()
-        }
+      const values = await row.$$('td').map((cell) => cell.getText())
+
+      // A record's first row carries the rowspanned Row ID + Section cells
+      // (6 cells); its remaining cells render only the 4 per-cell columns.
+      if (values.length === 6) {
+        const [rowId, section, column, cell, valueEntered, problem] = values
+        return { rowId, section, column, cell, valueEntered, problem }
       }
 
-      const [rowId, column, cell, valueEntered, problem] = await Promise.all([
-        row.$('td:nth-child(1)'),
-        row.$('td:nth-child(2)'),
-        row.$('td:nth-child(3)'),
-        row.$('td:nth-child(4)'),
-        row.$('td:nth-child(5)')
-      ])
-      return {
-        rowId: await rowId.getText(),
-        column: await column.getText(),
-        cell: await cell.getText(),
-        valueEntered: await valueEntered.getText(),
-        problem: await problem.getText()
-      }
+      const [column, cell, valueEntered, problem] = values
+      return { rowId: '', section: '', column, cell, valueEntered, problem }
     })
   }
 
