@@ -12,7 +12,6 @@ import ReprocessorPrnSummaryPage from '../page-objects/reports/reprocessor.prn.s
 import FreePrnsPage from '../page-objects/reports/free.prns.page.js'
 import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
-import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
 import SummaryLogChangedErrorPage from 'page-objects/reports/summary.log.changed.error.page.js'
 import { checkBodyText } from '../support/checks.js'
 import {
@@ -75,8 +74,6 @@ async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
   await ReportCheckAnswersPage.createReport()
   await checkBodyText('report created', 30)
   await $('a*=Go to reports').click()
-
-  return { orgDetails, migrationResponse }
 }
 
 describe('Stale summary log report @staleReport', () => {
@@ -118,33 +115,19 @@ describe('Stale summary log report @staleReport', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should redirect to the stale SL error page when submitting a report after SL re-upload @staleReportSubmit', async () => {
-    const { orgDetails, migrationResponse } = await setupAndCreateReport(
-      'Paper or board (R3)',
-      PA_REG,
-      PA_ACC,
-      PA_FILE
-    )
+  it('should redirect to the stale SL error page when attempting to submit a stale ready-to-submit report @staleReportSubmit', async () => {
+    await setupAndCreateReport('Paper or board (R3)', PA_REG, PA_ACC, PA_FILE)
 
-    // Open the submit/declaration page before re-uploading SL (GET renders normally)
+    // Re-upload SL to make the ready-to-submit report stale
+    await HomePage.homeLink()
+    await DashboardPage.selectTableLink(1, 1)
+    await WasteRecordsPage.submitSummaryLogLink()
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(PA_FILE)
+
+    // Attempting to reach the submit page is blocked by the stale SL check
+    await DashboardPage.selectTableLink(1, 1)
+    await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
-
-    // Re-upload SL in a new tab while the submit page remains open in the original tab
-    const originalTab = await browser.getWindowHandle()
-    await browser.newWindow('about:blank')
-    await browser.url(
-      `/organisations/${orgDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/summary-logs/upload`
-    )
-    await UploadSummaryLogPage.uploadFile(PA_FILE)
-    await UploadSummaryLogPage.continue()
-    await checkBodyText('Check before confirming upload', 60)
-    await UploadSummaryLogPage.confirmAndSubmit()
-    await checkBodyText('Summary log uploaded', 60)
-    await browser.closeWindow()
-    await browser.switchToWindow(originalTab)
-
-    // Submit from the original tab — the POST detects the stale SL and redirects
-    await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
 
     expect(await SummaryLogChangedErrorPage.headingText()).toBe(
       'Your summary log has changed'
