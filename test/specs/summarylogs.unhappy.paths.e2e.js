@@ -188,7 +188,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
         columnHeader: 'Date received for export',
         cell: 'G4',
         dataEntered: '????',
-        errorMessage: 'Must be a valid date'
+        errorMessage: 'Must be a valid date in the format dd/mm/yyyy'
       },
       {
         rowId: '',
@@ -292,7 +292,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
         columnHeader: 'Date of export',
         cell: 'U4',
         dataEntered: 'TBC',
-        errorMessage: 'Must be a valid date'
+        errorMessage: 'Must be a valid date in the format dd/mm/yyyy'
       },
       {
         rowId: '',
@@ -358,7 +358,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
         columnHeader: 'Date load left site',
         cell: 'G4',
         dataEntered: '???',
-        errorMessage: 'Must be a valid date'
+        errorMessage: 'Must be a valid date in the format dd/mm/yyyy'
       },
       {
         rowId: '',
