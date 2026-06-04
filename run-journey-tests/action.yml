@@ -16,7 +16,7 @@ runs:
   steps:
     - name: Checkout repository if not called by Journey Test PR
       if: inputs.journey-test-pr == 'false'
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         repository: DEFRA/epr-frontend-journey-tests
         ref: ${{inputs.branch}}
@@ -37,7 +37,7 @@ runs:
 
     - name: Checkout epr-frontend repository if it is Journey Test PR and there is a matching service branch
       if: inputs.journey-test-pr != 'false' && steps.service-branch.outputs.exists == 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         repository: DEFRA/epr-frontend
         ref: ${{steps.service-branch.outputs.ref}}
@@ -54,7 +54,7 @@ runs:
         docker build -t $IMAGE_TAG .
         echo "image=$EPR_FRONTEND_SHA" >> $GITHUB_OUTPUT
 
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
       with:
         node-version-file: .nvmrc
         cache: npm
@@ -90,7 +90,7 @@ runs:
 
     - name: Checkout epr-backend repository if matching branch exists
       if: steps.backend-branch.outputs.exists == 'true'
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         repository: DEFRA/epr-backend
         ref: ${{ steps.backend-branch.outputs.ref }}
@@ -144,14 +144,14 @@ runs:
 
     - name: Upload allure report
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: allure-report
         path: ./allure-report
 
     - name: Upload docker compose logs
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: docker-compose-logs
         path: ./logs.txt
