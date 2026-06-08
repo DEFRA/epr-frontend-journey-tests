@@ -20,14 +20,14 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+import seedOverseasSites from '~/test/support/apicalls.js'
 
 const PL_REG = 'R25SR500010912PL'
 const PL_ACC = 'R-ACC12145PL'
 const PL_FILE = `resources/sanity/reprocessorOutput_${PL_ACC}_${PL_REG}.xlsx`
 
-const PA_REG = 'R25SR500010912PA'
-const PA_ACC = 'R-ACC12145PA'
-const PA_FILE = `resources/sanity/reprocessorOutput_${PA_ACC}_${PA_REG}.xlsx`
+const REG_ONLY_FILE = 'resources/exporter-regonly.xlsx'
+const REG_NUMBER = 'E25SR500030913PA'
 
 async function navigateReprocessorToSupportingInfo() {
   await TonnesRecycledPage.enterTonnage('10')
@@ -76,8 +76,50 @@ async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
   await $('a*=Go to reports').click()
 }
 
+async function uploadAndNavigateToReports() {
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.submitSummaryLogLink()
+  await UploadSummaryLogPage.performUploadAndReturnToHomepage(REG_ONLY_FILE)
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.manageReportsLink()
+}
+
+async function setupRegisteredOnlyExporter() {
+  const organisationDetails = await createLinkedOrganisation([
+    {
+      material: 'Paper or board (R3)',
+      wasteProcessingType: 'Exporter',
+      withoutAccreditation: true
+    }
+  ])
+
+  const migrationResponse = await updateMigratedOrganisation(
+    organisationDetails.refNo,
+    [
+      {
+        regNumber: REG_NUMBER,
+        status: 'approved',
+        withoutAccreditation: true
+      }
+    ]
+  )
+
+  const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+  await linkDefraIdUser(
+    organisationDetails.refNo,
+    user.userId,
+    migrationResponse.email
+  )
+
+  await HomePage.openStart()
+  await HomePage.clickStartNow()
+  await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+  return { organisationDetails, migrationResponse }
+}
+
 describe('Stale summary log report @staleReport', () => {
-  it('should redirect to the stale SL error page when navigating to a stale report, with working Return and Delete buttons @staleReportNavigation', async () => {
+  it('should redirect to the stale SL error page when navigating to a stale report, with working Return and Delete buttons and unable to submit a stale ready-to-submit report @staleReportSubmit @staleReportNavigation', async () => {
     await setupAndCreateReport('Plastic (R3)', PL_REG, PL_ACC, PL_FILE)
 
     // Re-upload SL to make the existing report stale
@@ -87,6 +129,7 @@ describe('Stale summary log report @staleReport', () => {
     await UploadSummaryLogPage.performUploadAndReturnToHomepage(PL_FILE)
 
     // Navigating to the report now triggers the stale SL error page
+    // This means we are unable to submit a stale ready-to-submit report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
@@ -115,16 +158,29 @@ describe('Stale summary log report @staleReport', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should redirect to the stale SL error page when attempting to submit a stale ready-to-submit report @staleReportSubmit', async () => {
-    await setupAndCreateReport('Paper or board (R3)', PA_REG, PA_ACC, PA_FILE)
+  it('should redirect to the stale SL error page when navigating to a stale report (Registered Only), and unable to submit a stale in-progress report @staleReportSubmit @staleReportInProgress', async () => {
+    const setupResponse = await setupRegisteredOnlyExporter()
 
-    // Re-upload SL to make the ready-to-submit report stale
+    await seedOverseasSites(
+      setupResponse.organisationDetails.refNo,
+      [0],
+      [143, 297, 565, 893]
+    )
+
+    await uploadAndNavigateToReports()
+
+    await ReportsPage.selectActiveActionLink(1)
+    await ReportDetailPage.useThisData()
+    await TonnesRecycledPage.saveAndComeBackLater()
+
+    // Re-upload SL to make the existing report stale
     await HomePage.homeLink()
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepage(PA_FILE)
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(REG_ONLY_FILE)
 
-    // Attempting to reach the submit page is blocked by the stale SL check
+    // Navigating to the report now triggers the stale SL error page
+    // This means we are unable to submit a stale ready-to-submit report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
@@ -132,6 +188,12 @@ describe('Stale summary log report @staleReport', () => {
     expect(await SummaryLogChangedErrorPage.headingText()).toBe(
       'Your summary log has changed'
     )
+
+    // "Delete and start again" deletes the report and returns to reports with status Due
+    await SummaryLogChangedErrorPage.deleteAndStartAgain()
+    expect(await ReportsPage.headingText()).toContain('Reports')
+    expect(await ReportsPage.getActiveStatusBadge(1)).toBe('Due')
+    expect(await ReportsPage.getActiveStatusColour(1)).toBe('orange')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
