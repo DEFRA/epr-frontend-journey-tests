@@ -180,7 +180,7 @@ describe('Stale summary log report @staleReport', () => {
     await UploadSummaryLogPage.performUploadAndReturnToHomepage(REG_ONLY_FILE)
 
     // Navigating to the report now triggers the stale SL error page
-    // This means we are unable to submit a stale ready-to-submit report
+    // This means we are unable to submit a stale in-progress report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
