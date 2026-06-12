@@ -84,7 +84,7 @@ describe('Incomplete report submit @incompleteReportBlock', () => {
     const periodPath = currentUrl
       .split('/reports/')[1]
       .split('/')
-      .slice(0, 3)
+      .slice(0, 4)
       .join('/')
     await browser.url(`${periodBase}${periodPath}/check-your-answers`)
 
