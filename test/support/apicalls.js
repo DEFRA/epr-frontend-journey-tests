@@ -454,12 +454,13 @@ export async function unsubmitReport(
   registrationId,
   year,
   cadence,
-  period
+  period,
+  submissionNumber
 ) {
   const authClient = new AuthClient()
   const eprBackend = new EprBackend()
   await authClient.authenticate()
-  const unsubmitEndpoint = `/v1/organisations/${organisationId}/registrations/${registrationId}/reports/${year}/${cadence}/${period}/unsubmit`
+  const unsubmitEndpoint = `/v1/organisations/${organisationId}/registrations/${registrationId}/reports/${year}/${cadence}/${period}/${submissionNumber}/unsubmit`
   const response = await eprBackend.post(
     unsubmitEndpoint,
     '',

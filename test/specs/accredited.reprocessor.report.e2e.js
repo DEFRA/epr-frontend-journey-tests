@@ -382,6 +382,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
         setupResponse.migrationResponse.registrationIds[0],
         2026,
         'monthly',
+        1,
         1
       )
 
@@ -431,14 +432,14 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
 
       // Try to access prn-summary directly — should get 404
       await browser.url(
-        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/prn-summary`
+        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/1/prn-summary`
       )
       await checkBodyText('404', 10)
       await checkBodyText('Page not found', 10)
 
       // Try to access free-prns directly — should get 404
       await browser.url(
-        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/free-prns`
+        `/organisations/${organisationDetails.refNo}/registrations/${migrationResponse.registrationIds[0]}/reports/2026/monthly/1/1/free-prns`
       )
       await checkBodyText('404', 10)
       await checkBodyText('Page not found', 10)
