@@ -1,3 +1,4 @@
+/// <reference types="@wdio/globals/types" />
 import { browser, $, $$ } from '@wdio/globals'
 
 class CheckBeforeCreatingPRNPage {

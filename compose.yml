@@ -134,7 +134,7 @@ services:
         condition: service_completed_successfully
 
   defra-id-stub:
-    image: defradigital/cdp-defra-id-stub:${DEFRA_ID_STUB_VERSION:-latest}
+    image: defradigital/cdp-defra-id-stub:0.34.0
     ports:
       - '3200:3200'
     depends_on:
@@ -153,7 +153,7 @@ services:
       USE_SINGLE_INSTANCE_CACHE: true
 
   epr-re-ex-entra-stub:
-    image: defradigital/epr-re-ex-entra-stub:latest
+    image: defradigital/epr-re-ex-entra-stub:0.66.0
     ports:
       - 3010:3010
     environment:
