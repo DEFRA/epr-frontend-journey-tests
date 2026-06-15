@@ -318,6 +318,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
         migrationResponse.registrationIds[0],
         2026,
         'monthly',
+        1,
         1
       )
 
@@ -379,14 +380,14 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     it('should return 404 when non-accredited exporter tries to access PRN pages @accreditedExporterRouteGuard', async () => {
       // Try to access prn-summary directly — should get 404
       await browser.url(
-        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/prn-summary`
+        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/submissions/1/prn-summary`
       )
       await checkBodyText('404', 10)
       await checkBodyText('Page not found', 10)
 
       // Try to access free-perns directly — should get 404
       await browser.url(
-        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/free-perns`
+        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/submissions/1/free-perns`
       )
       await checkBodyText('404', 10)
       await checkBodyText('Page not found', 10)
@@ -395,13 +396,13 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
     it('should return 404 when registered-only exporter tries to access PRN pages @registeredOnlyExporterRegression', async () => {
       // Try to access prn-summary directly — should get 404
       await browser.url(
-        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/prn-summary`
+        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/submissions/1/prn-summary`
       )
       await checkBodyText('Page not found', 10)
 
       // Try to access free-perns directly — should get 404
       await browser.url(
-        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/free-perns`
+        `/organisations/${orgRefNo}/registrations/${registrationId}/reports/2026/monthly/1/submissions/1/free-perns`
       )
       await checkBodyText('Page not found', 10)
     })
