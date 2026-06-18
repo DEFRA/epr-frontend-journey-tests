@@ -207,7 +207,7 @@ export async function updateMigratedOrganisation(
 
   const currentYear = new Date().getFullYear()
 
-  let data = responseData
+  const data = responseData
   let accreditationIndex = 0
 
   const accreditationIds = []
@@ -321,11 +321,15 @@ export async function updateMigratedOrganisation(
       updatedAt: data.registrations[0].validFrom
     }
   ]
-  data = { organisation: data }
+  const payload = {
+    version: Number(data.version),
+    updateFragment: data
+  }
 
   response = await eprBackend.put(
-    `/v1/dev/organisations/${orgId}`,
-    JSON.stringify(data)
+    `/v1/organisations/${orgId}`,
+    JSON.stringify(payload),
+    authClient.authHeader()
   )
   expect(response.statusCode).toBe(200)
 
@@ -435,16 +439,18 @@ export async function seedOverseasSites(
     orgData.registrations[registrationIndex].overseasSites = overseasSites
   })
 
+  const payload = {
+    version: Number(orgData.version),
+    updateFragment: orgData
+  }
+
   const putResponse = await eprBackend.put(
-    `/v1/dev/organisations/${orgRefNo}`,
-    JSON.stringify({ organisation: orgData }),
+    `/v1/organisations/${orgRefNo}`,
+    JSON.stringify(payload),
     authClient.authHeader()
   )
 
-  await assertSuccessResponse(
-    putResponse,
-    `PUT /v1/dev/organisations/${orgRefNo}`
-  )
+  await assertSuccessResponse(putResponse, `PUT /v1/organisations/${orgRefNo}`)
 }
 
 export default seedOverseasSites
