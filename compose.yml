@@ -134,7 +134,7 @@ services:
         condition: service_completed_successfully
 
   defra-id-stub:
-    image: defradigital/cdp-defra-id-stub:0.34.0
+    image: defradigital/cdp-defra-id-stub:0.36.0
     ports:
       - '3200:3200'
     depends_on:
