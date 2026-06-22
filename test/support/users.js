@@ -10,23 +10,16 @@ class Users {
       loa: '1',
       aal: '1',
       enrolmentCount: 1,
-      enrolmentRequestCount: 1
+      enrolmentRequestCount: 1,
+      relationships: [
+        {
+          organisationName: 'ACME ltd',
+          relationshipRole: 'Employee',
+          roleName: 'Some role',
+          roleStatus: '1'
+        }
+      ]
     }
-  }
-
-  async userParams(userId) {
-    return new URLSearchParams({
-      csrfToken: randomUUID(),
-      userId,
-      relationshipId: 'relId',
-      organisationId: randomUUID(),
-      organisationName: 'ACME ltd',
-      relationshipRole: 'role',
-      roleName: 'User',
-      roleStatus: 'Status',
-      // eslint-disable-next-line camelcase
-      redirect_uri: 'http://localhost:3000/'
-    })
   }
 
   async authorisationPayload(email) {
