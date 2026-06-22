@@ -54,7 +54,7 @@ class DefraIdStubPage {
   }
 
   async loginViaEmail(email) {
-    const selector = `//tr[th[text()="${email.toLowerCase()}"]]//a`
+    const selector = `//tr[th[translate(text(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz")="${email.toLowerCase()}"]]//a`
     await browser.waitUntil(
       async () => {
         const el = await $(selector)
