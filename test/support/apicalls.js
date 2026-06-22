@@ -336,23 +336,11 @@ export async function updateMigratedOrganisation(
   return { email, registrationIds, accreditationIds }
 }
 
-export async function createAndRegisterDefraIdUser(
-  email,
-  numberOfRelationships = 1
-) {
+export async function createAndRegisterDefraIdUser(email) {
   const users = new Users()
   const user = await users.userPayload(email)
   await defraIdStub.register(JSON.stringify(user))
   defraIdStub.userIds.push(user.userId)
-
-  for (let i = 0; i < numberOfRelationships; i++) {
-    const params = await users.userParams(user.userId)
-    const resp = await defraIdStub.addRelationship(
-      params.toString(),
-      user.userId
-    )
-    expect(resp.statusCode).toBe(302)
-  }
 
   return user
 }
