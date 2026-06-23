@@ -29,7 +29,7 @@ describe('Summary Logs Reprocessor Input', () => {
       ]
     )
 
-    await createAndRegisterDefraIdUser(migrationResponse.email, 2)
+    await createAndRegisterDefraIdUser(migrationResponse.email)
 
     await HomePage.openStart()
 
@@ -55,7 +55,6 @@ describe('Summary Logs Reprocessor Input', () => {
     await HomePage.clickStartNow()
 
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-    await DefraIdStubPage.selectOrganisation(1)
 
     // Tests the linking of an organisation
     await HomePage.linkRegistration()
