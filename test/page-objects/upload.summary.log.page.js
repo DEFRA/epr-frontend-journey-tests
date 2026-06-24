@@ -16,7 +16,7 @@ class UploadSummaryLogPage {
     await this.uploadFile(filePath)
     await this.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Check before confirming upload', 60)
     await this.confirmAndSubmit()
 

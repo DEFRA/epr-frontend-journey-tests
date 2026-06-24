@@ -64,7 +64,7 @@ describe('Summary Logs Reprocessor Output', () => {
     await UploadSummaryLogPage.uploadFile('resources/reprocessor-output.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('1 new load will be added to your waste balance', 30)
@@ -95,7 +95,7 @@ describe('Summary Logs Reprocessor Output', () => {
     )
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText(

@@ -52,7 +52,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await UploadSummaryLogPage.uploadFile('resources/empty.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkUploadErrorText(
       '#main-content > div > div:nth-child(2) > div > div > p.govuk-body.govuk-\\!-font-weight-bold',
@@ -121,7 +121,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await UploadSummaryLogPage.uploadFile('resources/bad-marker.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText(
       "The summary log template you're uploading is incorrect - make sure you download the correct template for your registration or accreditation",
@@ -170,7 +170,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await UploadSummaryLogPage.uploadFile('resources/exporter-invalid.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Your summary log cannot be uploaded', 60)
 
@@ -424,7 +424,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await UploadSummaryLogPage.uploadFile('resources/cover-invalid.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText(
       "Material on summary log's 'Cover' tab is missing or incorrect",

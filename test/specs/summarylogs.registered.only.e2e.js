@@ -106,7 +106,7 @@ describe('@registered-only', () => {
     )
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 30)
     await checkBodyText('Check the following before confirming the upload.', 30)
@@ -179,7 +179,7 @@ describe('@registered-only', () => {
     await UploadSummaryLogPage.uploadFile('resources/exporter-regonly.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('Check the following before confirming the upload.', 30)

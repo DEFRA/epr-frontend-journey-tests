@@ -93,7 +93,7 @@ describe('Summary Logs Reprocessor Input', () => {
     await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
     await UploadSummaryLogPage.continue()
 
-    await checkBodyText('Your file is being checked', 30)
+    await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Check before confirming upload', 60)
     await UploadSummaryLogPage.confirmAndCheckDoubleClickPrevented()
