@@ -1,4 +1,4 @@
-FROM node:24.15.0-alpine
+FROM node:24.17.0-alpine
 WORKDIR /app
 RUN npm init -y && npm install express
 COPY ./docker/mock/waste.organisations.js .
