@@ -21,6 +21,7 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+import { expectActionRequiredStatus } from '../support/report-status.js'
 
 async function navigateReprocessorToSupportingInfo() {
   await TonnesRecycledPage.enterTonnage('10')
@@ -118,11 +119,7 @@ describe('Deleting a ready to submit report', () => {
     const reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    const statusBadge = await ReportsPage.getActiveStatusBadge(1)
-    const statusColour = await ReportsPage.getActiveStatusColour(1)
-
-    expect(statusBadge).toBe('Due')
-    expect(statusColour).toBe('orange')
+    await expectActionRequiredStatus(1)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

@@ -19,6 +19,7 @@ import {
   linkDefraIdUser,
   updateMigratedOrganisation
 } from '../support/apicalls.js'
+import { expectActionRequiredStatus } from '../support/report-status.js'
 
 async function navigateReprocessorToSupportingInfo() {
   await TonnesRecycledPage.enterTonnage('10')
@@ -115,11 +116,7 @@ describe('Deleting an in-progress report', () => {
     let reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    let statusBadge = await ReportsPage.getActiveStatusBadge(1)
-    let statusColour = await ReportsPage.getActiveStatusColour(1)
-
-    expect(statusBadge).toBe('Due')
-    expect(statusColour).toBe('orange')
+    await expectActionRequiredStatus(1)
 
     // --- Delete from check your answers page ---
 
@@ -156,11 +153,7 @@ describe('Deleting an in-progress report', () => {
     reportsHeading = await ReportsPage.headingText()
     expect(reportsHeading).toContain('Reports')
 
-    statusBadge = await ReportsPage.getActiveStatusBadge(1)
-    statusColour = await ReportsPage.getActiveStatusColour(1)
-
-    expect(statusBadge).toBe('Due')
-    expect(statusColour).toBe('orange')
+    await expectActionRequiredStatus(1)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
