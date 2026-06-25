@@ -243,7 +243,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // Verify CYA page
       const checkHeading = await ReportCheckAnswersPage.headingText()
       expect(checkHeading).toBe(
-        'Check your answers before creating draft report'
+        'Check your answers before you create this draft report'
       )
 
       // Clean up — delete the report
@@ -294,7 +294,7 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       // --- Check your answers page ---
       const checkHeading = await ReportCheckAnswersPage.headingText()
       expect(checkHeading).toBe(
-        'Check your answers before creating draft report'
+        'Check your answers before you create this draft report'
       )
 
       // Verify data persists to CYA

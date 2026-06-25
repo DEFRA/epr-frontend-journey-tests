@@ -111,7 +111,7 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
 
     // --- Check your answers page ---
     const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
+    expect(checkHeading).toBe('Check your answers before you create this draft report')
 
     // Verify tonnage not exported value and change link present on CYA
     await checkBodyText('5.50', 10)

@@ -89,7 +89,7 @@ describe('Incomplete report submit @incompleteReportBlock', () => {
     await browser.url(`${periodBase}${periodPath}/check-your-answers`)
 
     const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
+    expect(checkHeading).toBe('Check your answers before you create this draft report')
 
     // Click "Create draft report" — BE returns 400, FE surfaces the generic
     // error page. The happy-path confirmation text is absent.

@@ -237,7 +237,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       // --- Check your answers page ---
       const checkHeading = await ReportCheckAnswersPage.headingText()
       expect(checkHeading).toBe(
-        'Check your answers before creating draft report'
+        'Check your answers before you create this draft report'
       )
 
       // Verify PRN revenue persists to CYA
