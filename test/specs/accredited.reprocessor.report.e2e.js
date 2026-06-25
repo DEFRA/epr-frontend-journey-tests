@@ -91,6 +91,11 @@ describe('Accredited reprocessor report flow @accreditedReprocessor', () => {
       await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
     })
 
+    it('should display upload new summary log button and cancel link on detail page @accreditedReprocessorDetailButtons', async () => {
+      await ReportsPage.selectActiveActionLink(1)
+      await ReportDetailPage.verifyDetailPageButtons()
+    })
+
     it('should navigate back correctly through the accredited reprocessor flow @accreditedReprocessorBackLinks', async () => {
       await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()

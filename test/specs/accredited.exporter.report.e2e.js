@@ -85,6 +85,11 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
     })
 
+    it('should display upload new summary log button and cancel link on detail page @accreditedExporterDetailButtons', async () => {
+      await ReportsPage.selectActiveActionLink(1)
+      await ReportDetailPage.verifyDetailPageButtons()
+    })
+
     it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
       await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()

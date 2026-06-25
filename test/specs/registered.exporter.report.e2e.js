@@ -87,7 +87,10 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
 
     await uploadAndNavigateToReports()
 
-    // Start the report — should redirect to tonnes-not-exported
+    // Start the report — verify detail page buttons before proceeding
+    await ReportsPage.selectActiveActionLink(1)
+    await ReportDetailPage.verifyDetailPageButtons()
+
     await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 

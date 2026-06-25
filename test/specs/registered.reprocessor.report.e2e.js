@@ -94,7 +94,10 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
     const setupResponse = await setupRegisteredOnlyReprocessor()
     await uploadAndNavigateToReports()
 
-    // Start the report — verify registration number visible on detail page
+    // Start the report — verify detail page buttons before proceeding
+    await ReportsPage.selectActiveActionLink(1)
+    await ReportDetailPage.verifyDetailPageButtons()
+
     await ReportsPage.selectActiveActionLink(1)
     await checkBodyText(REG_NUMBER, 10)
     await ReportDetailPage.useThisData()

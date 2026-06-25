@@ -12,6 +12,12 @@ class UploadSummaryLogPage {
     )
   }
 
+  async headingText() {
+    const element = await $('h1.govuk-heading-xl')
+    await element.waitForExist({ timeout: 5000 })
+    return await element.getText()
+  }
+
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
