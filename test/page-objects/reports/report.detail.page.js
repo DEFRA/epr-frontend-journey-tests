@@ -19,7 +19,7 @@ class ReportDetailPage {
   }
 
   async uploadNewSummaryLog() {
-    await $('a.govuk-button--secondary').click()
+    await $('a.govuk-button--secondary=Upload new summary log').click()
   }
 
   async cancelAndReturnToReports() {

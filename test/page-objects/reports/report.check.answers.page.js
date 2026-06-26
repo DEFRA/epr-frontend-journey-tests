@@ -17,7 +17,7 @@ class ReportCheckAnswersPage {
   }
 
   async deleteAndStartAgainLink() {
-    await $('a.govuk-button--warning').click()
+    await $('a.govuk-button--warning=Delete and start again').click()
   }
 }
 
