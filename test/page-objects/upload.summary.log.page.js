@@ -3,15 +3,9 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
-import { checkDoubleClickPrevented } from '../support/double-click.js'
+import { summaryLogUploadActions } from './summary-log-upload-actions.js'
 
 class UploadSummaryLogPage {
-  open(orgId, regId) {
-    return browser.url(
-      `/organisations/${orgId}/registrations/${regId}/summary-logs/upload`
-    )
-  }
-
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
@@ -24,15 +18,6 @@ class UploadSummaryLogPage {
     await checkBodyTextDoesNotInclude('Declaration', 10)
     await checkBodyText('Summary log uploaded', 60)
     await this.clickOnReturnToHomePage()
-  }
-
-  async uploadFile(filePath) {
-    const remoteFilePath = await browser.uploadFile(filePath)
-    await $('#summary-log-upload').setValue(remoteFilePath)
-  }
-
-  async continue() {
-    await $('#main-content button[type=submit]').click()
   }
 
   async fileValidatedHeadline() {
@@ -78,19 +63,12 @@ class UploadSummaryLogPage {
     await $('#main-content button[type=submit]').click()
   }
 
-  async confirmAndCheckDoubleClickPrevented() {
-    await checkDoubleClickPrevented('#main-content button[type=submit]', {
-      waitForNavigation: false
-    })
-  }
-
-  async clickOnReturnToHomePage() {
-    await $('a*=Return to home').click()
-  }
-
   async returnToSubmissionPage() {
     await $('#main-content form > div.govuk-button-group > a').click()
   }
 }
+
+// Shared, flag-independent upload-page actions (open/uploadFile/continue/etc.)
+Object.assign(UploadSummaryLogPage.prototype, summaryLogUploadActions)
 
 export default new UploadSummaryLogPage()
