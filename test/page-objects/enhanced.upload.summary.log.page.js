@@ -1,8 +1,8 @@
 import { checkBodyText } from '../support/checks.js'
-import { summaryLogUploadActions } from './summary-log-upload-actions.js'
+import { SummaryLogUploadActions } from './summary-log-upload-actions.js'
 import EnhancedCheckSummaryLogPage from './enhanced.check.summary.log.page.js'
 
-class EnhancedUploadSummaryLogPage {
+class EnhancedUploadSummaryLogPage extends SummaryLogUploadActions {
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
@@ -17,8 +17,5 @@ class EnhancedUploadSummaryLogPage {
     await this.clickOnReturnToHomePage()
   }
 }
-
-// Shared, flag-independent upload-page actions (open/uploadFile/continue/etc.)
-Object.assign(EnhancedUploadSummaryLogPage.prototype, summaryLogUploadActions)
 
 export default new EnhancedUploadSummaryLogPage()

@@ -3,9 +3,9 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
-import { summaryLogUploadActions } from './summary-log-upload-actions.js'
+import { SummaryLogUploadActions } from './summary-log-upload-actions.js'
 
-class UploadSummaryLogPage {
+class UploadSummaryLogPage extends SummaryLogUploadActions {
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
@@ -67,8 +67,5 @@ class UploadSummaryLogPage {
     await $('#main-content form > div.govuk-button-group > a').click()
   }
 }
-
-// Shared, flag-independent upload-page actions (open/uploadFile/continue/etc.)
-Object.assign(UploadSummaryLogPage.prototype, summaryLogUploadActions)
 
 export default new UploadSummaryLogPage()
