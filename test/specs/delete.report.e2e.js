@@ -132,7 +132,9 @@ describe('Deleting an in-progress report', () => {
 
     // On check your answers page — click delete and start again
     const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
+    expect(checkHeading).toBe(
+      'Check your answers before you create this draft report'
+    )
     await ReportCheckAnswersPage.deleteAndStartAgainLink()
 
     // Confirm deletion page — test back link returns to check your answers
@@ -142,7 +144,7 @@ describe('Deleting an in-progress report', () => {
     await ConfirmDeleteReportPage.selectBackLink()
     const backToCheckAnswers = await ReportCheckAnswersPage.headingText()
     expect(backToCheckAnswers).toBe(
-      'Check your answers before creating draft report'
+      'Check your answers before you create this draft report'
     )
 
     // Return to confirm deletion and delete

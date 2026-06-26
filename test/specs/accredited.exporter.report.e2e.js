@@ -85,6 +85,11 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
     })
 
+    it('should display upload new summary log button and cancel link on detail page @accreditedExporterDetailButtons', async () => {
+      await ReportsPage.selectActiveActionLink(1)
+      await ReportDetailPage.verifyDetailPageButtons()
+    })
+
     it('should navigate back correctly through the accredited exporter flow @accreditedExporterBackLinks', async () => {
       await ReportsPage.selectActiveActionLink(1)
       await ReportDetailPage.useThisData()
@@ -232,7 +237,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       // --- Check your answers page ---
       const checkHeading = await ReportCheckAnswersPage.headingText()
       expect(checkHeading).toBe(
-        'Check your answers before creating draft report'
+        'Check your answers before you create this draft report'
       )
 
       // Verify PRN revenue persists to CYA
