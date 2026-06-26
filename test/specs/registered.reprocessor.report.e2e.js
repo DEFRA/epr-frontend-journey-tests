@@ -126,7 +126,9 @@ describe('Registered-only reprocessor report flow @registeredOnlyReprocessor', (
 
     // --- Check your answers page ---
     const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before you create this draft report')
+    expect(checkHeading).toBe(
+      'Check your answers before you create this draft report'
+    )
 
     // Verify recycling activity values displayed (rendered without formatTonnage, so no trailing zero)
     await checkBodyText('12.5', 10)
