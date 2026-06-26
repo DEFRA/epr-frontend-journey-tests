@@ -25,6 +25,7 @@ import {
   switchToNewTab,
   closeCurrentTabAndReturn
 } from '../support/windowtabs.js'
+import { expectActionRequiredStatus } from '../support/report-status.js'
 import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
 import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
 
@@ -145,11 +146,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       let reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      let statusBadge = await ReportsPage.getActiveStatusBadge(1)
-      let statusColour = await ReportsPage.getActiveStatusColour(1)
-
-      expect(statusBadge).toBe('Due')
-      expect(statusColour).toBe('orange')
+      await expectActionRequiredStatus(1)
 
       // --- Create report again, navigate to free-perns, delete from there ---
       await ReportsPage.selectActiveActionLink(1)
@@ -168,11 +165,7 @@ describe('Accredited exporter report flow @accreditedExporter', () => {
       reportsHeading = await ReportsPage.headingText()
       expect(reportsHeading).toContain('Reports')
 
-      statusBadge = await ReportsPage.getActiveStatusBadge(1)
-      statusColour = await ReportsPage.getActiveStatusColour(1)
-
-      expect(statusBadge).toBe('Due')
-      expect(statusColour).toBe('orange')
+      await expectActionRequiredStatus(1)
     })
 
     it('should save and come back later from PRN summary and free PERNs pages @accreditedExporterSave', async () => {

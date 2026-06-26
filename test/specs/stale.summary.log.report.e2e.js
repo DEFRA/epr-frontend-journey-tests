@@ -21,6 +21,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 import seedOverseasSites from '~/test/support/apicalls.js'
+import { expectActionRequiredStatus } from '../support/report-status.js'
 
 const PL_REG = 'R25SR500010912PL'
 const PL_ACC = 'R-ACC12145PL'
@@ -148,11 +149,11 @@ describe('Stale summary log report @staleReport', () => {
       'Your summary log has changed'
     )
 
-    // "Delete and start again" deletes the report and returns to reports with status Due
+    // "Delete and start again" deletes the report and returns to reports with
+    // its un-started action-required status (Due, or Overdue if past due date)
     await SummaryLogChangedErrorPage.deleteAndStartAgain()
     expect(await ReportsPage.headingText()).toContain('Reports')
-    expect(await ReportsPage.getActiveStatusBadge(1)).toBe('Due')
-    expect(await ReportsPage.getActiveStatusColour(1)).toBe('orange')
+    await expectActionRequiredStatus(1)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -189,11 +190,11 @@ describe('Stale summary log report @staleReport', () => {
       'Your summary log has changed'
     )
 
-    // "Delete and start again" deletes the report and returns to reports with status Due
+    // "Delete and start again" deletes the report and returns to reports with
+    // its un-started action-required status (Due, or Overdue if past due date)
     await SummaryLogChangedErrorPage.deleteAndStartAgain()
     expect(await ReportsPage.headingText()).toContain('Reports')
-    expect(await ReportsPage.getActiveStatusBadge(1)).toBe('Due')
-    expect(await ReportsPage.getActiveStatusColour(1)).toBe('orange')
+    await expectActionRequiredStatus(1)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
