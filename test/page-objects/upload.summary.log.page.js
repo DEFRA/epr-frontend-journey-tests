@@ -4,8 +4,10 @@ import {
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
 import { SummaryLogUploadActions } from './summary-log-upload-actions.js'
+import EnhancedCheckSummaryLogPage from './enhanced.check.summary.log.page.js'
 
 class UploadSummaryLogPage extends SummaryLogUploadActions {
+  // TODO: flag switchover - replaced by performUploadAndReturnToHomepageEnhanced below.
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
@@ -16,6 +18,22 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
 
     await checkBodyText('Your waste records are being updated', 30)
     await checkBodyTextDoesNotInclude('Declaration', 10)
+    await checkBodyText('Summary log uploaded', 60)
+    await this.clickOnReturnToHomePage()
+  }
+
+  // The enhanced (CMA) upload flow. Kept live (not commented) so it can't drift;
+  // used by the CMA spec now, becomes performUploadAndReturnToHomepage at switchover.
+  async performUploadAndReturnToHomepageEnhanced(filePath) {
+    await this.uploadFile(filePath)
+    await this.continue()
+
+    await checkBodyText('Your summary log is being checked', 30)
+    await checkBodyText('Upload your summary log', 60)
+
+    await EnhancedCheckSummaryLogPage.upload()
+
+    await checkBodyText('Your waste records are being updated', 30)
     await checkBodyText('Summary log uploaded', 60)
     await this.clickOnReturnToHomePage()
   }

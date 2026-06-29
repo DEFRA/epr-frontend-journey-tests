@@ -1,7 +1,7 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import EnhancedUploadSummaryLogPage from '../page-objects/enhanced.upload.summary.log.page.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText } from '../support/checks.js'
@@ -11,6 +11,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 
+// TODO: flag switchover - remove .skip
 describe.skip('Summary Logs Reprocessor Input (enhanced check page)', () => {
   it('Should be able to link a user to an organisation and submit a spreadsheet @reproInput @enhancedCheck', async () => {
     const organisationDetails = await createLinkedOrganisation([
@@ -90,13 +91,13 @@ describe.skip('Summary Logs Reprocessor Input (enhanced check page)', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await EnhancedUploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/summary-log.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
 
     await checkBodyText('Upload your summary log', 60)
-    await EnhancedUploadSummaryLogPage.confirmAndCheckDoubleClickPrevented()
+    await UploadSummaryLogPage.confirmAndCheckDoubleClickPrevented()
 
     await checkBodyText('Your waste records are being updated', 30)
 
@@ -104,7 +105,7 @@ describe.skip('Summary Logs Reprocessor Input (enhanced check page)', () => {
     await checkBodyText('Your updated waste balance', 10)
     await checkBodyText('391.62 tonnes', 10)
 
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('391.62')

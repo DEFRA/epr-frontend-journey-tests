@@ -1,7 +1,7 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import EnhancedUploadSummaryLogPage from '../page-objects/enhanced.upload.summary.log.page.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
@@ -13,6 +13,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 
+// TODO: flag switchover - remove .skip
 describe.skip('Summary Logs Reprocessor Output (enhanced check page)', () => {
   it('Should be able to submit a (Steel) Reprocessor Output Summary Log spreadsheet (6 rows total, but only 1 added for waste balance) @reproOutput @enhancedCheck', async () => {
     const organisationDetails = await createLinkedOrganisation([
@@ -62,10 +63,8 @@ describe.skip('Summary Logs Reprocessor Output (enhanced check page)', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/reprocessor-output.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/reprocessor-output.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
 
@@ -83,7 +82,7 @@ describe.skip('Summary Logs Reprocessor Output (enhanced check page)', () => {
     await checkBodyText('Your updated waste balance', 10)
     await checkBodyText('3.00 tonnes', 10)
 
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     let availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('3.00')
@@ -97,10 +96,10 @@ describe.skip('Summary Logs Reprocessor Output (enhanced check page)', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/reprocessor-output-adjustments.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
 
@@ -119,7 +118,7 @@ describe.skip('Summary Logs Reprocessor Output (enhanced check page)', () => {
     await checkBodyText('Your updated waste balance', 10)
     await checkBodyText('9.25 tonnes', 10)
 
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     availableWasteBalance = await DashboardPage.availableWasteBalance(1)
     expect(availableWasteBalance).toBe('9.25')

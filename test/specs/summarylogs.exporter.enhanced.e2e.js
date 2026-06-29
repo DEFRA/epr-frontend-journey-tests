@@ -1,7 +1,7 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import EnhancedUploadSummaryLogPage from '../page-objects/enhanced.upload.summary.log.page.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
@@ -14,6 +14,7 @@ import {
   updateMigratedOrganisation
 } from '../support/apicalls.js'
 
+// TODO: flag switchover - remove .skip
 describe.skip('Summary Logs Exporter (enhanced check page)', () => {
   it('Should be able to submit a Exporter Summary Log spreadsheet @exporter @enhancedCheck', async () => {
     const organisationDetails = await createLinkedOrganisation([
@@ -69,8 +70,8 @@ describe.skip('Summary Logs Exporter (enhanced check page)', () => {
 
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await EnhancedUploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -87,7 +88,7 @@ describe.skip('Summary Logs Exporter (enhanced check page)', () => {
     await checkBodyText('Your updated waste balance', 10)
     await checkBodyText('30.00 tonnes', 10)
 
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
 
@@ -101,10 +102,8 @@ describe.skip('Summary Logs Exporter (enhanced check page)', () => {
 
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/exporter-adjustments.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter-adjustments.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -127,7 +126,7 @@ describe.skip('Summary Logs Exporter (enhanced check page)', () => {
     await checkBodyText('Your updated waste balance', 10)
     await checkBodyText('139.00 tonnes', 10)
 
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
 

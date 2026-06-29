@@ -1,7 +1,7 @@
 import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
-import EnhancedUploadSummaryLogPage from '../page-objects/enhanced.upload.summary.log.page.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
@@ -23,6 +23,7 @@ import {
 const ADJUSTED_ACCORDION_MSG =
   /(has|have) all the required summary log data and (has|have) (added to|reduced) your waste balance|(does|do) NOT have all the required summary log data and (has|have) reduced your waste balance/
 
+// TODO: flag switchover - remove .skip
 describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
   // Resets the shared browser session between tests. Without it, leftover auth
   // state makes a later "start now" auto-log-in and skip the stub's user-selection
@@ -78,8 +79,8 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await EnhancedUploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -149,16 +150,14 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     expect(regNo).toExist()
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.performUploadAndReturnToHomepage(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
       'resources/reprocessor-output.xlsx'
     )
 
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/reprocessor-output.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/reprocessor-output.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -228,10 +227,10 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/reprocessor-output-regonly-cma.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -292,7 +291,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.performUploadAndReturnToHomepage(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
       'resources/exporter.xlsx'
     )
 
@@ -311,10 +310,8 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/exporter-adjustments.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter-adjustments.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -433,17 +430,15 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.performUploadAndReturnToHomepage(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
       'resources/exporter.xlsx'
     )
 
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/exporter-adjustments.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter-adjustments.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -543,16 +538,16 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.performUploadAndReturnToHomepage(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
       'resources/reprocessor-output-regonly.xlsx'
     )
 
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/reprocessor-output-regonly-adjustments.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -619,10 +614,10 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await WasteRecordsPage.submitSummaryLogLink()
 
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/reprocessor-output-regonly-cma-2025.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)
@@ -686,7 +681,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.performUploadAndReturnToHomepage(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
       'resources/exporter-2025.xlsx'
     )
 
@@ -705,10 +700,10 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectExportingTab()
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.submitSummaryLogLink()
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/exporter-adjustments-2025.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
     await checkBodyText('Upload your summary log', 60)

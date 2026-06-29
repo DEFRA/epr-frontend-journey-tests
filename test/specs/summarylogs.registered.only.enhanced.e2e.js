@@ -13,9 +13,10 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
-import EnhancedUploadSummaryLogPage from '../page-objects/enhanced.upload.summary.log.page.js'
+import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
 import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
 
+// TODO: flag switchover - remove .skip
 describe.skip('@registered-only (enhanced check page)', () => {
   // Resets the shared browser session between tests. Without it, leftover auth
   // state makes a later "start now" auto-log-in and skip the stub's user-selection
@@ -110,10 +111,10 @@ describe.skip('@registered-only (enhanced check page)', () => {
     await expect(browser).toHaveTitle(
       expect.stringContaining('Summary log: upload')
     )
-    await EnhancedUploadSummaryLogPage.uploadFile(
+    await UploadSummaryLogPage.uploadFile(
       'resources/reprocessor-output-regonly.xlsx'
     )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
 
@@ -125,7 +126,7 @@ describe.skip('@registered-only (enhanced check page)', () => {
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyTextDoesNotInclude('Your updated waste balance', 10)
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await DashboardPage.selectExportingTab()
     const exportRow = await DashboardPage.getTableRow(1, 1)
@@ -184,10 +185,8 @@ describe.skip('@registered-only (enhanced check page)', () => {
       expect.stringContaining('Summary log: upload')
     )
 
-    await EnhancedUploadSummaryLogPage.uploadFile(
-      'resources/exporter-regonly.xlsx'
-    )
-    await EnhancedUploadSummaryLogPage.continue()
+    await UploadSummaryLogPage.uploadFile('resources/exporter-regonly.xlsx')
+    await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
 
@@ -199,7 +198,7 @@ describe.skip('@registered-only (enhanced check page)', () => {
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyTextDoesNotInclude('Your updated waste balance', 10)
-    await EnhancedUploadSummaryLogPage.clickOnReturnToHomePage()
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
