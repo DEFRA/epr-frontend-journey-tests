@@ -1,9 +1,8 @@
 import { browser, $ } from '@wdio/globals'
 import { checkDoubleClickPrevented } from '../support/double-click.js'
 
-// Flag-independent upload-page actions shared by the legacy and enhanced upload
-// page objects: the upload page itself is unchanged by the flag (only the check
-// page after it differs), so these primitives live here rather than duplicated.
+// Flag-independent upload-page primitives for UploadSummaryLogPage: the upload
+// page itself is unchanged by the flag (only the check page after it differs).
 // A base class (not Object.assign) so the type-checker sees the inherited methods.
 export class SummaryLogUploadActions {
   open(orgId, regId) {
