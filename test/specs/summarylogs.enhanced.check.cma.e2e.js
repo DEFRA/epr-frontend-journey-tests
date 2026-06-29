@@ -349,6 +349,12 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       '1 change is NOT relevant to your waste balance'
     )
 
+    // Guard on the projection (renders last, at page bottom) so the raw read
+    // below isn't taken mid-parse; the expect()s keep the value diagnostics.
+    await checkBodyText(
+      'If you upload this summary log to create a new report, your waste balance will be 139.00 (from 30.00)',
+      10
+    )
     const bodyText = await browser.execute(() => document.body.innerText)
     // Open and closed new-loads sections each render their own caption, so two
     // "new loads will add" lines are expected here, not one.
@@ -467,6 +473,12 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       '1 change is NOT relevant to your waste balance'
     )
 
+    // Guard on the projection (renders last, at page bottom) so the raw read
+    // below isn't taken mid-parse; the expect()s keep the value diagnostics.
+    await checkBodyText(
+      'If you upload this summary log to create a new report, your waste balance will be 139.00 (from 30.00)',
+      10
+    )
     const bodyText = await browser.execute(() => document.body.innerText)
     expect(bodyText).toContain(
       'The new loads will add 99.00 tonnes to your waste balance.'
@@ -715,6 +727,12 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       '1 adjusted load will be recorded (and will reflect in your waste balance)'
     )
 
+    // Guard on the projection (renders last, at page bottom) so the raw read
+    // below isn't taken mid-parse; the expect()s keep the value diagnostics.
+    await checkBodyText(
+      'If you upload this summary log to create a new report, your waste balance will be 139.00 (from 30.00)',
+      10
+    )
     const bodyText = await browser.execute(() => document.body.innerText)
     expect(bodyText).toContain(
       'The new loads will add 99.00 tonnes to your waste balance.'
