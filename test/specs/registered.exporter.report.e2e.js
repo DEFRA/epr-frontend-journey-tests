@@ -87,7 +87,10 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
 
     await uploadAndNavigateToReports()
 
-    // Start the report — should redirect to tonnes-not-exported
+    // Start the report — verify detail page buttons before proceeding
+    await ReportsPage.selectActiveActionLink(1)
+    await ReportDetailPage.verifyDetailPageButtons()
+
     await ReportsPage.selectActiveActionLink(1)
     await ReportDetailPage.useThisData()
 
@@ -108,7 +111,9 @@ describe('Registered-only exporter report flow @registeredOnlyExporter', () => {
 
     // --- Check your answers page ---
     const checkHeading = await ReportCheckAnswersPage.headingText()
-    expect(checkHeading).toBe('Check your answers before creating draft report')
+    expect(checkHeading).toBe(
+      'Check your answers before you create this draft report'
+    )
 
     // Verify tonnage not exported value and change link present on CYA
     await checkBodyText('5.50', 10)
