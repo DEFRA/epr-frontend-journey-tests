@@ -66,9 +66,15 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await checkBodyText('Your summary log is being checked', 30)
 
+    // TODO: flag switchover - remove the legacy check-page assertions below
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('1 new load will be added to your waste balance', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
+    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
+    // await checkBodyText('Upload your summary log', 60)
+    // await checkBodyText('Open periods: new loads', 30)
+    // await checkBodyText('1 new load will be recorded (and will add to your waste balance)', 30)
+    // await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 
@@ -97,6 +103,7 @@ describe('Summary Logs Reprocessor Output', () => {
 
     await checkBodyText('Your summary log is being checked', 30)
 
+    // TODO: flag switchover - remove the legacy check-page assertions below
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText(
       '1 adjusted load will be reflected in your waste balance',
@@ -104,6 +111,11 @@ describe('Summary Logs Reprocessor Output', () => {
     )
 
     await UploadSummaryLogPage.confirmAndSubmit()
+    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
+    // await checkBodyText('Upload your summary log', 60)
+    // await checkBodyText('Open periods: adjusted loads', 30)
+    // await checkBodyText('1 adjusted load will be recorded (and will reflect in your waste balance)', 30)
+    // await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 

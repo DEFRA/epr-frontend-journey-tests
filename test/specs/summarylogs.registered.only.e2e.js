@@ -108,12 +108,20 @@ describe('@registered-only', () => {
 
     await checkBodyText('Your summary log is being checked', 30)
 
+    // TODO: flag switchover - remove the legacy check-page assertions below
+    //   (the 'Loads received/sent on' breakdown has no enhanced equivalent)
     await checkBodyText('Check before confirming upload', 30)
     await checkBodyText('Check the following before confirming the upload.', 30)
     await checkBodyText('Loads received', 30)
     await checkBodyText('Loads sent on', 30)
     await checkBodyText('new loads have been added', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
+    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
+    // await checkBodyText('Upload your summary log', 60)
+    // await checkBodyText('Open periods: new loads', 30)
+    // await checkBodyText('new loads will be recorded', 30)
+    // await checkBodyText('These have been added to your summary log.', 30)
+    // await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyTextDoesNotInclude('Your updated waste balance', 10)
@@ -181,6 +189,8 @@ describe('@registered-only', () => {
 
     await checkBodyText('Your summary log is being checked', 30)
 
+    // TODO: flag switchover - remove the legacy check-page assertions below
+    //   (the 'Loads received/exported/sent on' breakdown has no enhanced equivalent)
     await checkBodyText('Check before confirming upload', 60)
     await checkBodyText('Check the following before confirming the upload.', 30)
     await checkBodyText('Loads received', 30)
@@ -188,6 +198,12 @@ describe('@registered-only', () => {
     await checkBodyText('Loads sent on', 30)
     await checkBodyText('new loads have been added', 30)
     await UploadSummaryLogPage.confirmAndSubmit()
+    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
+    // await checkBodyText('Upload your summary log', 60)
+    // await checkBodyText('Open periods: new loads', 30)
+    // await checkBodyText('new loads will be recorded', 30)
+    // await checkBodyText('These have been added to your summary log.', 30)
+    // await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Summary log uploaded', 30)
     await checkBodyTextDoesNotInclude('Your updated waste balance', 10)

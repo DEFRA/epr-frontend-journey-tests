@@ -3,21 +3,17 @@ import {
   checkBodyText,
   checkBodyTextDoesNotInclude
 } from '../support/checks.js'
-import { checkDoubleClickPrevented } from '../support/double-click.js'
+import { SummaryLogUploadActions } from './summary-log-upload-actions.js'
+import EnhancedCheckSummaryLogPage from './enhanced.check.summary.log.page.js'
 
-class UploadSummaryLogPage {
-  open(orgId, regId) {
-    return browser.url(
-      `/organisations/${orgId}/registrations/${regId}/summary-logs/upload`
-    )
-  }
-
+class UploadSummaryLogPage extends SummaryLogUploadActions {
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
     await element.waitForExist({ timeout: 5000 })
     return await element.getText()
   }
 
+  // TODO: flag switchover - replaced by performUploadAndReturnToHomepageEnhanced below.
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
@@ -32,13 +28,20 @@ class UploadSummaryLogPage {
     await this.clickOnReturnToHomePage()
   }
 
-  async uploadFile(filePath) {
-    const remoteFilePath = await browser.uploadFile(filePath)
-    await $('#summary-log-upload').setValue(remoteFilePath)
-  }
+  // The enhanced (CMA) upload flow. Kept live (not commented) so it can't drift;
+  // used by the CMA spec now, becomes performUploadAndReturnToHomepage at switchover.
+  async performUploadAndReturnToHomepageEnhanced(filePath) {
+    await this.uploadFile(filePath)
+    await this.continue()
 
-  async continue() {
-    await $('#main-content button[type=submit]').click()
+    await checkBodyText('Your summary log is being checked', 30)
+    await checkBodyText('Upload your summary log', 60)
+
+    await EnhancedCheckSummaryLogPage.upload()
+
+    await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyText('Summary log uploaded', 60)
+    await this.clickOnReturnToHomePage()
   }
 
   async fileValidatedHeadline() {
@@ -82,16 +85,6 @@ class UploadSummaryLogPage {
 
   async confirmAndSubmit() {
     await $('#main-content button[type=submit]').click()
-  }
-
-  async confirmAndCheckDoubleClickPrevented() {
-    await checkDoubleClickPrevented('#main-content button[type=submit]', {
-      waitForNavigation: false
-    })
-  }
-
-  async clickOnReturnToHomePage() {
-    await $('a*=Return to home').click()
   }
 
   async returnToSubmissionPage() {

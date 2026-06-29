@@ -464,6 +464,71 @@ export async function unsubmitReport(
   await assertSuccessResponseWithoutBody(response, `POST ${unsubmitEndpoint}`)
 }
 
+/**
+ * Submits a report for a period so that period counts as "closed" — the
+ * precondition for closed-month-adjustment detection in the enhanced check page.
+ *
+ * Drives the same create -> patch -> ready_to_submit -> submitted state machine
+ * as the backend tests. Optimistic-concurrency version increments on every write,
+ * so the write count is fixed (see the inline `version 2/3` notes).
+ *
+ * patchFields must satisfy the operator's completeness check (assertReportComplete
+ * gates submit) — e.g. { tonnageRecycled, tonnageNotRecycled } for registered-only.
+ *
+ * Auth: report endpoints need the linked Defra ID user's bearer token
+ * (defraIdStub.authHeader), NOT the service AuthClient (which 403s) — so
+ * linkDefraIdUser must run first.
+ */
+export async function seedSubmittedReport(
+  organisationId,
+  registrationId,
+  userId,
+  year,
+  cadence,
+  period,
+  submissionNumber,
+  patchFields
+) {
+  const eprBackend = new EprBackend()
+  const authHeader = defraIdStub.authHeader(userId)
+
+  const reportPath = `/v1/organisations/${organisationId}/registrations/${registrationId}/reports/${year}/${cadence}/${period}/submissions/${submissionNumber}`
+  const statusPath = `${reportPath}/status`
+
+  const createResponse = await eprBackend.post(reportPath, '', authHeader)
+  await assertSuccessResponse(createResponse, `POST ${reportPath} (create)`)
+
+  const patchResponse = await eprBackend.patch(
+    reportPath,
+    JSON.stringify(patchFields),
+    authHeader
+  )
+  await assertSuccessResponse(patchResponse, `PATCH ${reportPath}`)
+
+  // version 2: the report is at v2 after create (v1) + patch (v2)
+  const readyResponse = await eprBackend.post(
+    statusPath,
+    JSON.stringify({ status: 'ready_to_submit', version: 2 }),
+    authHeader
+  )
+  await assertSuccessResponse(
+    readyResponse,
+    `POST ${statusPath} (ready_to_submit)`
+  )
+
+  // version 3: ready_to_submit produced v3
+  const submitResponse = await eprBackend.post(
+    statusPath,
+    JSON.stringify({
+      status: 'submitted',
+      version: 3,
+      submissionDeclaredBy: 'Test User'
+    }),
+    authHeader
+  )
+  await assertSuccessResponse(submitResponse, `POST ${statusPath} (submitted)`)
+}
+
 export async function externalAPICancelPrn(prnDetails) {
   await config.cognitoAuth.generateToken()
 
