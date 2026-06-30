@@ -450,10 +450,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  // TODO: flag switchover - unskip once FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES
-  // is permanently on. The ORS_NOT_FOUND warning only renders on the enhanced check
-  // page, which is currently behind that flag (default on locally, off elsewhere).
-  it.skip('Should warn on the enhanced check page when an OSR_ID has no matching overseas site @orsNotFound', async () => {
+  it('Should warn on the enhanced check page when an OSR_ID has no matching overseas site @orsNotFound', async () => {
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
     ])
