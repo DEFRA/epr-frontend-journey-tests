@@ -23,8 +23,7 @@ import {
 const ADJUSTED_ACCORDION_MSG =
   /(has|have) all the required summary log data and (has|have) (added to|reduced) your waste balance|(does|do) NOT have all the required summary log data and (has|have) reduced your waste balance/
 
-// TODO: flag switchover - remove .skip
-describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
+describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
   // Resets the shared browser session between tests. Without it, leftover auth
   // state makes a later "start now" auto-log-in and skip the stub's user-selection
   // page, so loginViaEmail times out (passes solo, fails in suite). deleteCookies
@@ -150,7 +149,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     expect(regNo).toExist()
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
       'resources/reprocessor-output.xlsx'
     )
 
@@ -291,7 +290,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
       'resources/exporter.xlsx'
     )
 
@@ -430,7 +429,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
       'resources/exporter.xlsx'
     )
 
@@ -538,7 +537,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
       'resources/reprocessor-output-regonly.xlsx'
     )
 
@@ -681,7 +680,7 @@ describe.skip('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await DashboardPage.selectLink(1)
 
     await WasteRecordsPage.submitSummaryLogLink()
-    await UploadSummaryLogPage.performUploadAndReturnToHomepageEnhanced(
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
       'resources/exporter-2025.xlsx'
     )
 
