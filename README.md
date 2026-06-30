@@ -134,17 +134,24 @@ Three-way discipline: legacy-only behaviour goes behind `else` / skip-when-on,
 new-only behaviour behind `if` / skip-when-off, and shared behaviour stays
 unguarded so it runs in both passes.
 
-**Run-twice matrix.** `check-pull-request.yml` runs the suite once per flag
-state. Each pass exports its flag value to both the container and the runner, so
-the flag-off pass exercises the legacy plus shared behaviour and the flag-on
-pass exercises the new plus shared behaviour.
+**Named matrix passes.** `check-pull-request.yml` runs the suite once per named
+entry in `matrix.include`. A permanent `baseline` entry runs every flag off,
+mirroring prod and covering the shared plus legacy behaviour. Each in-flight
+flag adds one entry that turns only itself on. Each pass exports its flag values
+to both the container and the runner, so the flag-on entry exercises the new
+plus shared behaviour. Cost is linear (`N + 1` passes for `N` flags), not the
+Cartesian blow-up you would get from a second matrix axis. One-hot does not
+exercise two flags on at once: that is the right default because flags gate
+independent features, and you add one explicit combined entry only when two
+genuinely interact.
 
 **Switchover payoff.** Turning the flag on in production is one line in the prod
-env file, with zero test changes (both passes stay green). Retiring the flag
-later is mechanical: every flag-specific site is an `if`/`else`, an `it.skip`, or
-the `flags.<key>` line. Drop the env var wherever it is set, then grep
-`flags.<key>` and delete. The cleanup is decoupled from the prod flip and never
-blocks it.
+env file, with zero test changes (every pass stays green). Retiring the flag
+later is mechanical and decoupled from the prod flip: drop the env var wherever
+it is set, delete the flag's `matrix.include` entry, then remove its `flags.js`
+line and grep `flags.<key>` to delete the now-dead branches. The matrix itself
+stays put: `baseline` always lives there, so when no flags are in flight the
+suite is a single `baseline` run and adding the next flag is a one-entry edit.
 
 ## Production
 
