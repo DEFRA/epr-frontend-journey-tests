@@ -142,9 +142,9 @@ pass exercises the new plus shared behaviour.
 **Switchover payoff.** Turning the flag on in production is one line in the prod
 env file, with zero test changes (both passes stay green). Retiring the flag
 later is mechanical: every flag-specific site is an `if`/`else`, an `it.skip`, or
-the `flags.<key>` line. Use the `/remove-flag` skill to drop the var across
-repos, then grep `flags.<key>` and delete. The cleanup is decoupled from the
-prod flip and never blocks it.
+the `flags.<key>` line. Drop the env var wherever it is set, then grep
+`flags.<key>` and delete. The cleanup is decoupled from the prod flip and never
+blocks it.
 
 ## Production
 
