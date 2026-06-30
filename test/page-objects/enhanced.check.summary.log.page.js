@@ -27,7 +27,7 @@ class EnhancedCheckSummaryLogPage {
   }
 
   async upload() {
-    await $('button[type="submit"]').click()
+    await $('#main-content button[type=submit]').click()
   }
 }
 

@@ -77,10 +77,6 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
     })
   }
 
-  async confirmAndSubmit() {
-    await $('#main-content button[type=submit]').click()
-  }
-
   async returnToSubmissionPage() {
     await $('#main-content form > div.govuk-button-group > a').click()
   }
