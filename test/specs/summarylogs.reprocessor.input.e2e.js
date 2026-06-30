@@ -95,10 +95,7 @@ describe('Summary Logs Reprocessor Input', () => {
 
     await checkBodyText('Your summary log is being checked', 30)
 
-    // TODO: flag switchover - remove the legacy assertion below
-    await checkBodyText('Check before confirming upload', 60)
-    // TODO: flag switchover - uncomment the enhanced assertion below
-    // await checkBodyText('Upload your summary log', 60)
+    await checkBodyText('Upload your summary log', 60)
     await UploadSummaryLogPage.confirmAndCheckDoubleClickPrevented()
 
     await checkBodyText('Your waste records are being updated', 30)

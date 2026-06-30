@@ -2,6 +2,7 @@ import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
+import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText } from '../support/checks.js'
@@ -72,15 +73,13 @@ describe('Summary Logs Exporter', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
-    // TODO: flag switchover - remove the legacy check-page assertions below
-    await checkBodyText('Check before confirming upload', 60)
-    await checkBodyText('2 new loads will be added to your waste balance', 10)
-    await UploadSummaryLogPage.confirmAndSubmit()
-    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
-    // await checkBodyText('Upload your summary log', 60)
-    // await checkBodyText('Open periods: new loads', 30)
-    // await checkBodyText('2 new loads will be recorded (and will add to your waste balance)', 30)
-    // await EnhancedCheckSummaryLogPage.upload()
+    await checkBodyText('Upload your summary log', 60)
+    await checkBodyText('Open periods: new loads', 30)
+    await checkBodyText(
+      '2 new loads will be recorded (and will add to your waste balance)',
+      30
+    )
+    await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 
@@ -106,22 +105,18 @@ describe('Summary Logs Exporter', () => {
     await UploadSummaryLogPage.continue()
 
     await checkBodyText('Your summary log is being checked', 30)
-    // TODO: flag switchover - remove the legacy check-page assertions below
-    await checkBodyText('Check before confirming upload', 60)
-    await checkBodyText('3 new loads will be added to your waste balance', 10)
+    await checkBodyText('Upload your summary log', 60)
+    await checkBodyText('Open periods: new loads', 30)
     await checkBodyText(
-      '2 adjusted loads will be reflected in your waste balance',
-      10
+      '3 new loads will be recorded (and will add to your waste balance)',
+      30
     )
-
-    await UploadSummaryLogPage.confirmAndSubmit()
-    // TODO: flag switchover - uncomment the enhanced check-page assertions below (and import EnhancedCheckSummaryLogPage)
-    // await checkBodyText('Upload your summary log', 60)
-    // await checkBodyText('Open periods: new loads', 30)
-    // await checkBodyText('3 new loads will be recorded (and will add to your waste balance)', 30)
-    // await checkBodyText('Open periods: adjusted loads', 30)
-    // await checkBodyText('1 adjusted load will be recorded (and will reflect in your waste balance)', 30)
-    // await EnhancedCheckSummaryLogPage.upload()
+    await checkBodyText('Open periods: adjusted loads', 30)
+    await checkBodyText(
+      '1 adjusted load will be recorded (and will reflect in your waste balance)',
+      30
+    )
+    await EnhancedCheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 

@@ -1,8 +1,5 @@
 import { browser, $, $$ } from '@wdio/globals'
-import {
-  checkBodyText,
-  checkBodyTextDoesNotInclude
-} from '../support/checks.js'
+import { checkBodyText } from '../support/checks.js'
 import { SummaryLogUploadActions } from './summary-log-upload-actions.js'
 import EnhancedCheckSummaryLogPage from './enhanced.check.summary.log.page.js'
 
@@ -13,24 +10,9 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
     return await element.getText()
   }
 
-  // TODO: flag switchover - replaced by performUploadAndReturnToHomepageEnhanced below.
+  // The enhanced (CMA) upload flow, now the only check page after the
+  // FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES switchover.
   async performUploadAndReturnToHomepage(filePath) {
-    await this.uploadFile(filePath)
-    await this.continue()
-
-    await checkBodyText('Your summary log is being checked', 30)
-    await checkBodyText('Check before confirming upload', 60)
-    await this.confirmAndSubmit()
-
-    await checkBodyText('Your waste records are being updated', 30)
-    await checkBodyTextDoesNotInclude('Declaration', 10)
-    await checkBodyText('Summary log uploaded', 60)
-    await this.clickOnReturnToHomePage()
-  }
-
-  // The enhanced (CMA) upload flow. Kept live (not commented) so it can't drift;
-  // used by the CMA spec now, becomes performUploadAndReturnToHomepage at switchover.
-  async performUploadAndReturnToHomepageEnhanced(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
 
@@ -93,10 +75,6 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
         details.setAttribute('open', '')
       })
     })
-  }
-
-  async confirmAndSubmit() {
-    await $('#main-content button[type=submit]').click()
   }
 
   async returnToSubmissionPage() {
