@@ -13,7 +13,8 @@ import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
   updateMigratedOrganisation,
-  linkDefraIdUser
+  linkDefraIdUser,
+  seedOverseasSites
 } from '../support/apicalls.js'
 
 describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
@@ -443,6 +444,82 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       'Sorry, there is a problem with the service - try again later',
       60
     )
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  // TODO: flag switchover - unskip once FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES
+  // is permanently on. The ORS_NOT_FOUND warning only renders on the enhanced check
+  // page, which is currently behind that flag (default on locally, off elsewhere).
+  it.skip('Should warn on the enhanced check page when an OSR_ID has no matching overseas site @orsNotFound', async () => {
+    const organisationDetails = await createLinkedOrganisation([
+      { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          regNumber: 'E25SR500030913PA',
+          accNumber: 'ACC234567',
+          status: 'approved',
+          // Matches the happy-path exporter setup so the file's rows fall inside
+          // the accreditation period and reach the ORS check (rather than being
+          // ignored as OUTSIDE_ACCREDITATION_PERIOD).
+          validFrom: '2025-02-02'
+        }
+      ]
+    )
+
+    // The file's export rows use OSR IDs 124, 439 and 512; seed an overseas site
+    // under 999 so none of them match. ORS validation is always on for exporters,
+    // so each unmatched row is excluded as ORS_NOT_FOUND (not silently dropped).
+    await seedOverseasSites(organisationDetails.refNo, [0], [999])
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    await DashboardPage.selectLink(1)
+    await WasteRecordsPage.submitSummaryLogLink()
+
+    await UploadSummaryLogPage.uploadFile(
+      'resources/exporter-ors-not-found.xlsx'
+    )
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your summary log is being checked', 30)
+    await checkBodyText(
+      'Your summary log data has been checked and is now ready for you to upload',
+      60
+    )
+    await checkBodyText(
+      'new loads will be recorded (but will NOT add to your waste balance)',
+      10
+    )
+
+    await UploadSummaryLogPage.expandLoadsList()
+    await checkBodyText(
+      'The OSR_ID has no matching overseas site registration',
+      10
+    )
+
+    await UploadSummaryLogPage.confirmAndSubmit()
+    await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyText('Summary log uploaded', 60)
+
+    await UploadSummaryLogPage.clickOnReturnToHomePage()
+    const availableWasteBalance = await DashboardPage.availableWasteBalance(1)
+    expect(availableWasteBalance).toBe('0.00')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

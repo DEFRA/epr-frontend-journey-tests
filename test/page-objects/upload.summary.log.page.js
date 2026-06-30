@@ -83,6 +83,18 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
     })
   }
 
+  async expandLoadsList() {
+    // Excluded/non-balance-affecting loads render inside govuk-details
+    // accordions, so their per-row reason text is only in innerText when open.
+    // Force every accordion open (idempotent — avoids toggling closed any that
+    // already default to open).
+    await browser.execute(() => {
+      document.querySelectorAll('details.govuk-details').forEach((details) => {
+        details.setAttribute('open', '')
+      })
+    })
+  }
+
   async confirmAndSubmit() {
     await $('#main-content button[type=submit]').click()
   }
