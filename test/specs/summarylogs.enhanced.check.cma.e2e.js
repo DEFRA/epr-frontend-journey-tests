@@ -17,6 +17,7 @@ import {
   updateMigratedOrganisation,
   seedSubmittedReport
 } from '../support/apicalls.js'
+import { flags } from '../support/flags.js'
 
 // The adjusted-loads accordion message varies by singular/plural and by whether
 // the load added to or reduced the balance, so it stays a pattern, not an exact string.
@@ -240,6 +241,16 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     ).join(' | ')
     expect(subStates).toContain('8 new loads will be recorded')
     await checkBodyText('These have been added to your summary log.', 30)
+
+    // Same journey, divergent assertion (idiom a): the closed-period
+    // resubmission banner renders on this page only when closed-period changes
+    // are present AND the flag is on. The flag selects whether we assert the
+    // banner's presence or its absence, so each matrix pass pins one state and
+    // the flag-off "banner absent" assertion can never go stale on the flip.
+    const assertResubmissionBanner = flags.closedPeriodAdjustments
+      ? checkBodyText
+      : checkBodyTextDoesNotInclude
+    await assertResubmissionBanner('resubmit it to your regulator', 10)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))

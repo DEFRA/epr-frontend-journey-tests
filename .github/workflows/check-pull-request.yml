@@ -68,9 +68,16 @@ jobs:
         run: docker build .
 
   tests:
-    name: Run Journey Tests
+    name: Run Journey Tests (closed-period adjustments=${{ matrix.closed-period-adjustments }})
     runs-on: ubuntu-latest
     needs: pr-prep
+    # Run-twice matrix: the suite runs once per flag state so both the flag-off
+    # and flag-on behaviours stay covered. See test/support/flags.js and the
+    # README "Feature flags in journey tests". Both legs are blocking gates.
+    strategy:
+      fail-fast: false
+      matrix:
+        closed-period-adjustments: ['false', 'true']
     steps:
       - name: Checkout journey-tests repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -80,3 +87,4 @@ jobs:
         with:
           branch: ${{ github.head_ref }}
           journey-test-pr: true
+          feature-flag-closed-period-adjustments: ${{ matrix.closed-period-adjustments }}

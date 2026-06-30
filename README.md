@@ -95,6 +95,57 @@ WDIO_CHROME_VERSION=146.0.7680.154 npm run test:local:grep
 npm run test:local:debug
 ```
 
+### Feature flags in journey tests
+
+When behaviour sits behind a feature flag, a single-mode run can only ever cover
+one state. The other state goes untested, and any assertion written for the
+current state (for example "this banner is absent") silently becomes wrong the
+moment the flag flips. This suite keeps both states covered at once and makes
+the production switchover config-only, with no test churn.
+
+**Single source of truth.** `test/support/flags.js` reads each `FEATURE_FLAG_*`
+env var, one line per active flag. No flag string appears anywhere else in test
+code: branch on `flags.<key>` instead. Every key must map to a real
+`FEATURE_FLAG_*` var that is exported into both the frontend container and the
+wdio runner: no test-only invented flags.
+
+```js
+import { flags } from '../support/flags.js'
+```
+
+**The flag cannot drift from app behaviour.** The `run-journey-tests` action
+writes the flag value to `$GITHUB_ENV` once, so the same value reaches both the
+frontend container (via `compose.yml` interpolation) and the runner process (via
+`process.env`). That single write is the only plumbing the convention needs.
+
+**Two branching idioms, both through `flags`:**
+
+- _Same journey, different assertions_ — branch on `flags.x` where the pages
+  diverge. When the difference is a single assertion (present vs absent), let
+  the flag pick the assertion verb rather than writing an `if`/`else`: see the
+  closed-period banner check in `summarylogs.enhanced.check.cma.e2e.js`. Reach
+  for an inline `if (flags.x) { ... } else { ... }` only when several statements
+  diverge.
+- _Whole scenario added or removed_ — swap `describe`/`describe.skip` (or
+  `it`/`it.skip`), e.g. `;(flags.x ? describe : describe.skip)('new flow', ...)`.
+  Skipped specs show as skipped in Allure, not silently absent.
+
+Three-way discipline: legacy-only behaviour goes behind `else` / skip-when-on,
+new-only behaviour behind `if` / skip-when-off, and shared behaviour stays
+unguarded so it runs in both passes.
+
+**Run-twice matrix.** `check-pull-request.yml` runs the suite once per flag
+state. Each pass exports its flag value to both the container and the runner, so
+the flag-off pass exercises the legacy plus shared behaviour and the flag-on
+pass exercises the new plus shared behaviour.
+
+**Switchover payoff.** Turning the flag on in production is one line in the prod
+env file, with zero test changes (both passes stay green). Retiring the flag
+later is mechanical: every flag-specific site is an `if`/`else`, an `it.skip`, or
+the `flags.<key>` line. Use the `/remove-flag` skill to drop the var across
+repos, then grep `flags.<key>` and delete. The cleanup is decoupled from the
+prod flip and never blocks it.
+
 ## Production
 
 ### Running the tests

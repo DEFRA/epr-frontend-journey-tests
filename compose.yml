@@ -235,6 +235,11 @@ services:
       DEFRA_ID_OIDC_CONFIGURATION_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
+      # Dual-exported with the wdio runner by the run-journey-tests action: the
+      # CI matrix sets this once per pass so the app behaviour and the test view
+      # of the flag stay in lockstep. Defaults to the image default (off) for a
+      # plain `docker compose up`. See test/support/flags.js.
+      FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-false}
       FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES: true
       NODE_ENV: development
       PORT: 3000
