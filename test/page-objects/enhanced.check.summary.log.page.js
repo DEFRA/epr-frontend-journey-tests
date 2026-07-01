@@ -29,6 +29,12 @@ class EnhancedCheckSummaryLogPage {
   async upload() {
     await $('#main-content button[type=submit]').click()
   }
+
+  // The PAE-1648 "Important" notification banner shown when the upload contains
+  // closed-period adjustments. Guarded behind FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS.
+  importantBanner() {
+    return $('.govuk-notification-banner')
+  }
 }
 
 export default new EnhancedCheckSummaryLogPage()

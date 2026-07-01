@@ -80,6 +80,13 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
   async returnToSubmissionPage() {
     await $('#main-content form > div.govuk-button-group > a').click()
   }
+
+  // The "Go to reports" button in the success page's "Further action needed"
+  // section. A PAE-1648 addition, shown only when the upload contains
+  // closed-period adjustments (FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS).
+  goToReportsButton() {
+    return $('a.govuk-button*=Go to reports')
+  }
 }
 
 export default new UploadSummaryLogPage()
