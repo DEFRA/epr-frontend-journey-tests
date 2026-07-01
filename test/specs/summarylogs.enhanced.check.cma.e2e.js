@@ -45,7 +45,7 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await browser.reloadSession()
   })
 
-  it('should not display closed period sections when uploading loads only to open periods @noClosedSection @enhancedCheck @cma', async () => {
+  it('should not display closed period sections or closed-period messaging when uploading loads only to open periods @noClosedSection @closedPeriodMessaging @enhancedCheck @cma', async () => {
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' },
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
@@ -115,6 +115,21 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await checkBodyTextDoesNotInclude('Closed periods: new loads', 5)
     await checkBodyTextDoesNotInclude('Closed periods: adjusted loads', 5)
+
+    expect(
+      await EnhancedCheckSummaryLogPage.importantBanner().isExisting()
+    ).toBe(false)
+    await checkBodyTextDoesNotInclude(IMPORTANT_BODY, 5)
+
+    await EnhancedCheckSummaryLogPage.upload()
+
+    await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyText('Summary log uploaded', 60)
+
+    await checkBodyTextDoesNotInclude(FURTHER_ACTION_HEADING, 5)
+    expect(await UploadSummaryLogPage.goToReportsButton().isExisting()).toBe(
+      false
+    )
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -189,7 +204,7 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('should display the closed period section when CMAs are detected @cmaDetected @enhancedCheck @cma', async () => {
+  it('should display the closed period section and closed-period messaging when CMAs are detected @cmaDetected @closedPeriodMessaging @enhancedCheck @cma', async () => {
     const organisationDetails = await createLinkedOrganisation([
       {
         material: 'Paper or board (R3)',
@@ -253,6 +268,32 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     ).join(' | ')
     expect(subStates).toContain('8 new loads will be recorded')
     await checkBodyText('These have been added to your summary log.', 30)
+
+    const banner = await EnhancedCheckSummaryLogPage.importantBanner()
+    expect(await banner.isExisting()).toBe(true)
+    const bannerText = await banner.getText()
+    expect(bannerText).toContain('Important')
+    expect(bannerText).toContain(IMPORTANT_BODY)
+
+    // Submit inline (not performUploadAndReturnToHomepage, which would click
+    // "Return to home" and skip the success-page assertions below).
+    await EnhancedCheckSummaryLogPage.upload()
+
+    await checkBodyText('Your waste records are being updated', 30)
+    await checkBodyText('Summary log uploaded', 60)
+
+    await checkBodyText(FURTHER_ACTION_HEADING, 10)
+    await checkBodyText(FURTHER_ACTION_PARA_1, 5)
+    await checkBodyText(FURTHER_ACTION_PARA_2, 5)
+    await checkBodyText(FURTHER_ACTION_PARA_3, 5)
+    expect(await UploadSummaryLogPage.goToReportsButton().isExisting()).toBe(
+      true
+    )
+    expect(
+      await UploadSummaryLogPage.goToReportsButton().getAttribute('href')
+    ).toBe(
+      `/organisations/${organisationDetails.refNo}/registrations/${regId}/reports`
+    )
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
@@ -753,176 +794,6 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await checkBodyTextDoesNotInclude('Open periods: new loads', 5)
     await checkBodyTextDoesNotInclude('Open periods: adjusted loads', 5)
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should show the Important banner and Further action needed messaging when closed-period adjustments are detected @closedPeriodMessaging @enhancedCheck @cma', async () => {
-    const organisationDetails = await createLinkedOrganisation([
-      {
-        material: 'Paper or board (R3)',
-        wasteProcessingType: 'Reprocessor',
-        withoutAccreditation: true
-      }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber: 'R25SR500040912PA',
-          status: 'approved',
-          withoutAccreditation: true
-        }
-      ]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    const regId = migrationResponse.registrationIds[0]
-
-    // Close Q1 2026 by seeding a submitted report, so the upload below lands in
-    // an already-reported (closed) period and triggers the messaging.
-    await seedSubmittedReport(
-      organisationDetails.refNo,
-      regId,
-      user.userId,
-      2026,
-      'quarterly',
-      1,
-      1,
-      { tonnageRecycled: 100, tonnageNotRecycled: 0 }
-    )
-
-    await HomePage.open()
-    await HomePage.clickStartNow()
-
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    await DashboardPage.selectLink(1)
-
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    await UploadSummaryLogPage.uploadFile(
-      'resources/reprocessor-output-regonly-cma.xlsx'
-    )
-    await UploadSummaryLogPage.continue()
-
-    await checkBodyText('Your summary log is being checked', 30)
-    await checkBodyText('Upload your summary log', 60)
-
-    // AC1: the "Important" banner is shown on the check before you submit page.
-    const banner = await EnhancedCheckSummaryLogPage.importantBanner()
-    expect(await banner.isExisting()).toBe(true)
-    const bannerText = await banner.getText()
-    expect(bannerText).toContain('Important')
-    expect(bannerText).toContain(IMPORTANT_BODY)
-
-    // Submit inline (not performUploadAndReturnToHomepage, which would click
-    // "Return to home" and skip the success-page assertions below).
-    await EnhancedCheckSummaryLogPage.upload()
-
-    await checkBodyText('Your waste records are being updated', 30)
-    await checkBodyText('Summary log uploaded', 60)
-
-    // AC1: the "Further action needed" section and "Go to reports" button are
-    // shown on the next (success) page.
-    await checkBodyText(FURTHER_ACTION_HEADING, 10)
-    await checkBodyText(FURTHER_ACTION_PARA_1, 5)
-    await checkBodyText(FURTHER_ACTION_PARA_2, 5)
-    await checkBodyText(FURTHER_ACTION_PARA_3, 5)
-    expect(await UploadSummaryLogPage.goToReportsButton().isExisting()).toBe(
-      true
-    )
-    // The button links to the reports page for this org/registration.
-    expect(
-      await UploadSummaryLogPage.goToReportsButton().getAttribute('href')
-    ).toBe(
-      `/organisations/${organisationDetails.refNo}/registrations/${regId}/reports`
-    )
-
-    await HomePage.signOut()
-    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
-  })
-
-  it('should not show the Important banner or Further action needed messaging when no closed-period adjustments are detected @closedPeriodMessaging @enhancedCheck @cma', async () => {
-    const organisationDetails = await createLinkedOrganisation([
-      { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' },
-      { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
-    ])
-
-    const migrationResponse = await updateMigratedOrganisation(
-      organisationDetails.refNo,
-      [
-        {
-          reprocessingType: 'output',
-          regNumber: 'R25SR5111050912PA',
-          accNumber: 'ACC123456',
-          status: 'approved'
-        },
-        {
-          regNumber: 'E25SR500030913PA',
-          accNumber: 'ACC234567',
-          status: 'approved',
-          validFrom: '2025-02-02'
-        }
-      ]
-    )
-    await seedOverseasSites(
-      organisationDetails.refNo,
-      [1],
-      [124, 183, 512, 876]
-    )
-
-    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
-    await linkDefraIdUser(
-      organisationDetails.refNo,
-      user.userId,
-      migrationResponse.email
-    )
-
-    await HomePage.openStart()
-    await HomePage.clickStartNow()
-
-    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-    await DashboardPage.selectExportingTab()
-    await DashboardPage.selectLink(1)
-
-    await WasteRecordsPage.submitSummaryLogLink()
-
-    // Open-period loads only (no submitted report seeded), so no closed-period
-    // adjustments are detected.
-    await UploadSummaryLogPage.uploadFile('resources/exporter.xlsx')
-    await UploadSummaryLogPage.continue()
-
-    await checkBodyText('Your summary log is being checked', 30)
-    await checkBodyText('Upload your summary log', 60)
-
-    // AC2: the "Important" banner is not shown on the check page.
-    expect(
-      await EnhancedCheckSummaryLogPage.importantBanner().isExisting()
-    ).toBe(false)
-    await checkBodyTextDoesNotInclude(IMPORTANT_BODY, 5)
-
-    await EnhancedCheckSummaryLogPage.upload()
-
-    await checkBodyText('Your waste records are being updated', 30)
-    await checkBodyText('Summary log uploaded', 60)
-
-    // AC2: the "Further action needed" section and "Go to reports" button are
-    // not displayed on the success page.
-    await checkBodyTextDoesNotInclude(FURTHER_ACTION_HEADING, 5)
-    expect(await UploadSummaryLogPage.goToReportsButton().isExisting()).toBe(
-      false
-    )
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
