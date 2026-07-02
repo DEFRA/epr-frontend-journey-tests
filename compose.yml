@@ -236,6 +236,7 @@ services:
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
       FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES: true
+      FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: true
       NODE_ENV: development
       PORT: 3000
       REDIS_HOST: redis
