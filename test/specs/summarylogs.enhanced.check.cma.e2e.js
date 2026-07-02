@@ -254,6 +254,10 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     expect(subStates).toContain('8 new loads will be recorded')
     await checkBodyText('These have been added to your summary log.', 30)
 
+    // The closed-period resubmission banner renders on this page when
+    // closed-period changes are present.
+    await checkBodyText('resubmit it to your regulator', 10)
+
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
@@ -758,10 +762,10 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  // The PAE-1648 closed-period messaging tests - the "Important" banner on the
-  // check page and the "Further action needed" section + "Go to reports" button
-  // on the success page - render when FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS is
-  // on. That flag is now permanent (defaults on), so these tests are enabled.
+  // The PAE-1648 closed-period messaging - the "Important" banner on the check
+  // page and the "Further action needed" section + "Go to reports" button on the
+  // success page - renders when closed-period changes are present. The "no
+  // changes" case below is data-driven, so it stays shared.
   describe('closed-period adjustment messaging', () => {
     it('should show the Important banner and Further action needed messaging when closed-period adjustments are detected @closedPeriodMessaging @enhancedCheck @cma', async () => {
       const organisationDetails = await createLinkedOrganisation([
