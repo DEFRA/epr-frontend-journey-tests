@@ -241,7 +241,6 @@ services:
       # leg, and a plain `docker compose up`) it defaults on: the shipping
       # behaviour the suite validates. See test/support/flags.js.
       FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-true}
-      FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES: true
       NODE_ENV: development
       PORT: 3000
       REDIS_HOST: redis
