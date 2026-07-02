@@ -122,8 +122,8 @@ frontend container (via `compose.yml` interpolation) and the runner process (via
 
 - _Same journey, different assertions_ — branch on `flags.x` where the pages
   diverge. When the difference is a single assertion (present vs absent), let
-  the flag pick the assertion verb rather than writing an `if`/`else`: see the
-  closed-period banner check in `summarylogs.enhanced.check.cma.e2e.js`. Reach
+  the flag pick the assertion verb rather than writing an `if`/`else`, e.g.
+  `const assert = flags.x ? checkBodyText : checkBodyTextDoesNotInclude`. Reach
   for an inline `if (flags.x) { ... } else { ... }` only when several statements
   diverge.
 - _Whole scenario added or removed_ — swap `describe`/`describe.skip` (or
