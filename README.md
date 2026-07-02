@@ -135,15 +135,17 @@ new-only behaviour behind `if` / skip-when-off, and shared behaviour stays
 unguarded so it runs in both passes.
 
 **Named matrix passes.** `check-pull-request.yml` runs the suite once per named
-entry in `matrix.include`. A permanent `baseline` entry runs every flag off,
-mirroring prod and covering the shared plus legacy behaviour. Each in-flight
-flag adds one entry that turns only itself on. Each pass exports its flag values
-to both the container and the runner, so the flag-on entry exercises the new
-plus shared behaviour. Cost is linear (`N + 1` passes for `N` flags), not the
-Cartesian blow-up you would get from a second matrix axis. One-hot does not
-exercise two flags on at once: that is the right default because flags gate
-independent features, and you add one explicit combined entry only when two
-genuinely interact.
+entry in `matrix.include`. A permanent `baseline` entry carries no flag
+overrides: it runs the configured defaults, where each flag's step expression
+supplies its default (e.g. `matrix.closed-period-adjustments || 'true'`), so
+`baseline` exercises the shipping behaviour. Each in-flight flag adds one entry
+that overrides a single flag away from its default to pin the other state. Each
+pass exports its flag values to both the container and the runner, so an
+override entry exercises the alternative behaviour. Cost is linear (`N + 1`
+passes for `N` overridden flags), not the Cartesian blow-up you would get from a
+second matrix axis. One-hot does not exercise two overrides at once: that is the
+right default because flags gate independent features, and you add one explicit
+combined entry only when two genuinely interact.
 
 **The required check is a gate job.** Branch protection requires the exact name
 `Run Journey Tests`, which a matrix leg (`Run Journey Tests (<name>)`) can never

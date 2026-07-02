@@ -72,19 +72,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: pr-prep
     # Named matrix passes (see test/support/flags.js and the README "Feature
-    # flags in journey tests"). `baseline` is permanent and runs every flag off,
-    # mirroring prod. Each in-flight flag adds one entry that turns only itself
-    # on, so cost is linear (N + 1) and the structure survives flags coming and
-    # going: retire a flag by deleting its entry, and baseline stays put. Every
-    # entry sets every flag input (untoggled flags stay 'false'). All blocking.
+    # flags in journey tests"). `baseline` is permanent and carries no flag
+    # overrides: it runs the configured defaults (each flag's step expression
+    # supplies its default, so baseline runs the shipping behaviour). Each
+    # in-flight flag adds one entry that overrides a single flag to pin the
+    # other state, so cost is linear (N + 1) and the structure survives flags
+    # coming and going: retire a flag by deleting its entry, and baseline stays
+    # put. All blocking.
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: baseline
-            closed-period-adjustments: 'false'
-          - name: closed-period-adjustments
-            closed-period-adjustments: 'true'
     steps:
       - name: Checkout journey-tests repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -94,7 +93,9 @@ jobs:
         with:
           branch: ${{ github.head_ref }}
           journey-test-pr: true
-          feature-flag-closed-period-adjustments: ${{ matrix.closed-period-adjustments }}
+          # `|| 'true'` is this flag's configured default: baseline (no override)
+          # runs it on. An override leg sets 'false' to pin the off state.
+          feature-flag-closed-period-adjustments: ${{ matrix.closed-period-adjustments || 'true' }}
 
   # Aggregate gate carrying the exact name the branch ruleset requires; matrix
   # legs report as "Run Journey Tests (<name>)" and can't match it. `if: always()`
