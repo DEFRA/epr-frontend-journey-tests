@@ -4,6 +4,12 @@ import UploadSummaryLogPage from '../upload.summary.log.page.js'
 import ReportsPage from './reports.page.js'
 
 class ReportDetailPage {
+  open(orgId, regId, year, cadence, period, submissionNumber = 1) {
+    return browser.url(
+      `/organisations/${orgId}/registrations/${regId}/reports/${year}/${cadence}/${period}/submissions/${submissionNumber}`
+    )
+  }
+
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
     await element.waitForExist({ timeout: 5000 })
@@ -12,6 +18,21 @@ class ReportDetailPage {
 
   async useThisData() {
     await $('button[type=submit]').click()
+  }
+
+  // The detail page renders each section total as a `govuk-caption-l` label
+  // immediately followed by a `govuk-heading-l` value (e.g. "26.60"). There is
+  // no test id, so we key off the caption text and take its sibling value.
+  async #sectionTotalByCaption(caption) {
+    const element = await $(
+      `//p[contains(@class, "govuk-caption-l")][normalize-space()="${caption}"]/following-sibling::p[1]`
+    )
+    await element.waitForExist({ timeout: 5000 })
+    return await element.getText()
+  }
+
+  async totalTonnageExported() {
+    return this.#sectionTotalByCaption('Total tonnage exported')
   }
 
   async useThisDataAndCheckDoubleClickPrevented() {
