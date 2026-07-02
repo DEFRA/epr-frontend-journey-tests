@@ -145,6 +145,13 @@ exercise two flags on at once: that is the right default because flags gate
 independent features, and you add one explicit combined entry only when two
 genuinely interact.
 
+**The required check is a gate job.** Branch protection requires the exact name
+`Run Journey Tests`, which a matrix leg (`Run Journey Tests (<name>)`) can never
+match. So an aggregate job named `Run Journey Tests` `needs` the legs and passes
+only if all of them did (`if: always()`, so a failed leg fails the gate rather
+than skipping it). Its fixed name keeps branch protection decoupled from the
+flag list — adding or retiring a flag edits only `matrix.include`.
+
 **Switchover payoff.** Turning the flag on in production is one line in the prod
 env file, with zero test changes (every pass stays green). Retiring the flag
 later is mechanical and decoupled from the prod flip: drop the env var wherever
