@@ -241,7 +241,6 @@ services:
       # plain `docker compose up`. See test/support/flags.js.
       FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-false}
       FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES: true
-      FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: true
       NODE_ENV: development
       PORT: 3000
       REDIS_HOST: redis

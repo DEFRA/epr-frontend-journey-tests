@@ -769,12 +769,15 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  // The PAE-1648 closed-period messaging tests - the "Important" banner on the
-  // check page and the "Further action needed" section + "Go to reports" button
-  // on the success page - render when FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS is
-  // on. That flag is now permanent (defaults on), so these tests are enabled.
+  // The PAE-1648 closed-period messaging - the "Important" banner on the check
+  // page and the "Further action needed" section + "Go to reports" button on the
+  // success page - is gated on FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS. The
+  // journey and seeded data are identical in both matrix passes; the flag flips
+  // whether we assert the messaging present or absent, so each pass pins one
+  // state. The "no changes" case below is data-driven, not flag-driven, so it
+  // stays shared.
   describe('closed-period adjustment messaging', () => {
-    it('should show the Important banner and Further action needed messaging when closed-period adjustments are detected @closedPeriodMessaging @enhancedCheck @cma', async () => {
+    it('should gate the Important banner and Further action messaging on the closed-period-adjustments flag @closedPeriodMessaging @enhancedCheck @cma', async () => {
       const organisationDetails = await createLinkedOrganisation([
         {
           material: 'Paper or board (R3)',
@@ -832,12 +835,18 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       await checkBodyText('Your summary log is being checked', 30)
       await checkBodyText('Upload your summary log', 60)
 
-      // The "Important" banner is shown on the check before you submit page.
+      // The "Important" banner on the check before you submit page - present
+      // when the flag is on, absent when off (same seeded closed-period changes).
       const banner = await EnhancedCheckSummaryLogPage.importantBanner()
-      expect(await banner.isExisting()).toBe(true)
-      const bannerText = await banner.getText()
-      expect(bannerText).toContain('Important')
-      expect(bannerText).toContain(IMPORTANT_BODY)
+      if (flags.closedPeriodAdjustments) {
+        expect(await banner.isExisting()).toBe(true)
+        const bannerText = await banner.getText()
+        expect(bannerText).toContain('Important')
+        expect(bannerText).toContain(IMPORTANT_BODY)
+      } else {
+        expect(await banner.isExisting()).toBe(false)
+        await checkBodyTextDoesNotInclude(IMPORTANT_BODY, 5)
+      }
 
       // Submit inline (not performUploadAndReturnToHomepage, which would click
       // "Return to home" and skip the success-page assertions below).
@@ -846,20 +855,28 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       await checkBodyText('Your waste records are being updated', 30)
       await checkBodyText('Summary log uploaded', 60)
 
-      // The "Further action needed" section and "Go to reports" button are shown
-      // on the success page, and the button links to the reports page.
-      await checkBodyText(FURTHER_ACTION_HEADING, 10)
-      await checkBodyText(FURTHER_ACTION_PARA_1, 5)
-      await checkBodyText(FURTHER_ACTION_PARA_2, 5)
-      await checkBodyText(FURTHER_ACTION_PARA_3, 5)
-      expect(await UploadSummaryLogPage.goToReportsButton().isExisting()).toBe(
-        true
-      )
-      expect(
-        await UploadSummaryLogPage.goToReportsButton().getAttribute('href')
-      ).toBe(
-        `/organisations/${organisationDetails.refNo}/registrations/${regId}/reports`
-      )
+      // The "Further action needed" section and "Go to reports" button on the
+      // success page - present when the flag is on (button links to reports),
+      // absent when off. The upload itself succeeds either way (asserted above).
+      if (flags.closedPeriodAdjustments) {
+        await checkBodyText(FURTHER_ACTION_HEADING, 10)
+        await checkBodyText(FURTHER_ACTION_PARA_1, 5)
+        await checkBodyText(FURTHER_ACTION_PARA_2, 5)
+        await checkBodyText(FURTHER_ACTION_PARA_3, 5)
+        expect(
+          await UploadSummaryLogPage.goToReportsButton().isExisting()
+        ).toBe(true)
+        expect(
+          await UploadSummaryLogPage.goToReportsButton().getAttribute('href')
+        ).toBe(
+          `/organisations/${organisationDetails.refNo}/registrations/${regId}/reports`
+        )
+      } else {
+        await checkBodyTextDoesNotInclude(FURTHER_ACTION_HEADING, 5)
+        expect(
+          await UploadSummaryLogPage.goToReportsButton().isExisting()
+        ).toBe(false)
+      }
 
       await HomePage.signOut()
       await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
