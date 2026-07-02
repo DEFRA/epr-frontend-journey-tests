@@ -26,10 +26,6 @@ const ADJUSTED_ACCORDION_MSG =
 // PAE-1648 closed-period adjustment messaging copy (en.json
 // summary-log:closedPeriodAdjustments), asserted verbatim by the closed-period
 // messaging tests at the bottom of this file.
-// TODO: Uncomment (together with those tests) once
-// FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS is enabled in the journey-test
-// environment.
-/*
 const IMPORTANT_BODY =
   "If you upload this summary log, you'll need to create a new report for any relevant period and an approved person from your business will need to resubmit it to your regulator."
 const FURTHER_ACTION_HEADING = 'Further action needed'
@@ -39,7 +35,6 @@ const FURTHER_ACTION_PARA_2 =
   'Once the new report has been created, an approved person from your business will need to submit it to your regulator.'
 const FURTHER_ACTION_PARA_3 =
   "Reports that need to be resubmitted to your regulator show the status 'Requires resubmission' on the reports page."
-*/
 
 describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
   // Resets the shared browser session between tests. Without it, leftover auth
@@ -765,12 +760,8 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
   // The PAE-1648 closed-period messaging tests - the "Important" banner on the
   // check page and the "Further action needed" section + "Go to reports" button
-  // on the success page - only render when FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS
-  // is on. That flag is not yet enabled, so the tests below are commented out to
-  // keep CI green.
-  // TODO: Re-enable once FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS is enabled, by
-  // uncommenting this block AND the copy constants near the top of the file.
-  /*
+  // on the success page - render when FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS is
+  // on. That flag is now permanent (defaults on), so these tests are enabled.
   describe('closed-period adjustment messaging', () => {
     it('should show the Important banner and Further action needed messaging when closed-period adjustments are detected @closedPeriodMessaging @enhancedCheck @cma', async () => {
       const organisationDetails = await createLinkedOrganisation([
@@ -936,5 +927,4 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
       await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
     })
   })
-  */
 })
