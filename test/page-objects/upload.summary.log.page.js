@@ -10,8 +10,6 @@ class UploadSummaryLogPage extends SummaryLogUploadActions {
     return await element.getText()
   }
 
-  // The enhanced (CMA) upload flow, now the only check page after the
-  // FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES switchover.
   async performUploadAndReturnToHomepage(filePath) {
     await this.uploadFile(filePath)
     await this.continue()
