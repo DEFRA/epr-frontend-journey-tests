@@ -97,70 +97,47 @@ npm run test:local:debug
 
 ### Feature flags in journey tests
 
-When behaviour sits behind a feature flag, a single-mode run can only ever cover
-one state. The other state goes untested, and any assertion written for the
-current state (for example "this banner is absent") silently becomes wrong the
-moment the flag flips. This suite keeps both states covered at once and makes
-the production switchover config-only, with no test churn.
+**`compose.yml` is the single source of flag state.** Each `FEATURE_FLAG_*` env
+var defaults in `compose.yml` (for example `${FEATURE_FLAG_X:-true}`), and the
+suite runs and asserts that one configured state unconditionally. Nothing else
+sets flags in CI: the `run-journey-tests` action takes no flag inputs, so every
+caller (this repo's PR checks and `epr-frontend` PR checks alike) exercises the
+same state and cannot drift. Note the interpolation default only fires while
+the env var is unset, so do not export `FEATURE_FLAG_*` vars in workflow env
+blocks.
 
-**Single source of truth.** `test/support/flags.js` reads each `FEATURE_FLAG_*`
-env var, one line per active flag. No flag string appears anywhere else in test
-code: branch on `flags.<key>` instead. Every key must map to a real
-`FEATURE_FLAG_*` var that is exported into both the frontend container and the
-wdio runner: no test-only invented flags.
+Most flags stop there. An in-flight feature is typically tested flag-on in CI
+(ahead of the production flip) while the flag-off gating is covered by the
+service's own unit and integration tests. When the flag flips on in production
+and is later retired, the journey suite needs no changes beyond eventually
+dropping the env var from `compose.yml`.
 
-```js
-import { flags } from '../support/flags.js'
-```
+**Named matrix passes are the escalation, not the default.**
+`check-pull-request.yml` runs the suite once per named entry in
+`matrix.include`. A permanent `baseline` entry runs the `compose.yml` defaults.
+If a flag's two states both genuinely warrant journey coverage (a risky or
+long-lived divergence, not just new messaging), give it a matrix entry that pins
+the non-default state, plumb the value through to the container and the runner,
+and branch the affected specs on it. Cost is linear (`N + 1` passes for `N`
+overridden flags). Reach for this deliberately: most flags do not earn it.
 
-**The flag cannot drift from app behaviour.** The `run-journey-tests` action
-writes the flag value to `$GITHUB_ENV` once, so the same value reaches both the
-frontend container (via `compose.yml` interpolation) and the runner process (via
-`process.env`). That single write is the only plumbing the convention needs.
-
-**Two branching idioms, both through `flags`:**
-
-- _Same journey, different assertions_ — branch on `flags.x` where the pages
-  diverge. When the difference is a single assertion (present vs absent), let
-  the flag pick the assertion verb rather than writing an `if`/`else`, e.g.
-  `const assert = flags.x ? checkBodyText : checkBodyTextDoesNotInclude`. Reach
-  for an inline `if (flags.x) { ... } else { ... }` only when several statements
-  diverge.
-- _Whole scenario added or removed_ — swap `describe`/`describe.skip` (or
-  `it`/`it.skip`), e.g. `;(flags.x ? describe : describe.skip)('new flow', ...)`.
-  Skipped specs show as skipped in Allure, not silently absent.
-
-Three-way discipline: legacy-only behaviour goes behind `else` / skip-when-on,
-new-only behaviour behind `if` / skip-when-off, and shared behaviour stays
-unguarded so it runs in both passes.
-
-**Named matrix passes.** `check-pull-request.yml` runs the suite once per named
-entry in `matrix.include`. A permanent `baseline` entry carries no flag
-overrides: it runs the configured defaults, where each flag's step expression
-supplies its default (e.g. `matrix.closed-period-adjustments || 'true'`), so
-`baseline` exercises the shipping behaviour. Each in-flight flag adds one entry
-that overrides a single flag away from its default to pin the other state. Each
-pass exports its flag values to both the container and the runner, so an
-override entry exercises the alternative behaviour. Cost is linear (`N + 1`
-passes for `N` overridden flags), not the Cartesian blow-up you would get from a
-second matrix axis. One-hot does not exercise two overrides at once: that is the
-right default because flags gate independent features, and you add one explicit
-combined entry only when two genuinely interact.
+The plumbing, when a flag earns it: add an action input for the flag, have the
+action's first step write it once to `$GITHUB_ENV`
+(`echo "FEATURE_FLAG_X=${{ inputs.feature-flag-x }}" >> "$GITHUB_ENV"`) so the
+same value reaches both the frontend container (via `compose.yml`
+interpolation) and the wdio runner (via `process.env`), then pass
+`${{ matrix.x || '<default>' }}` from the matrix step. Read the env var in one
+shared `test/support/flags.js` and branch specs on `flags.x`, for example
+letting the flag pick the assertion verb:
+`const assert = flags.x ? checkBodyText : checkBodyTextDoesNotInclude`. The
+fully worked version lives in the history of PR #429, which removed it.
 
 **The required check is a gate job.** Branch protection requires the exact name
 `Run Journey Tests`, which a matrix leg (`Run Journey Tests (<name>)`) can never
 match. So an aggregate job named `Run Journey Tests` `needs` the legs and passes
 only if all of them did (`if: always()`, so a failed leg fails the gate rather
 than skipping it). Its fixed name keeps branch protection decoupled from the
-flag list — adding or retiring a flag edits only `matrix.include`.
-
-**Switchover payoff.** Turning the flag on in production is one line in the prod
-env file, with zero test changes (every pass stays green). Retiring the flag
-later is mechanical and decoupled from the prod flip: drop the env var wherever
-it is set, delete the flag's `matrix.include` entry, then remove its `flags.js`
-line and grep `flags.<key>` to delete the now-dead branches. The matrix itself
-stays put: `baseline` always lives there, so when no flags are in flight the
-suite is a single `baseline` run and adding the next flag is a one-entry edit.
+matrix contents: adding or retiring an entry edits only `matrix.include`.
 
 ## Production
 
