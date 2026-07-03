@@ -100,9 +100,11 @@ npm run test:local:debug
 **`compose.yml` is the single source of flag state.** Each `FEATURE_FLAG_*` env
 var defaults in `compose.yml` (for example `${FEATURE_FLAG_X:-true}`), and the
 suite runs and asserts that one configured state unconditionally. Nothing else
-sets flags: the `run-journey-tests` action takes no flag inputs, so every caller
-(this repo's PR checks and `epr-frontend` PR checks alike) exercises the same
-state and cannot drift.
+sets flags in CI: the `run-journey-tests` action takes no flag inputs, so every
+caller (this repo's PR checks and `epr-frontend` PR checks alike) exercises the
+same state and cannot drift. Note the interpolation default only fires while
+the env var is unset, so do not export `FEATURE_FLAG_*` vars in workflow env
+blocks.
 
 Most flags stop there. An in-flight feature is typically tested flag-on in CI
 (ahead of the production flip) while the flag-off gating is covered by the
@@ -118,6 +120,17 @@ long-lived divergence, not just new messaging), give it a matrix entry that pins
 the non-default state, plumb the value through to the container and the runner,
 and branch the affected specs on it. Cost is linear (`N + 1` passes for `N`
 overridden flags). Reach for this deliberately: most flags do not earn it.
+
+The plumbing, when a flag earns it: add an action input for the flag, have the
+action's first step write it once to `$GITHUB_ENV`
+(`echo "FEATURE_FLAG_X=${{ inputs.feature-flag-x }}" >> "$GITHUB_ENV"`) so the
+same value reaches both the frontend container (via `compose.yml`
+interpolation) and the wdio runner (via `process.env`), then pass
+`${{ matrix.x || '<default>' }}` from the matrix step. Read the env var in one
+shared `test/support/flags.js` and branch specs on `flags.x`, for example
+letting the flag pick the assertion verb:
+`const assert = flags.x ? checkBodyText : checkBodyTextDoesNotInclude`. The
+fully worked version lives in the history of PR #429, which removed it.
 
 **The required check is a gate job.** Branch protection requires the exact name
 `Run Journey Tests`, which a matrix leg (`Run Journey Tests (<name>)`) can never

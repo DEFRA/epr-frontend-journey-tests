@@ -96,7 +96,9 @@ jobs:
   # Aggregate gate carrying the exact name the branch ruleset requires; matrix
   # legs report as "Run Journey Tests (<name>)" and can't match it. `if: always()`
   # so a failing leg fails the gate rather than skipping it (a skipped required
-  # check doesn't block).
+  # check doesn't block). Do NOT delete or fold this into `tests`, even while
+  # the matrix has a single leg: the ruleset's required check would never
+  # report and every PR would block.
   tests-gate:
     name: Run Journey Tests
     runs-on: ubuntu-latest
