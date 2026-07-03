@@ -10,26 +10,10 @@ inputs:
   journey-test-pr:
     description: is this action being called from a pr in this repo?
     default: 'false'
-  feature-flag-closed-period-adjustments:
-    description: >-
-      Value of FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS for this run. The CI
-      matrix runs the suite once per flag state. The value is dual-exported (see
-      the first step below) to both the frontend container and the wdio runner,
-      so the test view of the flag cannot drift from app behaviour.
-    default: 'false'
 
 runs:
   using: 'composite'
   steps:
-    - name: Dual-export feature flags to container and runner
-      shell: bash
-      run: |
-        # The one piece of plumbing the flags convention needs. Writing to
-        # $GITHUB_ENV makes the flag visible to every later step in this job:
-        # `docker compose up` interpolates it into the frontend container, and
-        # `npm run test:github` reads it via process.env in test/support/flags.js.
-        echo "FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS=${{ inputs.feature-flag-closed-period-adjustments }}" >> "$GITHUB_ENV"
-
     - name: Checkout repository if not called by Journey Test PR
       if: inputs.journey-test-pr == 'false'
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

@@ -235,11 +235,9 @@ services:
       DEFRA_ID_OIDC_CONFIGURATION_URL: http://defra-id-stub:3200/cdp-defra-id-stub/.well-known/openid-configuration
       DEFRA_ID_SERVICE_ID: d7d72b79-9c62-ee11-8df0-000d3adf7047
       EPR_BACKEND_URL: http://epr-backend:3001
-      # Dual-exported with the wdio runner by the run-journey-tests action: a
-      # matrix leg that overrides this flag sets it once per pass, keeping app
-      # behaviour and the test view in lockstep. With no override (the baseline
-      # leg, and a plain `docker compose up`) it defaults on: the shipping
-      # behaviour the suite validates. See test/support/flags.js.
+      # Single source of this flag's state in CI (see the README "Feature flags
+      # in journey tests"): on, the state the suite asserts. The flag-off gating
+      # is covered by epr-frontend's own tests.
       FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-true}
       FEATURE_FLAG_ENHANCED_SUMMARY_LOG_CHECK_PAGES: true
       NODE_ENV: development
