@@ -16,7 +16,7 @@ inputs:
       matrix runs the suite once per flag state. The value is dual-exported (see
       the first step below) to both the frontend container and the wdio runner,
       so the test view of the flag cannot drift from app behaviour.
-    default: 'false'
+    default: 'true'
 
 runs:
   using: 'composite'
