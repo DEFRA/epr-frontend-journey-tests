@@ -101,12 +101,10 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toBe(
-      'Review and create draft'
-    )
-
     // --- Resubmission explainer ---
-    await ReportsPage.selectActiveActionLink(1)
+    // Clicking the CTA by its label also asserts it reads "Review and create
+    // draft" (a wrong label leaves nothing to click).
+    await ReportsPage.selectActiveActionLinkByText(1, 'Review and create draft')
     expect(await ResubmissionExplainerPage.headingText()).toContain(
       'needs to be resubmitted'
     )
@@ -129,10 +127,9 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toBe('Continue')
-
     // --- Resume and complete the draft ---
-    await ReportsPage.selectActiveActionLink(1)
+    // Clicking by label also asserts the CTA has flipped to "Continue".
+    await ReportsPage.selectActiveActionLinkByText(1, 'Continue')
     await TonnesRecycledPage.enterTonnage('12.50')
     await TonnesRecycledPage.continue()
     await TonnesNotRecycledPage.enterTonnage('7.50')
@@ -157,9 +154,7 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toBe(
-      'Review and submit'
-    )
+    await ReportsPage.expectActiveActionLink(1, 'Review and submit')
     expect(await ReportsPage.getSubmittedStatusBadge(1)).toBe('Submitted')
 
     await HomePage.signOut()
