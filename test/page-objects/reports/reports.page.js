@@ -37,6 +37,14 @@ const getStatusColour = async (rowIndex, tableXPath) => {
   return match ? match[1] : 'blue'
 }
 
+const getActionLinkText = async (rowIndex, tableXPath) => {
+  const element = await $(
+    `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`
+  )
+  await element.waitForExist({ timeout: 5000 })
+  return await element.getText()
+}
+
 const activeTableXPath = tableAfterHeadingXPath(ACTIVE_HEADING)
 const submittedTableXPath = tableAfterHeadingXPath(SUBMITTED_HEADING)
 
@@ -57,6 +65,10 @@ class ReportsPage {
 
   async getActiveStatusBadge(rowIndex) {
     return await getStatusBadge(rowIndex, activeTableXPath)
+  }
+
+  async getActiveActionLinkText(rowIndex) {
+    return await getActionLinkText(rowIndex, activeTableXPath)
   }
 
   async getSubmittedStatusBadge(rowIndex) {
