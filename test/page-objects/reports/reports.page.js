@@ -9,6 +9,10 @@ const tableAfterHeadingXPath = (heading) =>
 const rowXPath = (tableXPath, rowIndex) =>
   `${tableXPath}//tbody/tr[${rowIndex}]`
 
+// selectActionLink and getActionLinkText both key off the first govuk-link in
+// the row, which assumes each row exposes exactly one action anchor (the period
+// cell is plain text). If a row ever gains a second link, target the action
+// column explicitly instead.
 const selectActionLink = async (rowIndex, tableXPath) => {
   const linkElement = await $(
     `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`

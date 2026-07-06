@@ -101,7 +101,7 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toContain(
+    expect(await ReportsPage.getActiveActionLinkText(1)).toBe(
       'Review and create draft'
     )
 
@@ -119,6 +119,9 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     )
     await ReportDetailPage.useThisData()
 
+    // Creating the draft redirects into the wizard at the first data page.
+    expect(await TonnesRecycledPage.headingText()).toBeTruthy()
+
     // --- Intermediate stage: revisit the landing before submitting ---
     // The draft now exists but is not yet ready to submit, so the period keeps
     // its "Requires resubmission" status and the CTA becomes "Continue".
@@ -126,7 +129,7 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toContain('Continue')
+    expect(await ReportsPage.getActiveActionLinkText(1)).toBe('Continue')
 
     // --- Resume and complete the draft ---
     await ReportsPage.selectActiveActionLink(1)
@@ -154,7 +157,7 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
-    expect(await ReportsPage.getActiveActionLinkText(1)).toContain(
+    expect(await ReportsPage.getActiveActionLinkText(1)).toBe(
       'Review and submit'
     )
     expect(await ReportsPage.getSubmittedStatusBadge(1)).toBe('Submitted')

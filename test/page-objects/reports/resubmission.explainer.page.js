@@ -13,10 +13,6 @@ class ResubmissionExplainerPage {
   async continue() {
     await $('a.govuk-button').click()
   }
-
-  async cancelAndReturnHome() {
-    await $('a*=Cancel and return to home').click()
-  }
 }
 
 export default new ResubmissionExplainerPage()
