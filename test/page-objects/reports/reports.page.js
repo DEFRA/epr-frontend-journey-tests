@@ -9,12 +9,37 @@ const tableAfterHeadingXPath = (heading) =>
 const rowXPath = (tableXPath, rowIndex) =>
   `${tableXPath}//tbody/tr[${rowIndex}]`
 
+// The action-link helpers key off the first govuk-link in the row, which
+// assumes each row exposes exactly one action anchor (the period cell is plain
+// text). If a row ever gains a second link, target the action column explicitly
+// instead.
 const selectActionLink = async (rowIndex, tableXPath) => {
   const linkElement = await $(
     `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`
   )
   await linkElement.waitForClickable({ timeout: 5000 })
   await linkElement.click()
+}
+
+// The action anchor carries a govuk-visually-hidden period suffix for screen
+// readers (e.g. "Review and create draft" + "Quarter 1, 2026"), so match on the
+// visible label as a substring rather than an exact string.
+const actionLinkByTextXPath = (rowIndex, tableXPath, label) =>
+  `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')][contains(normalize-space(), '${label}')]`
+
+const selectActionLinkByText = async (rowIndex, tableXPath, label) => {
+  const linkElement = await $(
+    actionLinkByTextXPath(rowIndex, tableXPath, label)
+  )
+  await linkElement.waitForClickable({ timeout: 5000 })
+  await linkElement.click()
+}
+
+const expectActionLink = async (rowIndex, tableXPath, label) => {
+  const linkElement = await $(
+    actionLinkByTextXPath(rowIndex, tableXPath, label)
+  )
+  await linkElement.waitForExist({ timeout: 5000 })
 }
 
 const getStatusBadgeElement = async (rowIndex, tableXPath) => {
@@ -53,6 +78,14 @@ class ReportsPage {
 
   async selectSubmittedActionLink(rowIndex) {
     await selectActionLink(rowIndex, submittedTableXPath)
+  }
+
+  async selectActiveActionLinkByText(rowIndex, label) {
+    await selectActionLinkByText(rowIndex, activeTableXPath, label)
+  }
+
+  async expectActiveActionLink(rowIndex, label) {
+    await expectActionLink(rowIndex, activeTableXPath, label)
   }
 
   async getActiveStatusBadge(rowIndex) {
