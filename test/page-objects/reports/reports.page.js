@@ -42,6 +42,17 @@ const expectActionLink = async (rowIndex, tableXPath, label) => {
   await linkElement.waitForExist({ timeout: 5000 })
 }
 
+// Returns the href of the row's action anchor, so callers can assert the CTA
+// targets the expected submission (e.g. a resubmitted period's "View report"
+// must point at submission 2, not the superseded submission 1).
+const getActionLinkHref = async (rowIndex, tableXPath) => {
+  const linkElement = await $(
+    `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`
+  )
+  await linkElement.waitForExist({ timeout: 5000 })
+  return await linkElement.getAttribute('href')
+}
+
 const getStatusBadgeElement = async (rowIndex, tableXPath) => {
   const element = await $(
     `${rowXPath(tableXPath, rowIndex)}//*[contains(@class,'govuk-tag')]`
@@ -86,6 +97,24 @@ class ReportsPage {
 
   async expectActiveActionLink(rowIndex, label) {
     await expectActionLink(rowIndex, activeTableXPath, label)
+  }
+
+  async expectSubmittedActionLink(rowIndex, label) {
+    await expectActionLink(rowIndex, submittedTableXPath, label)
+  }
+
+  async getSubmittedActionLinkHref(rowIndex) {
+    return await getActionLinkHref(rowIndex, submittedTableXPath)
+  }
+
+  // The Action required section renders an empty message instead of a table
+  // when no period needs action, so a missing table is the empty state.
+  async activeTableText() {
+    const table = await $(activeTableXPath)
+    if (!(await table.isExisting())) {
+      return ''
+    }
+    return await table.getText()
   }
 
   async getActiveStatusBadge(rowIndex) {
