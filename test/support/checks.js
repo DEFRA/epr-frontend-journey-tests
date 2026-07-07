@@ -23,7 +23,7 @@ export async function checkBodyTextDoesNotInclude(message, timeoutInSeconds) {
       ),
     {
       timeout: timeoutInSeconds * 1000,
-      timeoutMsg: `Expected text "${message}" to be present on the page within ${timeoutInSeconds} seconds`
+      timeoutMsg: `Expected text "${message}" to be absent from the page within ${timeoutInSeconds} seconds`
     }
   )
 }

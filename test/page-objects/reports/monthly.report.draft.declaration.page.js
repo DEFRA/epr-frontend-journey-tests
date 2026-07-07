@@ -6,6 +6,18 @@ class MonthlyReportDraftDeclarationPage {
     await $('a*=Reports').click()
   }
 
+  async headingText() {
+    const element = await $('h1.govuk-heading-xl')
+    await element.waitForExist({ timeout: 5000 })
+    return await element.getText()
+  }
+
+  async statusTag() {
+    const element = await $('#main-content .govuk-tag')
+    await element.waitForExist({ timeout: 5000 })
+    return await element.getText()
+  }
+
   async enterFullName(name) {
     await $('#submissionDeclaredBy').setValue(name)
   }

@@ -3,8 +3,12 @@ import { $ } from '@wdio/globals'
 const ACTIVE_HEADING = 'Action required'
 const SUBMITTED_HEADING = 'Submitted'
 
+// Scope to the table whose nearest preceding h3 is this heading. The extra
+// predicate matters when a section is empty: the landing renders no table for
+// it (just a message), so a plain following-sibling would otherwise resolve to
+// the next section's table (e.g. an empty Action required picking up Submitted).
 const tableAfterHeadingXPath = (heading) =>
-  `//h3[normalize-space()='${heading}']/following-sibling::table[contains(@class,'govuk-table')][1]`
+  `//h3[normalize-space()='${heading}']/following-sibling::table[contains(@class,'govuk-table')][preceding-sibling::h3[1][normalize-space()='${heading}']][1]`
 
 const rowXPath = (tableXPath, rowIndex) =>
   `${tableXPath}//tbody/tr[${rowIndex}]`
@@ -40,6 +44,17 @@ const expectActionLink = async (rowIndex, tableXPath, label) => {
     actionLinkByTextXPath(rowIndex, tableXPath, label)
   )
   await linkElement.waitForExist({ timeout: 5000 })
+}
+
+// Returns the href of the row's action anchor, so callers can assert the CTA
+// targets the expected submission (e.g. a resubmitted period's "View report"
+// must point at submission 2, not the superseded submission 1).
+const getActionLinkHref = async (rowIndex, tableXPath) => {
+  const linkElement = await $(
+    `${rowXPath(tableXPath, rowIndex)}//a[contains(@class,'govuk-link')]`
+  )
+  await linkElement.waitForExist({ timeout: 5000 })
+  return await linkElement.getAttribute('href')
 }
 
 const getStatusBadgeElement = async (rowIndex, tableXPath) => {
@@ -86,6 +101,24 @@ class ReportsPage {
 
   async expectActiveActionLink(rowIndex, label) {
     await expectActionLink(rowIndex, activeTableXPath, label)
+  }
+
+  async expectSubmittedActionLink(rowIndex, label) {
+    await expectActionLink(rowIndex, submittedTableXPath, label)
+  }
+
+  async getSubmittedActionLinkHref(rowIndex) {
+    return await getActionLinkHref(rowIndex, submittedTableXPath)
+  }
+
+  // The Action required section renders an empty message instead of a table
+  // when no period needs action, so a missing table is the empty state.
+  async activeTableText() {
+    const table = await $(activeTableXPath)
+    if (!(await table.isExisting())) {
+      return ''
+    }
+    return await table.getText()
   }
 
   async getActiveStatusBadge(rowIndex) {

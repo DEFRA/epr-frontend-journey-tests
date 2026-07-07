@@ -13,7 +13,12 @@ import TonnesNotRecycledPage from 'page-objects/reports/tonnes.not.recycled.page
 import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
 import ConfirmationPage from 'page-objects/reports/confirmation.page.js'
-import { checkBodyText } from '../support/checks.js'
+import MonthlyReportDraftDeclarationPage from 'page-objects/reports/monthly.report.draft.declaration.page.js'
+import ReportSubmittedPage from 'page-objects/reports/report.submitted.page.js'
+import {
+  checkBodyText,
+  checkBodyTextDoesNotInclude
+} from '../support/checks.js'
 import {
   createAndRegisterDefraIdUser,
   createLinkedOrganisation,
@@ -29,7 +34,7 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     await browser.reloadSession()
   })
 
-  it('creates a resubmission draft from a restated closed period, showing the intermediate Continue CTA before the final Review and submit CTA @requiresResubmissionStatus @cma', async () => {
+  it('creates, reviews and submits a resubmission draft from a restated closed period, ending as Resubmitted on the reports landing @requiresResubmissionStatus @reviewAndSubmit @cma', async () => {
     const organisationDetails = await createLinkedOrganisation([
       {
         material: 'Paper or board (R3)',
@@ -155,6 +160,50 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     )
     await ReportsPage.expectActiveActionLink(1, 'Review and submit')
     expect(await ReportsPage.getSubmittedStatusBadge(1)).toBe('Submitted')
+
+    // --- Review and submit the resubmission ---
+    // Clicking by label also asserts the CTA reads "Review and submit".
+    await ReportsPage.selectActiveActionLinkByText(1, 'Review and submit')
+
+    // Review page is the resubmission variant of the submit page: the heading
+    // reads "Resubmit report for {period}" (not "Submit report for …") and the
+    // Details status reads "Requires resubmission" (not "Ready to submit").
+    expect(await MonthlyReportDraftDeclarationPage.headingText()).toContain(
+      'Resubmit report for'
+    )
+    expect(await MonthlyReportDraftDeclarationPage.statusTag()).toBe(
+      'Requires resubmission'
+    )
+
+    // Enter the declarant name and submit.
+    await MonthlyReportDraftDeclarationPage.confirmAndSubmit()
+
+    expect(await ReportSubmittedPage.confirmationText()).toContain(
+      'report submitted to regulator'
+    )
+    await ReportSubmittedPage.returnToReportsLink()
+
+    // --- End state: the backend folds the resubmission into a single submitted
+    // item, so the period moves into the Submitted table tagged "Resubmitted"
+    // (green) with a "View report" link, and leaves Action required entirely. ---
+    expect(await ReportsPage.getSubmittedStatusBadge(1)).toBe('Resubmitted')
+    expect(await ReportsPage.getSubmittedStatusColour(1)).toBe('green')
+    await ReportsPage.expectSubmittedActionLink(1, 'View report')
+
+    // The "View report" CTA opens the resubmission (submission 2 — the latest
+    // submitted report), not the superseded submission 1.
+    expect(await ReportsPage.getSubmittedActionLinkHref(1)).toContain(
+      '/submissions/2/view'
+    )
+
+    // The period is gone from Action required: the purple "Requires
+    // resubmission" status no longer appears anywhere on the landing page, and
+    // the erstwhile "Ready to submit" draft does not linger in the Action
+    // required table (the restated Quarter 1 period must not reappear there).
+    await checkBodyTextDoesNotInclude('Requires resubmission', 10)
+    const activeTableText = await ReportsPage.activeTableText()
+    expect(activeTableText).not.toContain('Ready to submit')
+    expect(activeTableText).not.toContain('Quarter 1')
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
