@@ -3,8 +3,12 @@ import { $ } from '@wdio/globals'
 const ACTIVE_HEADING = 'Action required'
 const SUBMITTED_HEADING = 'Submitted'
 
+// Scope to the table whose nearest preceding h3 is this heading. The extra
+// predicate matters when a section is empty: the landing renders no table for
+// it (just a message), so a plain following-sibling would otherwise resolve to
+// the next section's table (e.g. an empty Action required picking up Submitted).
 const tableAfterHeadingXPath = (heading) =>
-  `//h3[normalize-space()='${heading}']/following-sibling::table[contains(@class,'govuk-table')][1]`
+  `//h3[normalize-space()='${heading}']/following-sibling::table[contains(@class,'govuk-table')][preceding-sibling::h3[1][normalize-space()='${heading}']][1]`
 
 const rowXPath = (tableXPath, rowIndex) =>
   `${tableXPath}//tbody/tr[${rowIndex}]`
