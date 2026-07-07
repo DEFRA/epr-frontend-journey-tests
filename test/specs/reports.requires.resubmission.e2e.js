@@ -97,7 +97,6 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
     // restated period, with a "Review and create draft" call to action.
     await DashboardPage.selectLink(1)
     await WasteRecordsPage.manageReportsLink()
-    await checkBodyText('Requires resubmission', 30)
     expect(await ReportsPage.getActiveStatusBadge(1)).toBe(
       'Requires resubmission'
     )
