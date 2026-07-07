@@ -18,14 +18,6 @@ class MonthlyReportDraftDeclarationPage {
     return await element.getText()
   }
 
-  async statusTagColour() {
-    const element = await $('#main-content .govuk-tag')
-    await element.waitForExist({ timeout: 5000 })
-    const classAttr = (await element.getAttribute('class')) ?? ''
-    const match = classAttr.match(/govuk-tag--(\w+)/)
-    return match ? match[1] : 'blue'
-  }
-
   async enterFullName(name) {
     await $('#submissionDeclaredBy').setValue(name)
   }

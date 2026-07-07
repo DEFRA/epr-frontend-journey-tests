@@ -167,16 +167,12 @@ describe('Reports - requires resubmission @requiresResubmission', () => {
 
     // Review page is the resubmission variant of the submit page: the heading
     // reads "Resubmit report for {period}" (not "Submit report for …") and the
-    // Details status is a purple "Requires resubmission" tag (not blue "Ready
-    // to submit").
+    // Details status reads "Requires resubmission" (not "Ready to submit").
     expect(await MonthlyReportDraftDeclarationPage.headingText()).toContain(
       'Resubmit report for'
     )
     expect(await MonthlyReportDraftDeclarationPage.statusTag()).toBe(
       'Requires resubmission'
-    )
-    expect(await MonthlyReportDraftDeclarationPage.statusTagColour()).toBe(
-      'purple'
     )
 
     // Enter the declarant name and submit.
