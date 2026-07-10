@@ -1,0 +1,58 @@
+import {
+  createAndRegisterDefraIdUser,
+  createLinkedOrganisation,
+  linkDefraIdUser,
+  updateMigratedOrganisation,
+  updateStatus
+} from '~/test/support/apicalls.js'
+import HomePage from 'page-objects/homepage.js'
+import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
+import DashboardPage from 'page-objects/dashboard.page.js'
+import { $, browser, expect } from '@wdio/globals'
+import { checkBodyText } from '~/test/support/checks.js'
+
+describe('Cancelled accreditation @cancelledaccreditation', () => {
+  it('Should not be able to access PERNs when an accreditation is cancelled @cancelledprn', async () => {
+    const regNumber = 'E25SR500030913PA'
+    const accNumber = 'ACC234567'
+
+    const organisationDetails = await createLinkedOrganisation([
+      { material: 'Aluminium (R4)', wasteProcessingType: 'Exporter' }
+    ])
+
+    const orgId = organisationDetails.refNo
+    const migrationResponse = await updateMigratedOrganisation(orgId, [
+      {
+        regNumber,
+        accNumber,
+        status: 'approved'
+      }
+    ])
+
+    const registrationId = migrationResponse.registrationIds[0]
+    const accreditationId = migrationResponse.accreditationIds[0]
+
+    await updateStatus(orgId, 'suspended')
+    await updateStatus(orgId, 'cancelled')
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(orgId, user.userId, migrationResponse.email)
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    await DashboardPage.selectTableLink(1, 1)
+
+    expect(await $('a*=Create new PERN').isExisting()).toBe(false)
+    expect(await $('a*=Manage PERNs').isExisting()).toBe(false)
+
+    // Try to access pern directly -- should get a 404
+    await browser.url(
+      `/organisations/${orgId}/registrations/${registrationId}/accreditations/${accreditationId}/packaging-recycling-notes`
+    )
+    await checkBodyText('404', 10)
+    await checkBodyText('Page not found', 10)
+  })
+})
