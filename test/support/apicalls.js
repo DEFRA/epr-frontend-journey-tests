@@ -336,6 +336,50 @@ export async function updateMigratedOrganisation(
   return { email, registrationIds, accreditationIds }
 }
 
+export async function updateStatus(orgId, newStatus) {
+  const authClient = new AuthClient()
+  const eprBackend = new EprBackend()
+
+  await authClient.authenticate()
+
+  let response = await eprBackend.get(
+    `/v1/organisations/${orgId}`,
+    authClient.authHeader()
+  )
+
+  const data = await assertSuccessResponse(
+    response,
+    `GET /v1/organisations/${orgId}`
+  )
+
+  data.accreditations[0].status = newStatus
+  const statusChangeDate = new Date(data.accreditations[0].validFrom)
+  statusChangeDate.setDate(statusChangeDate.getDate() + 1)
+  data.accreditations[0].statusHistory = [
+    ...(data.accreditations[0].statusHistory || []),
+    {
+      status: newStatus,
+      updatedAt: statusChangeDate.toISOString().split('T')[0]
+    }
+  ]
+
+  const payload = {
+    version: Number(data.version),
+    updateFragment: data
+  }
+
+  response = await eprBackend.put(
+    `/v1/organisations/${orgId}`,
+    JSON.stringify(payload),
+    authClient.authHeader()
+  )
+
+  await assertSuccessResponseWithoutBody(
+    response,
+    `PUT /v1/organisations/${orgId}`
+  )
+}
+
 export async function createAndRegisterDefraIdUser(email) {
   const users = new Users()
   const user = await users.userPayload(email)
