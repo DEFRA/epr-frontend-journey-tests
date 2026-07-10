@@ -55,6 +55,30 @@ class DashboardPage {
     return await materialElement.getText()
   }
 
+  async getRegistrationStatus(tableIndex, rowIndex) {
+    const registrationElement = await $(
+      '#main-content table.govuk-table:nth-of-type(' +
+        tableIndex +
+        ') tr:nth-child(' +
+        rowIndex +
+        ') > td:nth-child(2)'
+    )
+    await registrationElement.waitForExist({ timeout: 10000 })
+    return await registrationElement.getText()
+  }
+
+  async getAccreditationStatus(tableIndex, rowIndex) {
+    const accreditationElement = await $(
+      '#main-content table.govuk-table:nth-of-type(' +
+        tableIndex +
+        ') tr:nth-child(' +
+        rowIndex +
+        ') > td:nth-child(3)'
+    )
+    await accreditationElement.waitForExist({ timeout: 10000 })
+    return await accreditationElement.getText()
+  }
+
   async getNumberOfRows(tableIndex) {
     const rows = await $$(
       '#main-content table.govuk-table:nth-of-type(' + tableIndex + ') tbody tr'
@@ -75,6 +99,10 @@ class DashboardPage {
       tableRow.set(headerText[i], rowText[i])
     }
     return tableRow
+  }
+
+  async selectBackLink() {
+    await $('a*=Back').click()
   }
 }
 
