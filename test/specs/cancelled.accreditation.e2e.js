@@ -33,7 +33,6 @@ describe('Cancelled accreditation @cancelledaccreditation', () => {
     const accreditationId = migrationResponse.accreditationIds[0]
 
     await updateStatus(orgId, 'suspended')
-    await updateStatus(orgId, 'cancelled')
 
     const user = await createAndRegisterDefraIdUser(migrationResponse.email)
     await linkDefraIdUser(orgId, user.userId, migrationResponse.email)
@@ -42,6 +41,29 @@ describe('Cancelled accreditation @cancelledaccreditation', () => {
     await HomePage.clickStartNow()
 
     await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    // We can still create PERN when accreditation is suspended and links should be available
+    let accStatus = await DashboardPage.getAccreditationStatus(1, 1)
+    expect(accStatus).toBe('Suspended')
+
+    let regStatus = await DashboardPage.getRegistrationStatus(1, 1)
+    expect(regStatus).toBe('Approved')
+
+    await DashboardPage.selectTableLink(1, 1)
+
+    expect(await $('a*=Create new PERN').isExisting()).toBe(true)
+    expect(await $('a*=Manage PERNs').isExisting()).toBe(true)
+
+    // now we cancel the accreditation, PERN links should be gone
+    await updateStatus(orgId, 'cancelled')
+
+    await DashboardPage.selectBackLink()
+
+    accStatus = await DashboardPage.getAccreditationStatus(1, 1)
+    expect(accStatus).toBe('Not accredited')
+
+    regStatus = await DashboardPage.getRegistrationStatus(1, 1)
+    expect(regStatus).toBe('Approved')
 
     await DashboardPage.selectTableLink(1, 1)
 
