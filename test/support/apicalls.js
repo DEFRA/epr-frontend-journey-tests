@@ -176,7 +176,8 @@ export async function createLinkedOrganisation(dataRows) {
 export async function updateMigratedOrganisation(
   orgId,
   updateDataRows,
-  submittedToRegulator
+  submittedToRegulator,
+  validFrom = '2026-01-01'
 ) {
   const authClient = new AuthClient()
   const eprBackend = new EprBackend()
@@ -216,7 +217,7 @@ export async function updateMigratedOrganisation(
   for (let i = 0; i < updateDataRows.length; i++) {
     const orgUpdateData = updateDataRows[i]
     data.registrations[i].status = orgUpdateData.status
-    data.registrations[i].validFrom = '2026-01-01'
+    data.registrations[i].validFrom = validFrom
     data.registrations[i].validTo = `${currentYear + 1}-01-01`
     data.registrations[i].registrationNumber = orgUpdateData.regNumber
     data.registrations[i].statusHistory = [
@@ -258,7 +259,7 @@ export async function updateMigratedOrganisation(
       const j = accreditationIndex
       data.registrations[i].accreditationId = data.accreditations[j].id
       data.accreditations[j].status = orgUpdateData.status
-      data.accreditations[j].validFrom = '2026-01-01'
+      data.accreditations[j].validFrom = validFrom
       data.accreditations[j].validTo = `${currentYear + 1}-01-01`
       data.accreditations[j].statusHistory = [
         ...(data.accreditations[j].statusHistory || []),
@@ -331,7 +332,7 @@ export async function updateMigratedOrganisation(
     JSON.stringify(payload),
     authClient.authHeader()
   )
-  expect(response.statusCode).toBe(200)
+  await assertSuccessResponse(response, `PUT /v1/organisations/${orgId}`)
 
   return { email, registrationIds, accreditationIds }
 }

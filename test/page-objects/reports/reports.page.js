@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, $$ } from '@wdio/globals'
 
 const ACTIVE_HEADING = 'Action required'
 const SUBMITTED_HEADING = 'Submitted'
@@ -135,6 +135,10 @@ class ReportsPage {
 
   async getSubmittedStatusColour(rowIndex) {
     return await getStatusColour(rowIndex, submittedTableXPath)
+  }
+
+  async getActiveNumberOfRows() {
+    return (await $$(activeTableXPath + '//tbody/tr')).length
   }
 }
 
