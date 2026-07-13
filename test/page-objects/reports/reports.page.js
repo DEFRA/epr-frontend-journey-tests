@@ -99,6 +99,10 @@ class ReportsPage {
     await selectActionLinkByText(rowIndex, activeTableXPath, label)
   }
 
+  async getActivePeriodLabel(rowIndex) {
+    return await $(`${rowXPath(activeTableXPath, rowIndex)}//td[1]`).getText()
+  }
+
   async expectActiveActionLink(rowIndex, label) {
     await expectActionLink(rowIndex, activeTableXPath, label)
   }
