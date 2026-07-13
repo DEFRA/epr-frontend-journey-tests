@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, $$ } from '@wdio/globals'
 
 const ACTIVE_HEADING = 'Action required'
 const SUBMITTED_HEADING = 'Submitted'
@@ -99,6 +99,10 @@ class ReportsPage {
     await selectActionLinkByText(rowIndex, activeTableXPath, label)
   }
 
+  async getActivePeriodLabel(rowIndex) {
+    return await $(`${rowXPath(activeTableXPath, rowIndex)}//td[1]`).getText()
+  }
+
   async expectActiveActionLink(rowIndex, label) {
     await expectActionLink(rowIndex, activeTableXPath, label)
   }
@@ -135,6 +139,10 @@ class ReportsPage {
 
   async getSubmittedStatusColour(rowIndex) {
     return await getStatusColour(rowIndex, submittedTableXPath)
+  }
+
+  async getActiveNumberOfRows() {
+    return (await $$(activeTableXPath + '//tbody/tr')).length
   }
 }
 
