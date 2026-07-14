@@ -41,28 +41,19 @@ async function navigateReprocessorToSupportingInfo() {
   await FreePrnsPage.continue()
 }
 
-async function setupAccreditedReprocessor(
-  material,
-  regNumber,
-  accNumber,
-  submittedToRegulator
-) {
+async function setupAccreditedReprocessor(material, regNumber, accNumber) {
   const orgDetails = await createLinkedOrganisation([
     { material, wasteProcessingType: 'Reprocessor' }
   ])
 
-  const migrationResponse = await updateMigratedOrganisation(
-    orgDetails.refNo,
-    [
-      {
-        reprocessingType: 'output',
-        regNumber,
-        accNumber,
-        status: 'approved'
-      }
-    ],
-    submittedToRegulator
-  )
+  const migrationResponse = await updateMigratedOrganisation(orgDetails.refNo, [
+    {
+      reprocessingType: 'output',
+      regNumber,
+      accNumber,
+      status: 'approved'
+    }
+  ])
 
   const user = await createAndRegisterDefraIdUser(migrationResponse.email)
   await linkDefraIdUser(orgDetails.refNo, user.userId, migrationResponse.email)
@@ -70,8 +61,6 @@ async function setupAccreditedReprocessor(
   await HomePage.openStart()
   await HomePage.clickStartNow()
   await DefraIdStubPage.loginViaEmail(migrationResponse.email)
-
-  return orgDetails
 }
 
 async function createDraftReportFromCurrentReportsPage() {
