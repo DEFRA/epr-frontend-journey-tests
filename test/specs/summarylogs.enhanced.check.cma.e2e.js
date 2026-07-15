@@ -18,10 +18,11 @@ import {
   seedSubmittedReport
 } from '../support/apicalls.js'
 
-// The adjusted-loads accordion message varies by singular/plural and by whether
-// the load added to or reduced the balance, so it stays a pattern, not an exact string.
-const ADJUSTED_ACCORDION_MSG =
-  /(has|have) all the required summary log data and (has|have) (added to|reduced) your waste balance|(does|do) NOT have all the required summary log data and (has|have) reduced your waste balance/
+// The adjusted-loads accordion sub-heading varies by singular/plural and by
+// whether the group added to or reduced the balance, so it stays a pattern, not
+// an exact string. The rows are split by direction (added / reduced), with each
+// reduced row carrying its own reason.
+const ADJUSTED_ACCORDION_MSG = /(has|have) (added to|reduced) your waste balance/
 
 // PAE-1648 closed-period adjustment messaging copy (en.json
 // summary-log:closedPeriodAdjustments), asserted verbatim by the closed-period
