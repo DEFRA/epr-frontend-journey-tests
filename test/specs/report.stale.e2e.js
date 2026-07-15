@@ -12,7 +12,7 @@ import ReprocessorPrnSummaryPage from '../page-objects/reports/reprocessor.prn.s
 import FreePrnsPage from '../page-objects/reports/free.prns.page.js'
 import ReportSupportingInformationPage from 'page-objects/reports/report.supporting.information.page.js'
 import ReportCheckAnswersPage from 'page-objects/reports/report.check.answers.page.js'
-import SummaryLogChangedErrorPage from 'page-objects/reports/summary.log.changed.error.page.js'
+import ReportStaleErrorPage from 'page-objects/reports/report.stale.error.page.js'
 import { checkBodyText } from '../support/checks.js'
 import {
   createAndRegisterDefraIdUser,
@@ -41,7 +41,7 @@ async function navigateReprocessorToSupportingInfo() {
   await FreePrnsPage.continue()
 }
 
-async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
+async function setupAccreditedReprocessor(material, regNumber, accNumber) {
   const orgDetails = await createLinkedOrganisation([
     { material, wasteProcessingType: 'Reprocessor' }
   ])
@@ -61,13 +61,9 @@ async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
   await HomePage.openStart()
   await HomePage.clickStartNow()
   await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+}
 
-  await DashboardPage.selectTableLink(1, 1)
-  await WasteRecordsPage.submitSummaryLogLink()
-  await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
-
-  await DashboardPage.selectTableLink(1, 1)
-  await WasteRecordsPage.manageReportsLink()
+async function createDraftReportFromCurrentReportsPage() {
   await ReportsPage.selectActiveActionLink(1)
   await ReportDetailPage.useThisData()
   await navigateReprocessorToSupportingInfo()
@@ -75,6 +71,18 @@ async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
   await ReportCheckAnswersPage.createReport()
   await checkBodyText('report created', 30)
   await $('a*=Go to reports').click()
+}
+
+async function setupAndCreateReport(material, regNumber, accNumber, filePath) {
+  await setupAccreditedReprocessor(material, regNumber, accNumber)
+
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.submitSummaryLogLink()
+  await UploadSummaryLogPage.performUploadAndReturnToHomepage(filePath)
+
+  await DashboardPage.selectTableLink(1, 1)
+  await WasteRecordsPage.manageReportsLink()
+  await createDraftReportFromCurrentReportsPage()
 }
 
 async function uploadAndNavigateToReports() {
@@ -119,7 +127,7 @@ async function setupRegisteredOnlyExporter() {
   return { organisationDetails, migrationResponse }
 }
 
-describe('Stale summary log report @staleReport', () => {
+describe('Stale report @staleReport', () => {
   it('should redirect to the stale SL error page when navigating to a stale report, with working Return and Delete buttons and unable to submit a stale ready-to-submit report @staleReportSubmit @staleReportNavigation', async () => {
     await setupAndCreateReport('Plastic (R3)', PL_REG, PL_ACC, PL_FILE)
 
@@ -129,29 +137,29 @@ describe('Stale summary log report @staleReport', () => {
     await WasteRecordsPage.submitSummaryLogLink()
     await UploadSummaryLogPage.performUploadAndReturnToHomepage(PL_FILE)
 
-    // Navigating to the report now triggers the stale SL error page
+    // Navigating to the report now triggers the stale error page
     // This means we are unable to submit a stale ready-to-submit report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
 
-    expect(await SummaryLogChangedErrorPage.headingText()).toBe(
+    expect(await ReportStaleErrorPage.headingText()).toBe(
       'Your summary log has changed'
     )
 
     // "Return to reports" navigates back to the reports list without deleting
-    await SummaryLogChangedErrorPage.returnToReports()
+    await ReportStaleErrorPage.returnToReports()
     expect(await ReportsPage.headingText()).toContain('Reports')
 
     // Report is still present — navigating again shows the error page
     await ReportsPage.selectActiveActionLink(1)
-    expect(await SummaryLogChangedErrorPage.headingText()).toBe(
+    expect(await ReportStaleErrorPage.headingText()).toBe(
       'Your summary log has changed'
     )
 
     // "Delete and start again" deletes the report and returns to reports with
     // its un-started action-required status (Due, or Overdue if past due date)
-    await SummaryLogChangedErrorPage.deleteAndStartAgain()
+    await ReportStaleErrorPage.deleteAndStartAgain()
     expect(await ReportsPage.headingText()).toContain('Reports')
     await expectActionRequiredStatus(1)
 
@@ -180,19 +188,19 @@ describe('Stale summary log report @staleReport', () => {
     await WasteRecordsPage.submitSummaryLogLink()
     await UploadSummaryLogPage.performUploadAndReturnToHomepage(REG_ONLY_FILE)
 
-    // Navigating to the report now triggers the stale SL error page
+    // Navigating to the report now triggers the stale error page
     // This means we are unable to submit a stale in-progress report
     await DashboardPage.selectTableLink(1, 1)
     await WasteRecordsPage.manageReportsLink()
     await ReportsPage.selectActiveActionLink(1)
 
-    expect(await SummaryLogChangedErrorPage.headingText()).toBe(
+    expect(await ReportStaleErrorPage.headingText()).toBe(
       'Your summary log has changed'
     )
 
     // "Delete and start again" deletes the report and returns to reports with
     // its un-started action-required status (Due, or Overdue if past due date)
-    await SummaryLogChangedErrorPage.deleteAndStartAgain()
+    await ReportStaleErrorPage.deleteAndStartAgain()
     expect(await ReportsPage.headingText()).toContain('Reports')
     await expectActionRequiredStatus(1)
 
