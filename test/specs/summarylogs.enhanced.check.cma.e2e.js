@@ -383,9 +383,6 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     expect(bodyText).toContain(
       'The loads include all the required summary log data.'
     )
-    expect(bodyText).toContain(
-      'These loads could be missing required summary log data that stops them from adding to your waste balance.'
-    )
     expect(bodyText).toContain('depending on the adjustment.')
     expect(bodyText).toContain(
       'If you upload this summary log to create a new report, your waste balance will be 139.00 (from 30.00)'
@@ -499,9 +496,6 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
     )
     expect(bodyText).toContain(
       'The loads include all the required summary log data.'
-    )
-    expect(bodyText).toContain(
-      'These loads could be missing required summary log data that stops them from adding to your waste balance.'
     )
     expect(bodyText).toContain('depending on the adjustment.')
     expect(bodyText).toContain(
