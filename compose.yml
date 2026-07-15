@@ -209,7 +209,6 @@ services:
       # gates submit-time resubmission marking on it, so the two must agree.
       FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-true}
       FEATURE_FLAG_DEV_ENDPOINTS: true
-      FEATURE_FLAG_SUMMARY_LOG_ROW_STATES_BACKFILL: ${FEATURE_FLAG_SUMMARY_LOG_ROW_STATES_BACKFILL:-true}
       GOVUK_NOTIFY_API_KEY: fake-key-for-testing
       MONGO_URI: mongodb://mongodb:27017/
       NODE_ENV: development
