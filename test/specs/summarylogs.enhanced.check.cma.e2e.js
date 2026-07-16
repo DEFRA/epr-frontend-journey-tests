@@ -19,10 +19,12 @@ import {
 } from '../support/apicalls.js'
 
 // The adjusted-loads accordion splits each balance-affecting load by the
-// direction it moved the waste balance. Both scenarios below net a positive
-// adjustment, so the added sub-heading is always rendered and is asserted
-// verbatim.
+// direction it moved the waste balance: added loads carry one heading, reduced
+// loads another. MISSING_DATA_HEADING is the pre-fix copy PAE-1743 removed,
+// asserted absent by the reduced-reason test below.
 const ADJUSTED_ADDED_HEADING = 'This load has added to your waste balance'
+const ADJUSTED_REDUCED_HEADING = 'This load has reduced your waste balance'
+const MISSING_DATA_HEADING = 'does NOT have all the required summary log data'
 
 // PAE-1648 closed-period adjustment messaging copy (en.json
 // summary-log:closedPeriodAdjustments), asserted verbatim by the closed-period
@@ -752,6 +754,84 @@ describe('Summary Logs - Enhanced Check Page with CMA Detection', () => {
 
     await checkBodyTextDoesNotInclude('Open periods: new loads', 5)
     await checkBodyTextDoesNotInclude('Open periods: adjusted loads', 5)
+
+    await HomePage.signOut()
+    await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
+  })
+
+  // PAE-1743: an adjusted load excluded for a reason OTHER than missing data must
+  // show that reason under the "reduced" heading, not sit bare under a "missing
+  // data" one. @openAdjusted above covers the ADDED sub-group end to end; this
+  // covers the REDUCED sub-group. The per-code reason strings and the PRN->PERN
+  // wording swap are unit-tested (controller.test.js), so one journey through the
+  // canonical PRN case is enough here.
+  it('should show the reason under the reduced heading for an adjusted PRN-excluded load @adjustedReducedReason @enhancedCheck @cma', async () => {
+    const organisationDetails = await createLinkedOrganisation([
+      { material: 'Paper or board (R3)', wasteProcessingType: 'Reprocessor' }
+    ])
+
+    const migrationResponse = await updateMigratedOrganisation(
+      organisationDetails.refNo,
+      [
+        {
+          reprocessingType: 'input',
+          regNumber: 'R25SR500030912PA',
+          accNumber: 'ACC123456',
+          status: 'approved'
+        }
+      ]
+    )
+
+    const user = await createAndRegisterDefraIdUser(migrationResponse.email)
+    await linkDefraIdUser(
+      organisationDetails.refNo,
+      user.userId,
+      migrationResponse.email
+    )
+
+    await HomePage.openStart()
+    await HomePage.clickStartNow()
+    await DefraIdStubPage.loginViaEmail(migrationResponse.email)
+
+    // Baseline: row 1001 is included and contributes 339.99t to the balance.
+    await DashboardPage.selectLink(1)
+    await WasteRecordsPage.submitSummaryLogLink()
+    await UploadSummaryLogPage.performUploadAndReturnToHomepage(
+      'resources/summary-log.xlsx'
+    )
+
+    // Re-upload with row 1001's PRN answer flipped to Yes, excluding it — an
+    // open-period adjustment that reverses its earlier contribution.
+    await DashboardPage.selectLink(1)
+    await WasteRecordsPage.submitSummaryLogLink()
+    await UploadSummaryLogPage.uploadFile(
+      'resources/reprocessor-input-prn-issued.xlsx'
+    )
+    await UploadSummaryLogPage.continue()
+
+    await checkBodyText('Your summary log is being checked', 30)
+    await checkBodyText('Upload your summary log', 60)
+    await checkBodyText('Open periods: adjusted loads', 30)
+
+    await EnhancedCheckSummaryLogPage.expandAllLoadDetails()
+
+    const detailsText = await EnhancedCheckSummaryLogPage.loadDetailsText()
+    const rows = await EnhancedCheckSummaryLogPage.loadRowItems()
+    const bodyText = await browser.execute(() => document.body.innerText)
+
+    // The balance still moves by the excluded load's 339.99t — the ticket is
+    // explicit that the balance was correct and only the reason was hidden, so
+    // guard the value, not just the direction.
+    expect(bodyText).toContain(
+      'The adjusted loads will remove 339.99 tonnes from your waste balance.'
+    )
+    expect(detailsText).toContain(ADJUSTED_REDUCED_HEADING)
+    // The reported defect: pre-fix, row 1001 sat bare under the "missing data"
+    // heading. Assert its reason shows and that heading is gone.
+    expect(rows).toContain(
+      'Row ID: 1001. A PRN was already issued for this load'
+    )
+    expect(bodyText).not.toContain(MISSING_DATA_HEADING)
 
     await HomePage.signOut()
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
