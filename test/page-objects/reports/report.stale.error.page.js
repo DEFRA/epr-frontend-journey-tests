@@ -1,6 +1,6 @@
 import { $ } from '@wdio/globals'
 
-class SummaryLogChangedErrorPage {
+class ReportStaleErrorPage {
   async headingText() {
     const element = await $('h1.govuk-heading-xl')
     await element.waitForExist({ timeout: 5000 })
@@ -16,4 +16,4 @@ class SummaryLogChangedErrorPage {
   }
 }
 
-export default new SummaryLogChangedErrorPage()
+export default new ReportStaleErrorPage()
