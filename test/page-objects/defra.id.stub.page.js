@@ -58,7 +58,9 @@ class DefraIdStubPage {
     await browser.waitUntil(
       async () => {
         const el = await $(selector)
-        if (await el.isExisting()) return true
+        if (await el.isExisting()) {
+          return true
+        }
         await browser.refresh()
         return false
       },

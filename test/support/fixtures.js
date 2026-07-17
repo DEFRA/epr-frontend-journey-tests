@@ -38,7 +38,9 @@ export const createPrnDetails = ({
   }
 } = {}) => {
   const companyName = organisationDetails.organisation?.companyName ?? ''
-  if (regAddress === '') regAddress = organisationDetails.regAddresses?.[0]
+  if (regAddress === '') {
+    regAddress = organisationDetails.regAddresses?.[0]
+  }
 
   return {
     tonnageWordings,
