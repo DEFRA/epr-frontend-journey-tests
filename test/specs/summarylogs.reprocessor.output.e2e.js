@@ -2,7 +2,7 @@ import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
-import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
+import CheckSummaryLogPage from '../page-objects/check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import { checkBodyText } from '../support/checks.js'
@@ -73,7 +73,7 @@ describe('Summary Logs Reprocessor Output', () => {
       '1 new load will be recorded (and will add to your waste balance)',
       30
     )
-    await EnhancedCheckSummaryLogPage.upload()
+    await CheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 
@@ -108,7 +108,7 @@ describe('Summary Logs Reprocessor Output', () => {
       '1 adjusted load will be recorded (and will reflect in your waste balance)',
       30
     )
-    await EnhancedCheckSummaryLogPage.upload()
+    await CheckSummaryLogPage.upload()
 
     await checkBodyText('Your waste records are being updated', 30)
 
