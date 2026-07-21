@@ -242,6 +242,7 @@ services:
       # in journey tests"): on, the state the suite asserts. The flag-off gating
       # is covered by epr-frontend's own tests.
       FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS: ${FEATURE_FLAG_CLOSED_PERIOD_ADJUSTMENTS:-true}
+      FEATURE_FLAG_OPERATOR_INITIATED_RESUBMISSION: ${FEATURE_FLAG_OPERATOR_INITIATED_RESUBMISSION:-true}
       NODE_ENV: development
       PORT: 3000
       REDIS_HOST: redis
