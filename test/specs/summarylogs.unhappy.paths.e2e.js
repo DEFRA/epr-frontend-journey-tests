@@ -2,7 +2,7 @@ import { $, browser, expect } from '@wdio/globals'
 import DefraIdStubPage from 'page-objects/defra.id.stub.page.js'
 import HomePage from 'page-objects/homepage.js'
 import UploadSummaryLogPage from '../page-objects/upload.summary.log.page.js'
-import EnhancedCheckSummaryLogPage from '../page-objects/enhanced.check.summary.log.page.js'
+import CheckSummaryLogPage from '../page-objects/check.summary.log.page.js'
 import WasteRecordsPage from '../page-objects/waste.records.page.js'
 import DashboardPage from '../page-objects/dashboard.page.js'
 import {
@@ -450,7 +450,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
     await expect(browser).toHaveTitle(expect.stringContaining('Signed out'))
   })
 
-  it('Should warn on the enhanced check page when an OSR_ID has no matching overseas site @orsNotFound', async () => {
+  it('Should warn on the check page when an OSR_ID has no matching overseas site @orsNotFound', async () => {
     const organisationDetails = await createLinkedOrganisation([
       { material: 'Paper or board (R3)', wasteProcessingType: 'Exporter' }
     ])
@@ -511,7 +511,7 @@ describe('Summary Logs - Unhappy paths @unhappyPaths', () => {
       10
     )
 
-    await EnhancedCheckSummaryLogPage.upload()
+    await CheckSummaryLogPage.upload()
     await checkBodyText('Your waste records are being updated', 30)
     await checkBodyText('Summary log uploaded', 60)
 
